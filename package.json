@@ -1,7 +1,7 @@
 {
-  "name": "@motorshow/racetrack",
+  "name": "@dcl/racetrack",
   "version": "1.0.0",
-  "description": "Decentraland racetrack shared library",
+  "description": "DCL RaceTrack Library",
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
