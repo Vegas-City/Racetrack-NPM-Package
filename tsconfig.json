@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "declaration": true,
+    "stripInternal": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "target": "es2020",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "pretty": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "downlevelIteration": true,
+    "suppressExcessPropertyErrors": false,
+    "exactOptionalPropertyTypes": false,
+    "inlineSourceMap": true,
+    "sourceMap": false,
+    "removeComments": true,
+    "inlineSources": true,
+    "useDefineForClassFields": false,
+    "preserveConstEnums": true,
+    "allowJs": true,
+    "jsx": "react",
+    "jsxFactory": "ReactEcs.createElement",
+    "alwaysStrict": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true
+  },
+  "include": [
+    "index.ts",
+    "src"
+  ],
+  "exclude": [
+    "dist"
+  ]
+}
