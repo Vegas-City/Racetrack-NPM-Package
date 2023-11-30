@@ -1,0 +1,30 @@
+{
+  "name": "@dcl/racetrack",
+  "version": "1.0.0",
+  "description": "DCL RaceTrack Library",
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@dcl-sdk/utils": "^1.1.2",
+    "@dcl/sdk": "^7.3.26",
+    "@types/text-encoding": "^0.0.38",
+    "typedoc": "^0.25.3",
+    "typescript": "^5.1.6"
+  },
+  "files": [
+    "dist",
+    "index.ts",
+    "src/physics"
+  ],
+  "dependencies": {
+    "@dcl-sdk/utils": "^1.1.2",
+    "core-js": "^3.32.0",
+    "dcl-ui-toolkit": "^0.9.1",
+    "text-encoding": "^0.7.0"
+  }
+}
