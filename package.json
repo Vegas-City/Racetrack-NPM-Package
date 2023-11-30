@@ -1,6 +1,6 @@
 {
   "name": "@dcl/racetrack",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "DCL RaceTrack Library",
   "main": "index.js",
   "typings": "index.d.ts",
