@@ -19,7 +19,8 @@
   "files": [
     "dist",
     "index.ts",
-    "src/physics"
+    "src/physics",
+    "src/utils"
   ],
   "dependencies": {
     "@dcl-sdk/utils": "^1.1.3",
