@@ -11,7 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "@dcl-sdk/utils": "^1.1.2",
-    "@dcl/sdk": "^7.3.26",
+    "@dcl/sdk": "^7.3.30",
     "@types/text-encoding": "^0.0.38",
     "typedoc": "^0.25.3",
     "typescript": "^5.1.6"
@@ -19,10 +19,14 @@
   "files": [
     "dist",
     "index.ts",
-    "src/physics"
+    "src/physics",
+    "src/utils"
   ],
   "dependencies": {
-    "@dcl-sdk/utils": "^1.1.2",
+    "@dcl-sdk/utils": "^1.1.3",
+    "@dcl/sdk-commands": "^7.2.4",
+    "@types/cannon": "^0.1.12",
+    "cannon": "github:schteppe/cannon.js",
     "core-js": "^3.32.0",
     "dcl-ui-toolkit": "^0.9.1",
     "text-encoding": "^0.7.0"
