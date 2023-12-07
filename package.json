@@ -20,7 +20,8 @@
     "dist",
     "index.ts",
     "src/physics",
-    "src/utils"
+    "src/utils",
+    "src/racetrack"
   ],
   "dependencies": {
     "@dcl-sdk/utils": "^1.1.3",

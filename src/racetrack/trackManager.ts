@@ -1,0 +1,79 @@
+import { GltfContainer, Transform, TransformType, engine } from "@dcl/sdk/ecs"
+import { Quaternion, Vector3 } from "@dcl/sdk/math"
+import { Track } from "./track"
+import { Hotspot } from "./hotspot"
+import { Obstacle } from "./obstacle"
+
+export class TrackManager {
+    static debugMode: boolean = false
+
+    static track: Track
+    static hotspots: Hotspot[] = []
+    static obstacles: Obstacle[] = []
+
+    static trackTransform: TransformType = {
+        position: Vector3.Zero(),
+        rotation: Quaternion.Identity(),
+        scale: Vector3.One()
+    }
+
+    constructor(_config: any, _position: Vector3, _rotation: Quaternion, _scale: Vector3, _debugMode: boolean = false) {
+        TrackManager.debugMode = _debugMode
+        TrackManager.trackTransform = {
+            position: _position,
+            rotation: _rotation,
+            scale: _scale
+        }
+
+        TrackManager.loadTrack(_config)
+        TrackManager.loadHotspots(_config)
+        TrackManager.loadObstacles(_config)
+
+        engine.addSystem(TrackManager.update)
+    }
+
+    static loadTrack(_trackData: any): void {
+        const trackEntity = engine.addEntity()
+        console.log(_trackData.glb)
+        GltfContainer.create(trackEntity, {
+            src: _trackData.glb
+        })
+        Transform.create(trackEntity, {
+            position: TrackManager.trackTransform.position,
+            rotation: TrackManager.trackTransform.rotation,
+            scale: TrackManager.trackTransform.scale
+        })
+
+        let trackPolygons: Vector3[][] = []
+        for (let trackPart of _trackData.track) {
+            const poly: Vector3[] = trackPart.polygon
+            trackPolygons.push(poly)
+        }
+
+        TrackManager.track = new Track(trackPolygons)
+    }
+
+    static loadHotspots(_trackData: any): void {
+        for (let hotspot of _trackData.hotspots) {
+            TrackManager.hotspots.push(new Hotspot(hotspot.hotspotType, hotspot.polygon))
+        }
+    }
+
+    static loadObstacles(_trackData: any): void {
+        for (let obstacle of _trackData.obstacles) {
+            TrackManager.obstacles.push(new Obstacle(obstacle.obstacleType, obstacle.shape, obstacle.position, obstacle.rotation, obstacle.scale, obstacle.vertices, obstacle.indices))
+        }
+    }
+
+    static update(dt: number) {
+        const playerPos = Transform.get(engine.PlayerEntity).position
+
+        TrackManager.track.update(playerPos)
+        TrackManager.hotspots.forEach(hotspot => {
+            hotspot.update(playerPos)
+        })
+        TrackManager.obstacles.forEach(obstacle => {
+            obstacle.update()
+        })
+    }
+}
