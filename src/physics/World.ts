@@ -13,11 +13,12 @@ export class World {
 
     /* fields */
 
+    private static instance: World
     private __implementation: IWorld
 
     /* constructor */
 
-    constructor() {
+    private constructor() {
 
         // check the implementation
         switch (Config.physicsImplementation) {
@@ -32,6 +33,14 @@ export class World {
             default:
                 throw new Error("Unrecognised physics implementation requested")
         }
+    }
+
+    /* static methods */
+    static getInstance(): World {
+        if (World.instance === undefined || World.instance === null) {
+            World.instance = new World()
+        }
+        return World.instance
     }
 
     /* methods */
