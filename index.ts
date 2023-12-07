@@ -1,6 +1,5 @@
-import * as physics from "./src/physics"
+import * as physics from "./src/physics";
 
 export {
   physics
 }
-
