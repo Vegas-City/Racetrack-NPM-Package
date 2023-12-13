@@ -32,7 +32,15 @@ export class Hotspot {
         }
     }
 
-    update(_pos: Vector3) {
-        this.inside = isPointInsidePolygon(_pos, this.polygon)
+    update(_positions: Vector3[]) {
+        let isInside: boolean = false
+        for (let pos of _positions) {
+            if (isPointInsidePolygon(pos, this.polygon)) {
+                isInside = true
+                break
+            }
+        }
+
+        this.inside = isInside
     }
 }
