@@ -28,11 +28,16 @@ export class Track {
         }
     }
 
-    update(_pos: Vector3) {
+    update(_positions: Vector3[]) {
         let isInside: boolean = false
         for (let poly of this.polygons) {
-            if (isPointInsidePolygon(_pos, poly)) {
-                isInside = true
+            for (let pos of _positions) {
+                if (isPointInsidePolygon(pos, poly)) {
+                    isInside = true
+                    break
+                }
+            }
+            if (isInside) {
                 break
             }
         }

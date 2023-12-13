@@ -10,6 +10,7 @@ export class TrackManager {
     static track: Track
     static hotspots: Hotspot[] = []
     static obstacles: Obstacle[] = []
+    static carPoints: Vector3[] = []
 
     static trackTransform: TransformType = {
         position: Vector3.Zero(),
@@ -66,11 +67,9 @@ export class TrackManager {
     }
 
     static update(dt: number) {
-        const playerPos = Transform.get(engine.PlayerEntity).position
-
-        TrackManager.track.update(playerPos)
+        TrackManager.track.update(TrackManager.carPoints)
         TrackManager.hotspots.forEach(hotspot => {
-            hotspot.update(playerPos)
+            hotspot.update(TrackManager.carPoints)
         })
         TrackManager.obstacles.forEach(obstacle => {
             obstacle.update()
