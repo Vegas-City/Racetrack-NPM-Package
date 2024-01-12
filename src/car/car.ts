@@ -1,5 +1,4 @@
 import { Animator, AudioSource, CameraModeArea, CameraType, Entity, GltfContainer, InputAction, Material, MeshRenderer, Schemas, Transform, engine, pointerEventsSystem } from '@dcl/sdk/ecs'
-import { movePlayerTo, triggerSceneEmote } from '~system/RestrictedActions'
 import { Color4, Quaternion, RAD2DEG, Vector3 } from '@dcl/sdk/math'
 import { CarConfig } from './carConfig'
 import { localToWorldPosition } from '../utils/utils'
@@ -8,6 +7,7 @@ import { BoxShapeDefinition } from '../physics/shapes'
 import { TrackManager } from '../racetrack'
 import { InputManager } from '../racetrack/inputManager'
 import { CarUI, Minimap } from '../ui'
+import { movePlayerTo, triggerSceneEmote } from '~system/RestrictedActions'
 import * as utils from '@dcl-sdk/utils'
 
 export const CarWheelComponent = engine.defineComponent(
