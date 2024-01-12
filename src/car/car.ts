@@ -7,7 +7,7 @@ import { BoxShapeDefinition } from '../physics/shapes'
 import { TrackManager } from '../racetrack'
 import { InputManager } from '../racetrack/inputManager'
 import { CarUI, Minimap } from '../ui'
-import { movePlayerTo, triggerSceneEmote } from '~system/RestrictedActions'
+import { movePlayerTo, triggerSceneEmote } from '../utils/setup'
 import * as utils from '@dcl-sdk/utils'
 
 export const CarWheelComponent = engine.defineComponent(
