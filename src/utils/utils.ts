@@ -1,5 +1,5 @@
 import { TransformType } from "@dcl/sdk/ecs";
-import { Vector3 } from "@dcl/sdk/math";
+import { Quaternion, Vector3 } from "@dcl/sdk/math";
 
 export function applyTransformToPoint(_point: Vector3, _transform: TransformType): Vector3 {
     // Step 1: Apply Quaternion Rotation
@@ -55,4 +55,10 @@ export function isPointInsidePolygon(_point: Vector3, _poly: Vector3[]): boolean
     }
 
     return inside
+}
+
+export function localToWorldPosition(_localPosition: Vector3, _parentPosition: Vector3, _parentRotation: Quaternion) : Vector3 {
+    const rotatedPos = Vector3.rotate(_localPosition, _parentRotation)
+    const globalPos = Vector3.create(_parentPosition.x + rotatedPos.x, _parentPosition.y + rotatedPos.y, _parentPosition.z + rotatedPos.z)
+    return globalPos
 }
