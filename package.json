@@ -19,9 +19,11 @@
   "files": [
     "dist",
     "index.ts",
+    "src/car",
     "src/physics",
-    "src/utils",
-    "src/racetrack"
+    "src/racetrack",
+    "src/ui",
+    "src/utils"
   ],
   "dependencies": {
     "@dcl-sdk/utils": "^1.1.3",
