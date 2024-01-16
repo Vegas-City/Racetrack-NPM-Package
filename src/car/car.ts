@@ -77,7 +77,7 @@ export class Car {
         this.wheelY = _config.wheelY
         this.carScale = _config.carScale
 
-        const scale = Vector3.create(3*this.carScale, 1*this.carScale, 7*this.carScale)
+        const scale = Vector3.create(3 * this.carScale, 1 * this.carScale, 7 * this.carScale)
         this.initialiseCannon(_position, Quaternion.fromEulerDegrees(0, _rot, 0), scale)
 
         this.carEntity = engine.addEntity()
@@ -220,7 +220,7 @@ export class Car {
         Transform.create(wheelL1Child, {
             parent: this.wheelL1,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(this.carScale, this.carScale,this.carScale)
+            scale: Vector3.create(this.carScale, this.carScale, this.carScale)
         })
 
         CarWheelComponent.create(this.wheelL1, {
@@ -240,7 +240,7 @@ export class Car {
         Transform.create(wheelL2Child, {
             parent: this.wheelL2,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(this.carScale, this.carScale,this.carScale)
+            scale: Vector3.create(this.carScale, this.carScale, this.carScale)
         })
 
         CarWheelComponent.create(this.wheelL2, {
@@ -259,7 +259,7 @@ export class Car {
         Transform.create(wheelR1Child, {
             parent: this.wheelR1,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(this.carScale, this.carScale,this.carScale)
+            scale: Vector3.create(this.carScale, this.carScale, this.carScale)
         })
 
         CarWheelComponent.create(this.wheelR1, {
@@ -279,7 +279,7 @@ export class Car {
         Transform.create(wheelR2Child, {
             parent: this.wheelR2,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(this.carScale, this.carScale,this.carScale)
+            scale: Vector3.create(this.carScale, this.carScale, this.carScale)
         })
 
         CarWheelComponent.create(this.wheelR2, {
@@ -293,7 +293,7 @@ export class Car {
 
         const carEntityTransform = Transform.getMutable(this.carEntity)
 
-        const cagePos = localToWorldPosition(Vector3.create(0*this.carScale, 3*this.carScale, -10.5*this.carScale), carEntityTransform.position, carEntityTransform.rotation)
+        const cagePos = localToWorldPosition(Vector3.create(0 * this.carScale, 3 * this.carScale, -10.5 * this.carScale), carEntityTransform.position, carEntityTransform.rotation)
         const forwardDir = Vector3.add(cagePos, Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
         movePlayerTo({ newRelativePosition: Vector3.add(cagePos, _deltaDistance), cameraTarget: forwardDir })
     }
@@ -364,29 +364,55 @@ export class Car {
         return this.carBody.getVelocity().y < 0
     }
 
+    private calculateMaxSpeed(): number {
+        return this.maxSpeed * (TrackManager.track.inside ? 1 : 0.5)
+    }
+
+    private calculateMinSpeed(): number {
+        return this.minSpeed * (TrackManager.track.inside ? 1 : 0.5)
+    }
+
+    private calculateDeceleration(): number {
+        return this.deceleration * (TrackManager.track.inside ? 1 : 3)
+    }
+
     private updateSpeed(dt: number): void {
+        const maxSpeed = this.calculateMaxSpeed()
+        const minSpeed = this.calculateMinSpeed()
+        const deceleration = this.calculateDeceleration()
+
         if (this.occupied && InputManager.isForwardPressed) {
-            if (this.speed < this.maxSpeed) {
-                this.speed += (this.accelerationF * dt)
+            if (this.speed - maxSpeed > 2) {
+                this.speed -= (deceleration * dt)
             }
             else {
-                this.speed = this.maxSpeed
+                if (this.speed < maxSpeed) {
+                    this.speed += (this.accelerationF * dt)
+                }
+                else {
+                    this.speed = maxSpeed
+                }
             }
         }
         else if (this.occupied && InputManager.isBackwardPressed) {
-            if (this.speed > this.minSpeed) {
-                this.speed -= (this.accelerationB * dt)
+            if (minSpeed - this.speed > 2) {
+                this.speed += (deceleration * dt)
             }
             else {
-                this.speed = this.minSpeed
+                if (this.speed > minSpeed) {
+                    this.speed -= (this.accelerationB * dt)
+                }
+                else {
+                    this.speed = minSpeed
+                }
             }
         }
         else {
             if (this.speed > 0) {
-                this.speed -= (this.deceleration * dt)
+                this.speed -= (deceleration * dt)
             }
             else if (this.speed < 0) {
-                this.speed += (this.deceleration * dt)
+                this.speed += (deceleration * dt)
             }
 
             if (Math.abs(this.speed) < Car.stopSpeed) {
@@ -559,15 +585,12 @@ export class Car {
         TrackManager.carPoints.push(localToWorldPosition(Vector3.create(-2, 0, 1), carTransform.position, carTransform.rotation))
         TrackManager.carPoints.push(localToWorldPosition(Vector3.create(2, 0, -1), carTransform.position, carTransform.rotation))
         TrackManager.carPoints.push(localToWorldPosition(Vector3.create(2, 0, 1), carTransform.position, carTransform.rotation))
-        
-
-        console.log("ON TRACK: " + TrackManager.track.inside)
 
         // Update wheels
-        if (this.wheelL1) this.updateWheel(this.wheelL1, dt)
-        if (this.wheelL2) this.updateWheel(this.wheelL2, dt)
-        if (this.wheelR1) this.updateWheel(this.wheelR1, dt)
-        if (this.wheelR2) this.updateWheel(this.wheelR2, dt)
+        if (this.wheelL1) this.updateWheel(this.wheelL1)
+        if (this.wheelL2) this.updateWheel(this.wheelL2)
+        if (this.wheelR1) this.updateWheel(this.wheelR1)
+        if (this.wheelR2) this.updateWheel(this.wheelR2)
 
         if (this.occupied) {
             const playerPos = Transform.get(engine.PlayerEntity).position
@@ -579,7 +602,7 @@ export class Car {
         }
     }
 
-    private updateWheel(wheel: Entity, dt: number): void {
+    private updateWheel(wheel: Entity): void {
         if (this.carEntity === undefined || this.carEntity === null) return
 
         const data = CarWheelComponent.getMutable(wheel)
