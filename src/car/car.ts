@@ -24,7 +24,7 @@ export const CarWheelComponent = engine.defineComponent(
 
 export class Car {
     private static readonly MAX_STEERING_VALUE: number = Math.PI / 2
-    private static instances: Car[] = []
+    public static instances: Car[] = []
 
     private static stopSpeed: number = 0.2
     private static debugMode: boolean = false
