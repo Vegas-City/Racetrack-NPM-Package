@@ -43,17 +43,19 @@ export class Car {
     wheelX_R: number = 1.29
     wheelZ_F: number = 1.9
     wheelZ_B: number = 2.25
+    wheelY: number = 0.4
+    carScale: number = 1
 
-    speed: number = 0
-    accelerationF: number = 6
-    accelerationB: number = 4
-    deceleration: number = 2
-    maxSpeed: number = 35
-    minSpeed: number = -25
-    steerSpeed: number = 1.5
-    steerValue: number = 0
-    mass: number = 150
-    grip: number = 0.3
+    public speed: number = 0
+    public accelerationF: number = 6
+    public accelerationB: number = 4
+    public deceleration: number = 2
+    public maxSpeed: number = 35
+    public minSpeed: number = -25
+    public steerSpeed: number = 1.5
+    public steerValue: number = 0
+    public mass: number = 150
+    public grip: number = 0.3
     startRotY: number = 0
     occupied: boolean = false
     colliding: boolean = false
@@ -68,8 +70,14 @@ export class Car {
         this.maxSpeed = _config.maxSpeed
         this.steerSpeed = _config.steerSpeed
         this.grip = _config.grip
+        this.wheelX_L = _config.wheelX_L
+        this.wheelX_R = _config.wheelX_R
+        this.wheelZ_F = _config.wheelZ_F
+        this.wheelZ_B = _config.wheelZ_B
+        this.wheelY = _config.wheelY
+        this.carScale = _config.carScale
 
-        const scale = Vector3.create(3, 1, 7)
+        const scale = Vector3.create(3*this.carScale, 1*this.carScale, 7*this.carScale)
         this.initialiseCannon(_position, Quaternion.fromEulerDegrees(0, _rot, 0), scale)
 
         this.carEntity = engine.addEntity()
@@ -97,7 +105,7 @@ export class Car {
             parent: this.carEntity,
             position: Vector3.create(0, 0, -0.02),
             rotation: Quaternion.fromEulerDegrees(0, -90, 0),
-            scale: Vector3.create(1 / scale.z, 1 / scale.y, 1 / scale.x)
+            scale: Vector3.create(1 / scale.z * this.carScale, 1 / scale.y * this.carScale, 1 / scale.x * this.carScale)
         })
         GltfContainer.create(this.carModelEntity, {
             src: _config.carGLB
@@ -212,7 +220,7 @@ export class Car {
         Transform.create(wheelL1Child, {
             parent: this.wheelL1,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(1, 1, 1)
+            scale: Vector3.create(this.carScale, this.carScale,this.carScale)
         })
 
         CarWheelComponent.create(this.wheelL1, {
@@ -232,7 +240,7 @@ export class Car {
         Transform.create(wheelL2Child, {
             parent: this.wheelL2,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(1, 1, 1)
+            scale: Vector3.create(this.carScale, this.carScale,this.carScale)
         })
 
         CarWheelComponent.create(this.wheelL2, {
@@ -251,7 +259,7 @@ export class Car {
         Transform.create(wheelR1Child, {
             parent: this.wheelR1,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(1, 1, 1)
+            scale: Vector3.create(this.carScale, this.carScale,this.carScale)
         })
 
         CarWheelComponent.create(this.wheelR1, {
@@ -271,7 +279,7 @@ export class Car {
         Transform.create(wheelR2Child, {
             parent: this.wheelR2,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(1, 1, 1)
+            scale: Vector3.create(this.carScale, this.carScale,this.carScale)
         })
 
         CarWheelComponent.create(this.wheelR2, {
@@ -285,7 +293,7 @@ export class Car {
 
         const carEntityTransform = Transform.getMutable(this.carEntity)
 
-        const cagePos = localToWorldPosition(Vector3.create(0, 3, -10.5), carEntityTransform.position, carEntityTransform.rotation)
+        const cagePos = localToWorldPosition(Vector3.create(0*this.carScale, 3*this.carScale, -10.5*this.carScale), carEntityTransform.position, carEntityTransform.rotation)
         const forwardDir = Vector3.add(cagePos, Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
         movePlayerTo({ newRelativePosition: Vector3.add(cagePos, _deltaDistance), cameraTarget: forwardDir })
     }

@@ -14,4 +14,12 @@ export type CarConfig = {
     leftWheelGLB: string
     rightWheelGLB: string
     steeringWheelGLB: string
+
+    wheelX_L: number
+    wheelX_R: number
+    wheelZ_F: number
+    wheelZ_B: number
+    wheelY: number
+
+    carScale: number
 }
