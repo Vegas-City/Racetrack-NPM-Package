@@ -20,15 +20,31 @@ export class CarAttributes {
         this.grip = _config.grip
     }
 
-    public calculateMaxSpeed(): number {
-        return this.maxSpeed * (TrackManager.track.inside ? 1 : 0.5)
+    public calculateAccelerationF(): number {
+        return this.accelerationF
+    }
+
+    public calculateAccelerationB(): number {
+        return this.accelerationB
+    }
+
+    public calculateDeceleration(): number {
+        return this.deceleration * (TrackManager.track.inside ? 1 : 3)
     }
 
     public calculateMinSpeed(): number {
         return this.minSpeed * (TrackManager.track.inside ? 1 : 0.5)
     }
 
-    public calculateDeceleration(): number {
-        return this.deceleration * (TrackManager.track.inside ? 1 : 3)
+    public calculateMaxSpeed(): number {
+        return this.maxSpeed * (TrackManager.track.inside ? 1 : 0.5)
+    }
+
+    public calculateSteerSpeed(): number {
+        return this.steerSpeed
+    }
+
+    public calculateGrip(): number {
+        return this.grip
     }
 }
