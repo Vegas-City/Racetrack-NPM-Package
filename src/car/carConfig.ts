@@ -11,6 +11,7 @@ export type CarConfig = {
     engineStartAudio: string
     
     carGLB: string
+    carColliderGLB: string
     leftWheelGLB: string
     rightWheelGLB: string
     steeringWheelGLB: string
