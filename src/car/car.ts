@@ -9,6 +9,7 @@ import { InputManager } from '../racetrack/inputManager'
 import { CarUI, Minimap } from '../ui'
 import { movePlayerTo, triggerSceneEmote } from '../utils/setup'
 import * as utils from '@dcl-sdk/utils'
+import { CarAttributes } from './carAttributes'
 
 export const CarWheelComponent = engine.defineComponent(
     "carWheelComponent",
@@ -45,31 +46,19 @@ export class Car {
     wheelZ_B: number = 2.25
     wheelY: number = 0.4
     carScale: number = 1
+    speed: number = 0
+    steerValue: number = 0
 
-    public speed: number = 0
-    public accelerationF: number = 6
-    public accelerationB: number = 4
-    public deceleration: number = 2
-    public maxSpeed: number = 35
-    public minSpeed: number = -25
-    public steerSpeed: number = 1.5
-    public steerValue: number = 0
-    public mass: number = 150
-    public grip: number = 0.3
     startRotY: number = 0
     occupied: boolean = false
     colliding: boolean = false
     collisionDir: Vector3 = Vector3.Zero()
 
+    carAttributes: CarAttributes
+
     constructor(_config: CarConfig, _position: Vector3, _rot: number) {
-        this.mass = _config.mass
-        this.accelerationF = _config.accelerationF
-        this.accelerationB = _config.accelerationB
-        this.deceleration = _config.deceleration
-        this.minSpeed = _config.minSpeed
-        this.maxSpeed = _config.maxSpeed
-        this.steerSpeed = _config.steerSpeed
-        this.grip = _config.grip
+        this.carAttributes = new CarAttributes(_config)
+
         this.wheelX_L = _config.wheelX_L
         this.wheelX_R = _config.wheelX_R
         this.wheelZ_F = _config.wheelZ_F
@@ -160,7 +149,7 @@ export class Car {
             position: Vector3.create(_position.x, _position.y, _position.z),
             rotation: Quaternion.create(_rot.x, _rot.y, _rot.z, _rot.w),
             scale: Vector3.create(_scale.x, _scale.y, _scale.z),
-            mass: this.mass,
+            mass: this.carAttributes.mass,
             material: "car"
         })
 
@@ -365,15 +354,15 @@ export class Car {
     }
 
     private calculateMaxSpeed(): number {
-        return this.maxSpeed * (TrackManager.track.inside ? 1 : 0.5)
+        return this.carAttributes.maxSpeed * (TrackManager.track.inside ? 1 : 0.5)
     }
 
     private calculateMinSpeed(): number {
-        return this.minSpeed * (TrackManager.track.inside ? 1 : 0.5)
+        return this.carAttributes.minSpeed * (TrackManager.track.inside ? 1 : 0.5)
     }
 
     private calculateDeceleration(): number {
-        return this.deceleration * (TrackManager.track.inside ? 1 : 3)
+        return this.carAttributes.deceleration * (TrackManager.track.inside ? 1 : 3)
     }
 
     private updateSpeed(dt: number): void {
@@ -387,7 +376,7 @@ export class Car {
             }
             else {
                 if (this.speed < maxSpeed) {
-                    this.speed += (this.accelerationF * dt)
+                    this.speed += (this.carAttributes.accelerationF * dt)
                 }
                 else {
                     this.speed = maxSpeed
@@ -400,7 +389,7 @@ export class Car {
             }
             else {
                 if (this.speed > minSpeed) {
-                    this.speed -= (this.accelerationB * dt)
+                    this.speed -= (this.carAttributes.accelerationB * dt)
                 }
                 else {
                     this.speed = minSpeed
@@ -453,7 +442,7 @@ export class Car {
         else {
             if (this.occupied && InputManager.isLeftPressed) {
                 if (this.steerValue > -Car.MAX_STEERING_VALUE) {
-                    this.steerValue -= (this.steerSpeed * dt)
+                    this.steerValue -= (this.carAttributes.steerSpeed * dt)
                 }
                 else {
                     this.steerValue = -Car.MAX_STEERING_VALUE
@@ -461,7 +450,7 @@ export class Car {
             }
             else if (this.occupied && InputManager.isRightPressed) {
                 if (this.steerValue < Car.MAX_STEERING_VALUE) {
-                    this.steerValue += (this.steerSpeed * dt)
+                    this.steerValue += (this.carAttributes.steerSpeed * dt)
                 }
                 else {
                     this.steerValue = Car.MAX_STEERING_VALUE
@@ -469,10 +458,10 @@ export class Car {
             }
             else {
                 if (this.steerValue > 0) {
-                    this.steerValue = Math.max(0, this.steerValue - (this.steerSpeed * dt))
+                    this.steerValue = Math.max(0, this.steerValue - (this.carAttributes.steerSpeed * dt))
                 }
                 else if (this.steerValue < 0) {
-                    this.steerValue = Math.min(0, this.steerValue + (this.steerSpeed * dt))
+                    this.steerValue = Math.min(0, this.steerValue + (this.carAttributes.steerSpeed * dt))
                 }
             }
         }
@@ -552,12 +541,12 @@ export class Car {
 
         // Make the steering angle relative to the speed - the faster the car moves the harder it is to steer left/right
         const absSpeed = Math.abs(this.speed)
-        const steerAngle = (this.steerValue / Car.MAX_STEERING_VALUE) * (1 / Math.max(2, absSpeed * 0.5)) * 45 * this.grip * 2
+        const steerAngle = (this.steerValue / Car.MAX_STEERING_VALUE) * (1 / Math.max(2, absSpeed * 0.5)) * 45 * this.carAttributes.grip * 2
         const targetForwardDir = Vector3.normalize(Vector3.rotate(forwardDir, Quaternion.fromEulerDegrees(0, steerAngle, 0)))
         const velocity = Vector3.create(targetForwardDir.x * this.speed, targetForwardDir.y * this.speed * (this.isFreeFalling() ? 0.1 : 1), targetForwardDir.z * this.speed)
 
         // Grip Force
-        const gripCoef = this.speed * (-this.grip) * this.steerValue
+        const gripCoef = this.speed * (-this.carAttributes.grip) * this.steerValue
         const grippedVelocity = Vector3.create(sideDir.x * gripCoef, sideDir.y * gripCoef, sideDir.z * gripCoef)
         const totalVelocity = Vector3.add(Vector3.add(velocity, grippedVelocity), collisionCounterVelocity)
         //const totalVelocity = this.applyCollisions(Vector3.add(velocity, grippedVelocity), forwardDir)
