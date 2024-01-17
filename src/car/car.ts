@@ -31,9 +31,11 @@ export class Car {
     private static debugMode: boolean = false
     private static camFollow: boolean = false
     static activeCarEntity: Entity | null = null
+    public thirdPersonView: boolean = true
 
     carEntity: Entity | null = null
     carModelEntity: Entity | null = null
+    carColliderEntity: Entity | null = null
     playerCageEntity: Entity | null = null
     carBody: Body | null = null
     wheelL1: Entity | null = null
@@ -116,6 +118,14 @@ export class Car {
             ]
         })
 
+        this.carColliderEntity = engine.addEntity()
+        Transform.create(this.carColliderEntity, {
+            parent: this.carModelEntity
+        })
+        GltfContainer.create(this.carColliderEntity, {
+            src: _config.carColliderGLB
+        })
+
         this.playerCageEntity = engine.addEntity()
         Transform.create(this.playerCageEntity, {
             parent: this.carEntity,
@@ -176,12 +186,12 @@ export class Car {
     }
 
     private attachPointerEvent(): void {
-        if (this.carModelEntity === undefined || this.carModelEntity === null) return
+        if (this.carColliderEntity === undefined || this.carColliderEntity === null) return
 
         const self = this
         pointerEventsSystem.onPointerDown(
             {
-                entity: this.carModelEntity,
+                entity: this.carColliderEntity,
                 opts: {
                     button: InputAction.IA_POINTER,
                     hoverText: 'Get in'
@@ -277,14 +287,43 @@ export class Car {
         })
     }
 
-    private switchToThirdPersonPerspective(_deltaDistance: Vector3 = Vector3.Zero()): void {
-        if (this.carEntity === undefined || this.carEntity === null) return
+    private getCagePos():Vector3{
+        if (this.carEntity === undefined || this.carEntity === null) {
+            return Vector3.Zero()
+        }
+
+        if (this.playerCageEntity === undefined || this.playerCageEntity === null) {
+            return Vector3.Zero()
+        } 
+        
+        const carEntityTransform = Transform.get(this.carEntity)
+        const playerCageTransform = Transform.get(this.playerCageEntity)
+
+        if (this.thirdPersonView) { 
+            return localToWorldPosition(Vector3.create(0*this.carScale, 3*this.carScale, -10.5*this.carScale), carEntityTransform.position, carEntityTransform.rotation) //3rd person
+        } else {
+            return localToWorldPosition(Vector3.multiply(playerCageTransform.position,carEntityTransform.scale), carEntityTransform.position, carEntityTransform.rotation) //1st person
+        }
+    }
+
+    public switchToCarPerspective(_deltaDistance: Vector3 = Vector3.Zero()): void {
+        if (this.carEntity === undefined || this.carEntity === null || this.playerCageEntity === undefined || this.playerCageEntity ===null || this.carModelEntity===undefined || this.carModelEntity===null) return
 
         const carEntityTransform = Transform.getMutable(this.carEntity)
 
-        const cagePos = localToWorldPosition(Vector3.create(0 * this.carScale, 3 * this.carScale, -10.5 * this.carScale), carEntityTransform.position, carEntityTransform.rotation)
-        const forwardDir = Vector3.add(cagePos, Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
-        movePlayerTo({ newRelativePosition: Vector3.add(cagePos, _deltaDistance), cameraTarget: forwardDir })
+        //Update cage and car transform
+        const scale = Vector3.create(3*this.carScale, 1*this.carScale, 7*this.carScale)
+        if(this.thirdPersonView){
+            Transform.getMutable(this.playerCageEntity).position = Vector3.create(0, 2, -1.5)
+            Transform.getMutable(this.carModelEntity).position = Vector3.create(0, 0, -0.02)
+ 
+        } else {
+            Transform.getMutable(this.playerCageEntity).position = Vector3.create(-0.15, 0, -0.3)
+            Transform.getMutable(this.carModelEntity).position = Vector3.create(0, 1.27, -0.02 -0.3)
+        }
+
+        const forwardDir = Vector3.add(this.getCagePos(), Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
+        movePlayerTo({ newRelativePosition: Vector3.add(this.getCagePos(), _deltaDistance), cameraTarget: forwardDir })
     }
 
     private enterCar(): void {
@@ -307,7 +346,12 @@ export class Car {
                     if (self.carEntity === undefined || self.carEntity === null || self.carModelEntity === undefined || self.carModelEntity === null) return
 
                     utils.timers.setTimeout(function () {
-                        self.switchToThirdPersonPerspective()
+
+                        if(self.carColliderEntity !== undefined && self.carColliderEntity!==null){
+                            Transform.getMutable(self.carColliderEntity).scale = Vector3.Zero()
+                        }
+
+                        self.switchToCarPerspective()
                         CarUI.Show()
                         Minimap.Show()
 
@@ -336,6 +380,11 @@ export class Car {
         Car.activeCarEntity = null
 
         const carTransform = Transform.getMutable(this.carEntity)
+
+        if(this.carColliderEntity !== undefined && this.carColliderEntity!==null){
+            Transform.getMutable(this.carColliderEntity).scale = Vector3.One()
+        }
+
         const targetPos = localToWorldPosition(Vector3.create(-2.3, -2, -0.2), carTransform.position, carTransform.rotation)
         const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carTransform.position, carTransform.rotation)
         movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
@@ -536,7 +585,7 @@ export class Car {
         if (Car.camFollow && this.occupied) {
             const targetPos = localToWorldPosition(Vector3.create(0, 3, -6), carTransform.position, carTransform.rotation)
             const targetCameraPos = Vector3.add(targetPos, Vector3.add(forwardDir, Vector3.create(0, -0.3, 0)))
-            movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
+            movePlayerTo({ newRelativePosition: this.getCagePos(), cameraTarget: targetCameraPos })
         }
 
         // Make the steering angle relative to the speed - the faster the car moves the harder it is to steer left/right
@@ -583,10 +632,9 @@ export class Car {
 
         if (this.occupied) {
             const playerPos = Transform.get(engine.PlayerEntity).position
-            const cagePos = localToWorldPosition(Vector3.create(0, 3, -10.5), carTransform.position, carTransform.rotation)
-            const distToCar = Vector3.distance(playerPos, cagePos)
+            const distToCar = Vector3.distance(playerPos, this.getCagePos())
             if (distToCar > 6) {
-                this.switchToThirdPersonPerspective(deltaDistance)
+                this.switchToCarPerspective(deltaDistance)
             }
         }
     }
