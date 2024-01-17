@@ -50,6 +50,7 @@ export class Car {
     carScale: number = 1
     speed: number = 0
     steerValue: number = 0
+    mass: number = 150
 
     startRotY: number = 0
     occupied: boolean = false
@@ -159,7 +160,7 @@ export class Car {
             position: Vector3.create(_position.x, _position.y, _position.z),
             rotation: Quaternion.create(_rot.x, _rot.y, _rot.z, _rot.w),
             scale: Vector3.create(_scale.x, _scale.y, _scale.z),
-            mass: this.carAttributes.mass,
+            mass: this.mass,
             material: "car"
         })
 
@@ -402,22 +403,10 @@ export class Car {
         return this.carBody.getVelocity().y < 0
     }
 
-    private calculateMaxSpeed(): number {
-        return this.carAttributes.maxSpeed * (TrackManager.track.inside ? 1 : 0.5)
-    }
-
-    private calculateMinSpeed(): number {
-        return this.carAttributes.minSpeed * (TrackManager.track.inside ? 1 : 0.5)
-    }
-
-    private calculateDeceleration(): number {
-        return this.carAttributes.deceleration * (TrackManager.track.inside ? 1 : 3)
-    }
-
     private updateSpeed(dt: number): void {
-        const maxSpeed = this.calculateMaxSpeed()
-        const minSpeed = this.calculateMinSpeed()
-        const deceleration = this.calculateDeceleration()
+        const maxSpeed = this.carAttributes.calculateMaxSpeed()
+        const minSpeed = this.carAttributes.calculateMinSpeed()
+        const deceleration = this.carAttributes.calculateDeceleration()
 
         if (this.occupied && InputManager.isForwardPressed) {
             if (this.speed - maxSpeed > 2) {
