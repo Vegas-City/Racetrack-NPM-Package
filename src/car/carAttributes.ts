@@ -1,5 +1,7 @@
 import { TrackManager } from "../racetrack"
 import { CarConfig } from "./carConfig"
+import { HotspotType } from "../racetrack";
+import { engine } from "@dcl/sdk/ecs";
 
 export class CarAttributes {
     public accelerationF: number = 6
@@ -10,6 +12,8 @@ export class CarAttributes {
     public steerSpeed: number = 1.5
     public grip: number = 0.3
 
+    private oilSpillTimer: number = 0
+
     constructor(_config: CarConfig) {
         this.accelerationF = _config.accelerationF
         this.accelerationB = _config.accelerationB
@@ -18,6 +22,8 @@ export class CarAttributes {
         this.maxSpeed = _config.maxSpeed
         this.steerSpeed = _config.steerSpeed
         this.grip = _config.grip
+
+        engine.addSystem(this.update.bind(this))
     }
 
     public calculateAccelerationF(): number {
@@ -41,10 +47,36 @@ export class CarAttributes {
     }
 
     public calculateSteerSpeed(): number {
-        return this.steerSpeed
+        return this.steerSpeed * (this.oilSpillTimer > 0 ? 0.35 : 1)
     }
 
     public calculateGrip(): number {
-        return this.grip
+        return this.grip * (this.oilSpillTimer > 0 ? 0.35 : 1)
+    }
+
+    private isOnOilSpill(): boolean {
+        for (let hotspot of TrackManager.hotspots) {
+            if (hotspot.hotspotType == HotspotType.oilSpill && hotspot.inside) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private checkOilSpill(dt: number): void {
+        if (this.isOnOilSpill()) {
+            this.oilSpillTimer = 3
+        }
+        else {
+            this.oilSpillTimer -= dt
+            if (this.oilSpillTimer <= 0) {
+                this.oilSpillTimer = 0
+            }
+        }
+    }
+
+    private update(dt: number) {
+        // Check oil spill
+        this.checkOilSpill(dt)
     }
 }
