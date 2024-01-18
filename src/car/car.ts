@@ -54,8 +54,12 @@ export class Car {
 
     startRotY: number = 0
     occupied: boolean = false
+
     colliding: boolean = false
     collisionDir: Vector3 = Vector3.Zero()
+    collisionCooldown: number = 0
+    collisionBounceF: number = 0.5
+    collisionBounceB: number = 1
 
     carAttributes: CarAttributes
 
@@ -169,6 +173,8 @@ export class Car {
 
         const self = this
         this.carBody.addEventListener("collide", (function (e: any) {
+            if (self.collisionCooldown > 0) return
+
             const contact = e.contact
             var contactNormal = Vector3.Zero()
             var colDisplacement = Vector3.Zero()
@@ -183,6 +189,14 @@ export class Car {
             self.colliding = true
             //self.collisionPoint = Vector3.create(self.carBody.position.x + colDisplacement.x, self.carBody.position.y + colDisplacement.y, self.carBody.position.z + colDisplacement.z)
             self.collisionDir = Vector3.normalize(Vector3.create(contactNormal.x, contactNormal.y, contactNormal.z))
+            self.collisionCooldown = 0.5
+
+            if (self.speed > 0) {
+                self.speed = -self.collisionBounceF
+            }
+            else {
+                self.speed = self.collisionBounceB
+            }
         }).bind(this))
     }
 
@@ -288,39 +302,39 @@ export class Car {
         })
     }
 
-    private getCagePos():Vector3{
+    private getCagePos(): Vector3 {
         if (this.carEntity === undefined || this.carEntity === null) {
             return Vector3.Zero()
         }
 
         if (this.playerCageEntity === undefined || this.playerCageEntity === null) {
             return Vector3.Zero()
-        } 
-        
+        }
+
         const carEntityTransform = Transform.get(this.carEntity)
         const playerCageTransform = Transform.get(this.playerCageEntity)
 
-        if (this.thirdPersonView) { 
-            return localToWorldPosition(Vector3.create(0*this.carScale, 3*this.carScale, -10.5*this.carScale), carEntityTransform.position, carEntityTransform.rotation) //3rd person
+        if (this.thirdPersonView) {
+            return localToWorldPosition(Vector3.create(0 * this.carScale, 3 * this.carScale, -10.5 * this.carScale), carEntityTransform.position, carEntityTransform.rotation) //3rd person
         } else {
-            return localToWorldPosition(Vector3.multiply(playerCageTransform.position,carEntityTransform.scale), carEntityTransform.position, carEntityTransform.rotation) //1st person
+            return localToWorldPosition(Vector3.multiply(playerCageTransform.position, carEntityTransform.scale), carEntityTransform.position, carEntityTransform.rotation) //1st person
         }
     }
 
     public switchToCarPerspective(_deltaDistance: Vector3 = Vector3.Zero()): void {
-        if (this.carEntity === undefined || this.carEntity === null || this.playerCageEntity === undefined || this.playerCageEntity ===null || this.carModelEntity===undefined || this.carModelEntity===null) return
+        if (this.carEntity === undefined || this.carEntity === null || this.playerCageEntity === undefined || this.playerCageEntity === null || this.carModelEntity === undefined || this.carModelEntity === null) return
 
         const carEntityTransform = Transform.getMutable(this.carEntity)
 
         //Update cage and car transform
-        const scale = Vector3.create(3*this.carScale, 1*this.carScale, 7*this.carScale)
-        if(this.thirdPersonView){
+        const scale = Vector3.create(3 * this.carScale, 1 * this.carScale, 7 * this.carScale)
+        if (this.thirdPersonView) {
             Transform.getMutable(this.playerCageEntity).position = Vector3.create(0, 2, -1.5)
             Transform.getMutable(this.carModelEntity).position = Vector3.create(0, 0, -0.02)
- 
+
         } else {
             Transform.getMutable(this.playerCageEntity).position = Vector3.create(-0.15, 0, -0.3)
-            Transform.getMutable(this.carModelEntity).position = Vector3.create(0, 1.27, -0.02 -0.3)
+            Transform.getMutable(this.carModelEntity).position = Vector3.create(0, 1.27, -0.02 - 0.3)
         }
 
         const forwardDir = Vector3.add(this.getCagePos(), Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
@@ -348,7 +362,7 @@ export class Car {
 
                     utils.timers.setTimeout(function () {
 
-                        if(self.carColliderEntity !== undefined && self.carColliderEntity!==null){
+                        if (self.carColliderEntity !== undefined && self.carColliderEntity !== null) {
                             Transform.getMutable(self.carColliderEntity).scale = Vector3.Zero()
                         }
 
@@ -382,7 +396,7 @@ export class Car {
 
         const carTransform = Transform.getMutable(this.carEntity)
 
-        if(this.carColliderEntity !== undefined && this.carColliderEntity!==null){
+        if (this.carColliderEntity !== undefined && this.carColliderEntity !== null) {
             Transform.getMutable(this.carColliderEntity).scale = Vector3.One()
         }
 
@@ -556,6 +570,11 @@ export class Car {
     private updateCar(dt: number): void {
         if (this.carEntity === undefined || this.carEntity === null
             || this.carBody === undefined || this.carBody === null) return
+
+        this.collisionCooldown -= dt
+        if (this.collisionCooldown <= 0) {
+            this.collisionCooldown = 0
+        }
 
         const carTransform = Transform.getMutable(this.carEntity)
 
