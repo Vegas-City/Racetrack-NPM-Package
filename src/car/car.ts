@@ -178,24 +178,28 @@ export class Car {
             const contact = e.contact
             var contactNormal = Vector3.Zero()
             var colDisplacement = Vector3.Zero()
+            var colId: number = 0
             if (contact.bi.id === self.carBody?.getId()) {
                 contact.ni.negate(contactNormal)
                 colDisplacement = Vector3.create(contact.ri.x, contact.ri.y, contact.ri.z)
+                colId = contact.bj.id
             }
             else {
                 contactNormal = Vector3.create(contact.ni.x, contact.ni.y, contact.ni.z)
                 colDisplacement = Vector3.create(contact.rj.x, contact.rj.y, contact.rj.z)
+                colId = contact.bi.id
             }
             self.colliding = true
             //self.collisionPoint = Vector3.create(self.carBody.position.x + colDisplacement.x, self.carBody.position.y + colDisplacement.y, self.carBody.position.z + colDisplacement.z)
             self.collisionDir = Vector3.normalize(Vector3.create(contactNormal.x, contactNormal.y, contactNormal.z))
             self.collisionCooldown = 0.5
 
+            const bounceFactor = TrackManager.getBounceFactorFromId(colId)
             if (self.speed > 0) {
-                self.speed = -self.collisionBounceF
+                self.speed = -self.collisionBounceF * bounceFactor
             }
             else {
-                self.speed = self.collisionBounceB
+                self.speed = self.collisionBounceB * bounceFactor
             }
         }).bind(this))
     }
@@ -534,7 +538,6 @@ export class Car {
 
                 const energyLoss: number = this.speed * sign * impactCoef * 7
                 collisionCounterVelocity = Vector3.create(this.collisionDir.x * energyLoss, 0, this.collisionDir.z * energyLoss)
-                console.log(this.collisionDir)
             }
 
             this.colliding = false
@@ -551,8 +554,6 @@ export class Car {
                 const weightY = 1 - Math.abs(this.collisionDir.y)
                 const weightZ = 1 - Math.abs(this.collisionDir.z)
                 adjustedVelocity = Vector3.create(weightX * _velocity.x, weightY * _velocity.y, weightZ * _velocity.z)
-                console.log(weightX + "  " + weightY + "  " + weightZ)
-                console.log(adjustedVelocity)
             }
 
             this.colliding = false
