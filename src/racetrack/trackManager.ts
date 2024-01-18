@@ -67,13 +67,17 @@ export class TrackManager {
         }
     }
 
-    static getObstacleTypeFromId(_id: number) : ObstacleType {
-        for(let obstacle of TrackManager.obstacles) {
-            if(obstacle.body?.getId() == _id) {
+    static getObstacleTypeFromId(_id: number): ObstacleType {
+        for (let obstacle of TrackManager.obstacles) {
+            if (obstacle.body?.getId() == _id) {
                 return obstacle.obstacleType
             }
         }
         return ObstacleType.none
+    }
+
+    static getBounceFactorFromId(_id: number): number {
+        return Obstacle.getBounceFactor(TrackManager.getObstacleTypeFromId(_id))
     }
 
     static update(dt: number) {
