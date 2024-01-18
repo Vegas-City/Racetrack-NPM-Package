@@ -115,6 +115,18 @@ export class Obstacle {
             case ObstacleType.tree: return 1
             case ObstacleType.barrel: return 0
         }
-        return 0
+    }
+
+    static getObstacleTypeFromId(_id: number): ObstacleType {
+        for (let obstacle of TrackManager.obstacles) {
+            if (obstacle.body?.getId() == _id) {
+                return obstacle.obstacleType
+            }
+        }
+        return ObstacleType.none
+    }
+
+    static getBounceFactorFromId(_id: number): number {
+        return Obstacle.getBounceFactor(Obstacle.getObstacleTypeFromId(_id))
     }
 }

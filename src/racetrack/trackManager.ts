@@ -3,7 +3,7 @@ import { Quaternion, Vector3 } from "@dcl/sdk/math"
 import { Track } from "./track"
 import { Hotspot } from "./hotspot"
 import { Obstacle } from "./obstacle"
-import { ObstacleType } from "./enums"
+import { HotspotReactionManager } from "./hotspotReactionManager"
 
 export class TrackManager {
     static debugMode: boolean = false
@@ -32,6 +32,7 @@ export class TrackManager {
         TrackManager.loadObstacles(_config)
 
         engine.addSystem(TrackManager.update)
+        engine.addSystem(HotspotReactionManager.update)
     }
 
     static loadTrack(_trackData: any): void {
@@ -65,19 +66,6 @@ export class TrackManager {
         for (let obstacle of _trackData.obstacles) {
             TrackManager.obstacles.push(new Obstacle(obstacle.obstacleType, obstacle.shape, obstacle.position, obstacle.rotation, obstacle.scale, obstacle.vertices, obstacle.indices))
         }
-    }
-
-    static getObstacleTypeFromId(_id: number): ObstacleType {
-        for (let obstacle of TrackManager.obstacles) {
-            if (obstacle.body?.getId() == _id) {
-                return obstacle.obstacleType
-            }
-        }
-        return ObstacleType.none
-    }
-
-    static getBounceFactorFromId(_id: number): number {
-        return Obstacle.getBounceFactor(TrackManager.getObstacleTypeFromId(_id))
     }
 
     static update(dt: number) {

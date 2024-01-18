@@ -1,9 +1,6 @@
 import { TrackManager } from "../racetrack"
 import { CarConfig } from "./carConfig"
-import { Car } from "./car"
-import { HotspotType } from "../racetrack";
-import { Transform, engine } from "@dcl/sdk/ecs";
-import { Quaternion } from "@dcl/sdk/math";
+import { HotspotReactionManager } from "../racetrack/hotspotReactionManager";
 
 export class CarAttributes {
     public accelerationF: number = 6
@@ -14,10 +11,6 @@ export class CarAttributes {
     public steerSpeed: number = 1.5
     public grip: number = 0.3
 
-    private oilSpillTimer: number = 0
-    private oilSpillSwayElapsed: number = 0
-    private oilSpillSwayLeft: boolean = false
-
     constructor(_config: CarConfig) {
         this.accelerationF = _config.accelerationF
         this.accelerationB = _config.accelerationB
@@ -26,8 +19,6 @@ export class CarAttributes {
         this.maxSpeed = _config.maxSpeed
         this.steerSpeed = _config.steerSpeed
         this.grip = _config.grip
-
-        engine.addSystem(this.update.bind(this))
     }
 
     public calculateAccelerationF(): number {
@@ -51,61 +42,10 @@ export class CarAttributes {
     }
 
     public calculateSteerSpeed(): number {
-        return this.steerSpeed * (this.oilSpillTimer > 0 ? 0.35 : 1)
+        return this.steerSpeed * (HotspotReactionManager.oilSpillTimer > 0 ? 0.35 : 1)
     }
 
     public calculateGrip(): number {
-        return this.grip * (this.oilSpillTimer > 0 ? 0.35 : 1)
-    }
-
-    private isOnOilSpill(): boolean {
-        for (let hotspot of TrackManager.hotspots) {
-            if (hotspot.hotspotType == HotspotType.oilSpill && hotspot.inside) {
-                return true
-            }
-        }
-        return false
-    }
-
-    private checkOilSpill(dt: number): void {
-        if (this.isOnOilSpill()) {
-            this.oilSpillTimer = 3
-        }
-        else {
-            this.oilSpillTimer -= dt
-            if (this.oilSpillTimer <= 0) {
-                this.oilSpillTimer = 0
-            }
-        }
-
-        if (this.oilSpillTimer > 0) {
-            const car = Car.instances[0]
-
-            if (this.oilSpillSwayLeft) {
-                this.oilSpillSwayElapsed -= (dt * 4)
-
-                if (this.oilSpillSwayElapsed < -1) {
-                    this.oilSpillSwayLeft = false
-                }
-            }
-            else {
-                this.oilSpillSwayElapsed += (dt * 4)
-
-                if (this.oilSpillSwayElapsed > 1) {
-                    this.oilSpillSwayLeft = true
-                }
-            }
-
-            if(car.carBody) {
-                const newRot = Quaternion.multiply(car.carBody.getRotation(), Quaternion.fromEulerDegrees(0, this.oilSpillSwayElapsed * car.speed * 0.2, 0))
-                car.carBody.setRotation(newRot)
-            }
-
-        }
-    }
-
-    private update(dt: number) {
-        // Check oil spill
-        this.checkOilSpill(dt)
+        return this.grip * (HotspotReactionManager.oilSpillTimer > 0 ? 0.35 : 1)
     }
 }

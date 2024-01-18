@@ -4,7 +4,7 @@ import { CarConfig } from './carConfig'
 import { localToWorldPosition } from '../utils/utils'
 import { PhysicsManager, Body } from '../physics'
 import { BoxShapeDefinition } from '../physics/shapes'
-import { TrackManager } from '../racetrack'
+import { Obstacle, TrackManager } from '../racetrack'
 import { InputManager } from '../racetrack/inputManager'
 import { CarUI, Minimap } from '../ui'
 import { movePlayerTo, triggerSceneEmote } from '../utils/setup'
@@ -194,7 +194,7 @@ export class Car {
             self.collisionDir = Vector3.normalize(Vector3.create(contactNormal.x, contactNormal.y, contactNormal.z))
             self.collisionCooldown = 0.5
 
-            const bounceFactor = TrackManager.getBounceFactorFromId(colId)
+            const bounceFactor = Obstacle.getBounceFactorFromId(colId)
             if (self.speed > 0) {
                 self.speed = -self.collisionBounceF * bounceFactor
             }
