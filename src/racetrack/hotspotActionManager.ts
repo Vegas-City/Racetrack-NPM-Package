@@ -28,7 +28,7 @@ export class HotspotActionManager {
             }
         }
 
-        if (HotspotActionManager.oilSpillTimer > 0) {
+        if (Car.instances.length > 0 && HotspotActionManager.oilSpillTimer > 0) {
             const car = Car.instances[0]
 
             if (HotspotActionManager.oilSpillSwayLeft) {
