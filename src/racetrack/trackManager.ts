@@ -4,7 +4,6 @@ import { Track } from "./track"
 import { Hotspot } from "./hotspot"
 import { Obstacle } from "./obstacle"
 import { HotspotActionManager } from "./hotspotActionManager"
-import { LapCheckpoint } from "./lapCheckpoint"
 import { Lap } from "./lap"
 
 export class TrackManager {
@@ -35,7 +34,6 @@ export class TrackManager {
         TrackManager.loadLapCheckpoints(_config)
 
         engine.addSystem(TrackManager.update)
-        engine.addSystem(HotspotActionManager.update)
     }
 
     static loadTrack(_trackData: any): void {
@@ -85,5 +83,9 @@ export class TrackManager {
         TrackManager.obstacles.forEach(obstacle => {
             obstacle.update()
         })
+        if (TrackManager.carPoints.length > 0) {
+            Lap.update(TrackManager.carPoints[0])
+        }
+        HotspotActionManager.update(dt)
     }
 }
