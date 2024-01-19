@@ -1,6 +1,6 @@
 import { TrackManager } from "../racetrack"
 import { CarConfig } from "./carConfig"
-import { HotspotReactionManager } from "../racetrack/hotspotReactionManager";
+import { HotspotActionManager } from "../racetrack/hotspotActionManager";
 
 export class CarAttributes {
     public accelerationF: number = 6
@@ -42,10 +42,10 @@ export class CarAttributes {
     }
 
     public calculateSteerSpeed(): number {
-        return this.steerSpeed * (HotspotReactionManager.oilSpillTimer > 0 ? 0.35 : 1)
+        return this.steerSpeed * (HotspotActionManager.oilSpillTimer > 0 ? 0.35 : 1)
     }
 
     public calculateGrip(): number {
-        return this.grip * (HotspotReactionManager.oilSpillTimer > 0 ? 0.35 : 1)
+        return this.grip * (HotspotActionManager.oilSpillTimer > 0 ? 0.35 : 1)
     }
 }

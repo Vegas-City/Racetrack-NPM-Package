@@ -3,7 +3,9 @@ import { Quaternion, Vector3 } from "@dcl/sdk/math"
 import { Track } from "./track"
 import { Hotspot } from "./hotspot"
 import { Obstacle } from "./obstacle"
-import { HotspotReactionManager } from "./hotspotReactionManager"
+import { HotspotActionManager } from "./hotspotActionManager"
+import { LapCheckpoint } from "./lapCheckpoint"
+import { Lap } from "./lap"
 
 export class TrackManager {
     static debugMode: boolean = false
@@ -30,9 +32,10 @@ export class TrackManager {
         TrackManager.loadTrack(_config)
         TrackManager.loadHotspots(_config)
         TrackManager.loadObstacles(_config)
+        TrackManager.loadLapCheckpoints(_config)
 
         engine.addSystem(TrackManager.update)
-        engine.addSystem(HotspotReactionManager.update)
+        engine.addSystem(HotspotActionManager.update)
     }
 
     static loadTrack(_trackData: any): void {
@@ -65,6 +68,12 @@ export class TrackManager {
     static loadObstacles(_trackData: any): void {
         for (let obstacle of _trackData.obstacles) {
             TrackManager.obstacles.push(new Obstacle(obstacle.obstacleType, obstacle.shape, obstacle.position, obstacle.rotation, obstacle.scale, obstacle.vertices, obstacle.indices))
+        }
+    }
+
+    static loadLapCheckpoints(_trackData: any): void {
+        for (let checkpoint of _trackData.lapCheckpoints) {
+            Lap.addCheckpoint(checkpoint.index, checkpoint.position)
         }
     }
 

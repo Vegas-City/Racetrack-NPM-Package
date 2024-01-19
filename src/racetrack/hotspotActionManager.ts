@@ -3,7 +3,7 @@ import { TrackManager } from "./trackManager"
 import { Quaternion } from "@dcl/sdk/math"
 import { Car } from "../car"
 
-export class HotspotReactionManager {
+export class HotspotActionManager {
     static oilSpillTimer: number = 0
     private static oilSpillSwayElapsed: number = 0
     private static oilSpillSwayLeft: boolean = false
@@ -18,31 +18,31 @@ export class HotspotReactionManager {
     }
 
     private static checkOilSpill(dt: number): void {
-        if (HotspotReactionManager.isOnOilSpill()) {
-            HotspotReactionManager.oilSpillTimer = 3
+        if (HotspotActionManager.isOnOilSpill()) {
+            HotspotActionManager.oilSpillTimer = 3
         }
         else {
-            HotspotReactionManager.oilSpillTimer -= dt
-            if (HotspotReactionManager.oilSpillTimer <= 0) {
-                HotspotReactionManager.oilSpillTimer = 0
+            HotspotActionManager.oilSpillTimer -= dt
+            if (HotspotActionManager.oilSpillTimer <= 0) {
+                HotspotActionManager.oilSpillTimer = 0
             }
         }
 
-        if (HotspotReactionManager.oilSpillTimer > 0) {
+        if (HotspotActionManager.oilSpillTimer > 0) {
             const car = Car.instances[0]
 
-            if (HotspotReactionManager.oilSpillSwayLeft) {
-                HotspotReactionManager.oilSpillSwayElapsed -= (dt * 4)
+            if (HotspotActionManager.oilSpillSwayLeft) {
+                HotspotActionManager.oilSpillSwayElapsed -= (dt * 4)
 
-                if (HotspotReactionManager.oilSpillSwayElapsed < -1) {
-                    HotspotReactionManager.oilSpillSwayLeft = false
+                if (HotspotActionManager.oilSpillSwayElapsed < -1) {
+                    HotspotActionManager.oilSpillSwayLeft = false
                 }
             }
             else {
-                HotspotReactionManager.oilSpillSwayElapsed += (dt * 4)
+                HotspotActionManager.oilSpillSwayElapsed += (dt * 4)
 
-                if (HotspotReactionManager.oilSpillSwayElapsed > 1) {
-                    HotspotReactionManager.oilSpillSwayLeft = true
+                if (HotspotActionManager.oilSpillSwayElapsed > 1) {
+                    HotspotActionManager.oilSpillSwayLeft = true
                 }
             }
 
@@ -56,6 +56,6 @@ export class HotspotReactionManager {
 
     static update(dt: number) {
         // Check oil spill
-        HotspotReactionManager.checkOilSpill(dt)
+        HotspotActionManager.checkOilSpill(dt)
     }
 }
