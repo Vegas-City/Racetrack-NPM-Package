@@ -8,6 +8,7 @@ export class Lap {
 
     static checkpoints: LapCheckpoint[] = []
     static currentIndex: number = 0
+    static lapsCompleted: number = -1
 
     static addCheckpoint(_index: number, _pos: Vector3): void {
         let checkpoint = Lap.findCheckpoint(_index)
@@ -28,14 +29,18 @@ export class Lap {
     }
 
     static update(): void {
+        console.log("Current Lap: " + Lap.lapsCompleted)
         const currentCheckpoint = Lap.checkpoints[Lap.currentIndex]
         for (let carPoint of TrackManager.carPoints) {
             const distance = pointToLineDistance(carPoint, currentCheckpoint.point1, currentCheckpoint.point2)
-            if(distance < Lap.checkpointThresholdDistance) {
+            if (distance < Lap.checkpointThresholdDistance) {
                 // crossed checkpoint
-                Lap.currentIndex++
-                if(Lap.currentIndex >= Lap.checkpoints.length) {
+                if (Lap.currentIndex == 0) {
                     // completed a lap
+                    Lap.lapsCompleted++
+                }
+                Lap.currentIndex++
+                if (Lap.currentIndex >= Lap.checkpoints.length) {
                     Lap.currentIndex = 0
                 }
             }
