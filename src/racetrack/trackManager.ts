@@ -3,7 +3,7 @@ import { Quaternion, Vector3 } from "@dcl/sdk/math"
 import { Track } from "./track"
 import { Hotspot } from "./hotspot"
 import { Obstacle } from "./obstacle"
-import { HotspotReactionManager } from "./hotspotReactionManager"
+import { HotspotActionManager } from "./hotspotActionManager"
 
 export class TrackManager {
     static debugMode: boolean = false
@@ -32,7 +32,7 @@ export class TrackManager {
         TrackManager.loadObstacles(_config)
 
         engine.addSystem(TrackManager.update)
-        engine.addSystem(HotspotReactionManager.update)
+        engine.addSystem(HotspotActionManager.update)
     }
 
     static loadTrack(_trackData: any): void {

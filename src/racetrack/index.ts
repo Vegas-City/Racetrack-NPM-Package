@@ -5,6 +5,7 @@ import { Obstacle } from "./obstacle";
 import { Track } from "./track";
 import { TrackManager } from "./trackManager";
 import { InputManager } from "./inputManager";
+import { HotspotActionManager } from "./hotspotActionManager";
 
 export { HotspotType, ObstacleType }
 export { Hotspot }
@@ -12,3 +13,4 @@ export { Obstacle }
 export { Track }
 export { TrackManager }
 export { InputManager }
+export { HotspotActionManager }
