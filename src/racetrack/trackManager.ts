@@ -35,8 +35,6 @@ export class TrackManager {
         TrackManager.loadLapCheckpoints(_config)
 
         engine.addSystem(TrackManager.update)
-        engine.addSystem(HotspotActionManager.update)
-        engine.addSystem(Lap.update)
     }
 
     static loadTrack(_trackData: any): void {
@@ -86,5 +84,9 @@ export class TrackManager {
         TrackManager.obstacles.forEach(obstacle => {
             obstacle.update()
         })
+        if (TrackManager.carPoints.length > 0) {
+            Lap.update(TrackManager.carPoints[0])
+        }
+        HotspotActionManager.update(dt)
     }
 }
