@@ -3,7 +3,7 @@ import { LapCheckpoint } from "./lapCheckpoint";
 import { pointToLineDistance } from "../utils/utils";
 
 export class Lap {
-    static readonly checkpointThresholdDistance: number = 4
+    static readonly checkpointThresholdDistance: number = 2
 
     static checkpoints: LapCheckpoint[] = []
     static currentIndex: number = 0
@@ -28,9 +28,10 @@ export class Lap {
     }
 
     static update(_carPos: Vector3): void {
-        if(Lap.checkpoints.length < 1) return
+        if (Lap.checkpoints.length < 1) return
 
-        console.log("Current Lap: " + Lap.lapsCompleted)
+        console.log("Current Lap: " + (Lap.lapsCompleted + 1))
+        console.log("Current Lap Checkpoint: " + Lap.currentIndex)
         const currentCheckpoint = Lap.checkpoints[Lap.currentIndex]
         const distance = pointToLineDistance(_carPos, currentCheckpoint.point1, currentCheckpoint.point2)
 
