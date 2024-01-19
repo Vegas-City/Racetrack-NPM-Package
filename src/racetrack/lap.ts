@@ -1,8 +1,13 @@
 import { Vector3 } from "@dcl/sdk/math";
 import { LapCheckpoint } from "./lapCheckpoint";
+import { TrackManager } from "./trackManager";
+import { pointToLineDistance } from "../utils/utils";
 
 export class Lap {
+    static readonly checkpointThresholdDistance: number = 4
+
     static checkpoints: LapCheckpoint[] = []
+    static currentIndex: number = -1
 
     static addCheckpoint(_index: number, _pos: Vector3): void {
         let checkpoint = Lap.findCheckpoint(_index)
@@ -20,5 +25,12 @@ export class Lap {
             }
         }
         return null
+    }
+
+    static update(): void {
+        const currentCheckpoint = Lap.checkpoints[Lap.currentIndex]
+        for (let carPoint of TrackManager.carPoints) {
+            const distance = pointToLineDistance(carPoint, currentCheckpoint.point1, currentCheckpoint.point2)
+        }
     }
 }

@@ -36,6 +36,7 @@ export class TrackManager {
 
         engine.addSystem(TrackManager.update)
         engine.addSystem(HotspotActionManager.update)
+        engine.addSystem(Lap.update)
     }
 
     static loadTrack(_trackData: any): void {
