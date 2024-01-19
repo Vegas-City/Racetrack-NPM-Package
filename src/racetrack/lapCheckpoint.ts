@@ -1,6 +1,6 @@
-import { Vector3 } from "@dcl/sdk/math";
+import { Color4, Vector3 } from "@dcl/sdk/math";
 import { TrackManager } from "./trackManager";
-import { Entity, MeshRenderer, Transform, engine } from "@dcl/ecs";
+import { Entity, Material, MeshRenderer, Transform, engine } from "@dcl/ecs";
 
 export class LapCheckpoint {
     index: number = 0
@@ -25,6 +25,10 @@ export class LapCheckpoint {
                     position: Vector3.create(this.point1.x, 2, this.point1.z),
                     scale: Vector3.create(1, 4, 1)
                 })
+
+                Material.setPbrMaterial(this.debugEntity1, {
+                    albedoColor: this.index == 0 ? Color4.Blue() : Color4.Black()
+                })
             }
         }
         else if (this.point2 != Vector3.Zero()) {
@@ -37,6 +41,10 @@ export class LapCheckpoint {
                 Transform.create(this.debugEntity2, {
                     position: Vector3.create(this.point2.x, 2, this.point2.z),
                     scale: Vector3.create(1, 4, 1)
+                })
+
+                Material.setPbrMaterial(this.debugEntity2, {
+                    albedoColor: this.index == 0 ? Color4.Blue() : Color4.Black()
                 })
             }
         }
