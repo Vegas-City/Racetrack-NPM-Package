@@ -57,12 +57,12 @@ export function isPointInsidePolygon(_point: Vector3, _poly: Vector3[]): boolean
     return inside
 }
 
-export function pointDistanceToLine(_point: Vector3, _linePoint1: Vector3, _linePoint2: Vector3): number {
+export function pointToLineDistance(_point: Vector3, _linePoint1: Vector3, _linePoint2: Vector3): number {
     const vectorAP = Vector3.subtract(_linePoint1, _point)
     const vectorAB = Vector3.subtract(_linePoint1, _linePoint2)
     const crossProduct = Vector3.cross(vectorAB, vectorAP)
     const distance = Vector3.length(crossProduct) / Vector3.length(vectorAB)
-    
+
     return distance
 }
 
