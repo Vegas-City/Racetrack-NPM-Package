@@ -1,6 +1,7 @@
 import { Color4, Vector3 } from "@dcl/sdk/math";
 import { TrackManager } from "./trackManager";
 import { Entity, Material, MeshRenderer, Transform, engine } from "@dcl/ecs";
+import { applyTransformToPoint } from "../utils";
 
 export class LapCheckpoint {
     index: number = 0
@@ -14,8 +15,8 @@ export class LapCheckpoint {
     }
 
     addPoint(_pos: Vector3): void {
-        if (this.point1 != Vector3.Zero()) {
-            this.point1 = _pos
+        if (Vector3.equalsWithEpsilon(this.point1, Vector3.Zero())) {
+            this.point1 = applyTransformToPoint(Vector3.create(_pos.x, 0, _pos.z), { position: TrackManager.trackTransform.position, rotation: TrackManager.trackTransform.rotation, scale: TrackManager.trackTransform.scale })
 
             if (TrackManager.debugMode) {
                 this.debugEntity1 = engine.addEntity()
@@ -31,8 +32,8 @@ export class LapCheckpoint {
                 })
             }
         }
-        else if (this.point2 != Vector3.Zero()) {
-            this.point2 = _pos
+        else if (Vector3.equalsWithEpsilon(this.point2, Vector3.Zero())) {
+            this.point2 = applyTransformToPoint(Vector3.create(_pos.x, 0, _pos.z), { position: TrackManager.trackTransform.position, rotation: TrackManager.trackTransform.rotation, scale: TrackManager.trackTransform.scale })
 
             if (TrackManager.debugMode) {
                 this.debugEntity2 = engine.addEntity()
