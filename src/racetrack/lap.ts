@@ -1,6 +1,5 @@
 import { Vector3 } from "@dcl/sdk/math";
 import { LapCheckpoint } from "./lapCheckpoint";
-import { TrackManager } from "./trackManager";
 import { pointToLineDistance } from "../utils/utils";
 
 export class Lap {
@@ -29,10 +28,12 @@ export class Lap {
     }
 
     static update(_carPos: Vector3): void {
+        if(Lap.checkpoints.length < 1) return
+
         console.log("Current Lap: " + Lap.lapsCompleted)
         const currentCheckpoint = Lap.checkpoints[Lap.currentIndex]
         const distance = pointToLineDistance(_carPos, currentCheckpoint.point1, currentCheckpoint.point2)
-        
+
         if (distance < Lap.checkpointThresholdDistance) {
             // crossed checkpoint
             if (Lap.currentIndex == 0) {
