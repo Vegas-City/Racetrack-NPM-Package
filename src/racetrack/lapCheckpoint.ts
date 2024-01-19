@@ -35,7 +35,7 @@ export class LapCheckpoint {
                 MeshRenderer.setCylinder(this.debugEntity2)
 
                 Transform.create(this.debugEntity2, {
-                    position: Vector3.create(this.point1.x, 2, this.point1.z),
+                    position: Vector3.create(this.point2.x, 2, this.point2.z),
                     scale: Vector3.create(1, 4, 1)
                 })
             }
