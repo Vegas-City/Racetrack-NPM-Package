@@ -4,7 +4,6 @@ import { Track } from "./track"
 import { Hotspot } from "./hotspot"
 import { Obstacle } from "./obstacle"
 import { HotspotActionManager } from "./hotspotActionManager"
-import { LapCheckpoint } from "./lapCheckpoint"
 import { Lap } from "./lap"
 
 export class TrackManager {
