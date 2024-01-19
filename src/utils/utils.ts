@@ -57,7 +57,16 @@ export function isPointInsidePolygon(_point: Vector3, _poly: Vector3[]): boolean
     return inside
 }
 
-export function localToWorldPosition(_localPosition: Vector3, _parentPosition: Vector3, _parentRotation: Quaternion) : Vector3 {
+export function pointDistanceToLine(_point: Vector3, _linePoint1: Vector3, _linePoint2: Vector3): number {
+    const vectorAP = Vector3.subtract(_linePoint1, _point)
+    const vectorAB = Vector3.subtract(_linePoint1, _linePoint2)
+    const crossProduct = Vector3.cross(vectorAB, vectorAP)
+    const distance = Vector3.length(crossProduct) / Vector3.length(vectorAB)
+    
+    return distance
+}
+
+export function localToWorldPosition(_localPosition: Vector3, _parentPosition: Vector3, _parentRotation: Quaternion): Vector3 {
     const rotatedPos = Vector3.rotate(_localPosition, _parentRotation)
     const globalPos = Vector3.create(_parentPosition.x + rotatedPos.x, _parentPosition.y + rotatedPos.y, _parentPosition.z + rotatedPos.z)
     return globalPos
