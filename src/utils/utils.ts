@@ -61,7 +61,11 @@ export function pointToLineDistance(_point: Vector3, _linePoint1: Vector3, _line
     const vectorAP = Vector3.subtract(_linePoint1, _point)
     const vectorAB = Vector3.subtract(_linePoint1, _linePoint2)
     const crossProduct = Vector3.cross(vectorAB, vectorAP)
-    const distance = Vector3.length(crossProduct) / Vector3.length(vectorAB)
+    let distance = Vector3.length(crossProduct) / Vector3.length(vectorAB)
+
+    if (Vector3.distance(_point, _linePoint1) > Vector3.distance(_linePoint1, _linePoint2) || Vector3.distance(_point, _linePoint2) > Vector3.distance(_linePoint1, _linePoint2)) {
+        distance = 10 // any large number
+    }
 
     return distance
 }
