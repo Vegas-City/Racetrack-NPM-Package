@@ -1,19 +1,18 @@
 import { Color4 } from "@dcl/sdk/math"
+import { Lap } from "../racetrack"
 import ReactEcs, { Label, UiEntity } from "@dcl/sdk/react-ecs"
 
-export class CarUI {
+export class LapUI {
     static visibility: boolean = false
-    static racerPosition: string = "1st"
-    static speed: string = "250 MPH"
 
     private static component = () => (
         <UiEntity
             uiTransform={{
-                position: { right: '0px', bottom: '0px' },
+                position: { right: '0px', top: '270px' },
                 height: 100,
                 width: 100,
                 positionType: 'absolute',
-                display: CarUI.visibility ? 'flex' : 'none'
+                display: LapUI.visibility ? 'flex' : 'none'
             }}
         >
             <UiEntity
@@ -27,19 +26,29 @@ export class CarUI {
                 uiBackground={{
                     textureMode: 'center',
                     texture: {
-                        src: "images/ui/speedUI.png",
+                        src: "images/ui/lapUI.png",
                         wrapMode: 'repeat'
                     }
                 }}
             >
-                <Label // Speed
-                    value={CarUI.speed}
+                <Label // Lap
+                    value={LapUI.formatLap()}
                     color={Color4.Black()}
-                    fontSize={56}
+                    fontSize={24}
                     font="serif"
                     textAlign="top-center"
                     uiTransform={{
-                        position: { left: '165px', top: "108px" }
+                        position: { left: '230px', top: "6px" }
+                    }}
+                />
+                <Label // Time
+                    value={LapUI.formatTime()}
+                    color={Color4.Black()}
+                    fontSize={38}
+                    font="serif"
+                    textAlign="top-center"
+                    uiTransform={{
+                        position: { left: '180px', top: "36px" }
                     }}
                 />
             </UiEntity>
@@ -48,19 +57,24 @@ export class CarUI {
 
     static Render() {
         return [
-            CarUI.component()
+            LapUI.component()
         ]
     }
 
     static Show() {
-        CarUI.visibility = true
+        LapUI.visibility = true
     }
 
     static Hide() {
-        CarUI.visibility = false
+        LapUI.visibility = false
     }
 
-    static Update(_speed: number) {
-        CarUI.speed = (Math.round(_speed * 2.857 * 2 * 100) / 100).toFixed(1).toString()
+    private static formatLap(): string {
+        if (Lap.lapsCompleted < 0) return ""
+        return (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
+    }
+
+    private static formatTime(): string {
+        return (Math.round(Lap.lapElapsed * 10) / 10).toFixed(1).toString()
     }
 }

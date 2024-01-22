@@ -8,6 +8,8 @@ export class Lap {
     static checkpoints: LapCheckpoint[] = []
     static currentIndex: number = 0
     static lapsCompleted: number = -1
+    static lapElapsed: number = 0
+    static totalLaps: number = 3 // make the default 3
 
     static addCheckpoint(_index: number, _pos: Vector3): void {
         let checkpoint = Lap.findCheckpoint(_index)
@@ -16,6 +18,10 @@ export class Lap {
             Lap.checkpoints.push(checkpoint)
         }
         checkpoint.addPoint(_pos)
+    }
+
+    static setTotalLaps(_laps: number): void {
+        Lap.totalLaps = _laps
     }
 
     private static findCheckpoint(_index: number): LapCheckpoint | null {
@@ -27,11 +33,10 @@ export class Lap {
         return null
     }
 
-    static update(_carPos: Vector3): void {
+    static update(_dt: number, _carPos: Vector3): void {
         if (Lap.checkpoints.length < 1) return
 
-        //console.log("Current Lap: " + (Lap.lapsCompleted + 1))
-        //console.log("Current Lap Checkpoint: " + Lap.currentIndex)
+        if (Lap.lapsCompleted >= 0) Lap.lapElapsed += _dt
         const currentCheckpoint = Lap.checkpoints[Lap.currentIndex]
         const distance = pointToLineDistance(_carPos, currentCheckpoint.point1, currentCheckpoint.point2)
 
@@ -40,6 +45,7 @@ export class Lap {
             if (Lap.currentIndex == 0) {
                 // completed a lap
                 Lap.lapsCompleted++
+                Lap.lapElapsed = 0
             }
             Lap.currentIndex++
             if (Lap.currentIndex >= Lap.checkpoints.length) {
