@@ -1,11 +1,11 @@
 import { Vector3 } from "@dcl/sdk/math"
-import { GhostPoint } from "@vegascity/racetrack/src/ghostCar/ghostPoint"
+import { GhostPoint } from "./ghostPoint"
 
 export class GhostData {
-    lap:number
-    track:number
-    userWallet:string
-    createDate:Date
-    frequecy:number
-    points: GhostPoint[]
+    lap:number = 0
+    track:number = 0
+    userWallet:string = ""
+    createDate:Date = new Date()
+    frequecy:number = 0
+    points: GhostPoint[] = []
 }

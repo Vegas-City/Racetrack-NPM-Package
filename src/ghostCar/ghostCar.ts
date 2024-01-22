@@ -1,15 +1,15 @@
 import { engine } from "@dcl/sdk/ecs";
-import { GhostData } from "@vegascity/racetrack/src/ghostCar/ghostData";
-import { GhostPoint } from "@vegascity/racetrack/src/ghostCar/ghostPoint";
+import { GhostData } from "./ghostData";
+import { GhostPoint } from "./ghostPoint";
 
 export class GhostCar {
 
-    ghostData: GhostData
+    ghostData: GhostData | undefined
 
     pointIndex: number = 0
     currentUpdateTime:number = 0
     ghostCarRunning : boolean = false
-    targetPoint: GhostPoint
+    targetPoint: GhostPoint | undefined
 
     constructor(){
         // Follow predefined path
@@ -29,6 +29,9 @@ export class GhostCar {
     }
 
     update(_dt:number){
+        if(this.ghostData == undefined){
+            return
+        }
         this.currentUpdateTime+=_dt
         
         let newIndex:number = Math.min((this.currentUpdateTime/ this.ghostData.frequecy))
