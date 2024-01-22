@@ -61,6 +61,6 @@ export class CarUI {
     }
 
     static Update(_speed: number) {
-        CarUI.speed = (Math.round(_speed * 2.857 * 100) / 100).toFixed(1).toString()
+        CarUI.speed = (Math.round(_speed * 2.857 * 2 * 100) / 100).toFixed(1).toString()
     }
 }
