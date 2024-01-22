@@ -6,7 +6,7 @@ import { PhysicsManager, Body } from '../physics'
 import { BoxShapeDefinition } from '../physics/shapes'
 import { Obstacle, TrackManager } from '../racetrack'
 import { InputManager } from '../racetrack/inputManager'
-import { CarUI, Minimap } from '../ui'
+import { CarUI, LapUI, Minimap } from '../ui'
 import { movePlayerTo, triggerSceneEmote } from '../utils/setup'
 import { CarAttributes } from './carAttributes'
 import * as utils from '@dcl-sdk/utils'
@@ -372,6 +372,7 @@ export class Car {
 
                         self.switchToCarPerspective()
                         CarUI.Show()
+                        LapUI.Show()
                         Minimap.Show()
 
                         if (self.playerCageEntity) {
@@ -410,6 +411,7 @@ export class Car {
 
         this.attachPointerEvent()
         CarUI.Hide()
+        LapUI.Hide()
         Minimap.Hide()
 
         if (this.playerCageEntity) CameraModeArea.deleteFrom(this.playerCageEntity)
