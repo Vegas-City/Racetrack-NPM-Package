@@ -1,47 +1,54 @@
 import { Color4 } from "@dcl/sdk/math"
-import ReactEcs, { Label, UiEntity } from "@dcl/sdk/react-ecs"
 import { Lap } from "../racetrack"
+import ReactEcs, { Label, UiEntity } from "@dcl/sdk/react-ecs"
 
 export class LapUI {
-    static visibility: boolean = true
+    static visibility: boolean = false
 
     private static component = () => (
         <UiEntity
             uiTransform={{
-                height: "200px",
-                width: "55%",
+                position: { right: '0px', top: '270px' },
+                height: 100,
+                width: 100,
                 positionType: 'absolute',
                 display: LapUI.visibility ? 'flex' : 'none'
             }}
         >
             <UiEntity
                 uiTransform={{
-                    position: { right: "0px" },
-                    height: "150px",
-                    width: "300px",
+                    position: { bottom: "30px", right: "0px" },
+                    height: 256,
+                    width: 256,
                     positionType: 'absolute',
                     display: "flex"
                 }}
-                uiBackground={{ color: Color4.create(0, 0, 0.2, 1) }}
+                uiBackground={{
+                    textureMode: 'center',
+                    texture: {
+                        src: "images/ui/lapUI.png",
+                        wrapMode: 'repeat'
+                    }
+                }}
             >
                 <Label // Lap
-                    value={Lap.lapsCompleted >= 0 ? ("Lap " + (Lap.lapsCompleted + 1).toString()) : ""}
-                    color={Color4.White()}
-                    fontSize={48}
+                    value={LapUI.formatLap()}
+                    color={Color4.Black()}
+                    fontSize={24}
                     font="serif"
                     textAlign="top-center"
                     uiTransform={{
-                        position: { left: '150px' }
+                        position: { left: '230px', top: "6px" }
                     }}
                 />
                 <Label // Time
                     value={LapUI.formatTime()}
-                    color={Color4.Green()}
-                    fontSize={48}
+                    color={Color4.Black()}
+                    fontSize={38}
                     font="serif"
                     textAlign="top-center"
                     uiTransform={{
-                        position: { left: '150px', top: "65px" }
+                        position: { left: '180px', top: "36px" }
                     }}
                 />
             </UiEntity>
@@ -62,11 +69,12 @@ export class LapUI {
         LapUI.visibility = false
     }
 
+    private static formatLap(): string {
+        if (Lap.lapsCompleted < 0) return ""
+        return (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
+    }
+
     private static formatTime(): string {
-        let time = (Math.round(Lap.lapElapsed * 10) / 10).toString()
-        if (!time.includes(".")) {
-            time += ".0"
-        }
-        return time
+        return (Math.round(Lap.lapElapsed * 10) / 10).toFixed(1).toString()
     }
 }
