@@ -84,7 +84,7 @@ export class TrackManager {
             obstacle.update()
         })
         if (TrackManager.carPoints.length > 0) {
-            Lap.update(TrackManager.carPoints[0])
+            Lap.update(dt, TrackManager.carPoints[0])
         }
         HotspotActionManager.update(dt)
     }
