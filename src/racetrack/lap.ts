@@ -30,8 +30,8 @@ export class Lap {
     static update(_carPos: Vector3): void {
         if (Lap.checkpoints.length < 1) return
 
-        console.log("Current Lap: " + (Lap.lapsCompleted + 1))
-        console.log("Current Lap Checkpoint: " + Lap.currentIndex)
+        //console.log("Current Lap: " + (Lap.lapsCompleted + 1))
+        //console.log("Current Lap Checkpoint: " + Lap.currentIndex)
         const currentCheckpoint = Lap.checkpoints[Lap.currentIndex]
         const distance = pointToLineDistance(_carPos, currentCheckpoint.point1, currentCheckpoint.point2)
 
