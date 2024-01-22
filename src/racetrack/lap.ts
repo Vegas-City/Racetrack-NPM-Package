@@ -9,6 +9,7 @@ export class Lap {
     static currentIndex: number = 0
     static lapsCompleted: number = -1
     static lapElapsed: number = 0
+    static totalLaps: number = 3 // make the default 3
 
     static addCheckpoint(_index: number, _pos: Vector3): void {
         let checkpoint = Lap.findCheckpoint(_index)
@@ -17,6 +18,10 @@ export class Lap {
             Lap.checkpoints.push(checkpoint)
         }
         checkpoint.addPoint(_pos)
+    }
+
+    static setTotalLaps(_laps: number): void {
+        Lap.totalLaps = _laps
     }
 
     private static findCheckpoint(_index: number): LapCheckpoint | null {
