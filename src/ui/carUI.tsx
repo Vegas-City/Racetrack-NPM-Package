@@ -10,40 +10,36 @@ export class CarUI {
         <UiEntity
             uiTransform={{
                 position: { right: '0px', bottom: '0px' },
-                height: "200px",
-                width: "200px",
+                height: 100,
+                width: 100,
                 positionType: 'absolute',
                 display: CarUI.visibility ? 'flex' : 'none'
             }}
         >
             <UiEntity
                 uiTransform={{
-                    position: { right: "0px" },
-                    height: "200px",
-                    width: "300px",
+                    position: { bottom: "30px", right: "0px" },
+                    height: 256,
+                    width: 256,
                     positionType: 'absolute',
                     display: "flex"
                 }}
-                uiBackground={{ color: Color4.create(0, 0, 0, 0.8) }}
+                uiBackground={{
+                    textureMode: 'center',
+                    texture: {
+                        src: "images/ui/speedUI.png",
+                        wrapMode: 'repeat'
+                    }
+                }}
             >
-                <Label // Position
-                    value={CarUI.racerPosition}
-                    color={Color4.White()}
-                    fontSize={48}
-                    font="serif"
-                    textAlign="top-center"
-                    uiTransform={{
-                        position: { left: '150px' }
-                    }}
-                />
                 <Label // Speed
                     value={CarUI.speed}
-                    color={Color4.White()}
-                    fontSize={48}
+                    color={Color4.Black()}
+                    fontSize={56}
                     font="serif"
                     textAlign="top-center"
                     uiTransform={{
-                        position: { left: '150px', top: "100px" }
+                        position: { left: '165px', top: "108px" }
                     }}
                 />
             </UiEntity>
@@ -64,15 +60,7 @@ export class CarUI {
         CarUI.visibility = false
     }
 
-    static Update(_pos: number, _speed: number) {
-        CarUI.racerPosition = _pos.toString()
-        switch (_pos) {
-            case 1: CarUI.racerPosition += "st"
-                break
-            case 2: CarUI.racerPosition += "nd"
-                break
-            default: CarUI.racerPosition += "th"
-        }
-        CarUI.speed = (Math.round(_speed * 2.857 * 100) / 100).toFixed(1).toString() + " MPH"
+    static Update(_speed: number) {
+        CarUI.speed = (Math.round(_speed * 2.857 * 100) / 100).toFixed(1).toString()
     }
 }
