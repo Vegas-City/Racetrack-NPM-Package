@@ -3,11 +3,13 @@ import * as utils from "./src/utils";
 import * as racetrack from "./src/racetrack";
 import * as car from "./src/car";
 import * as ui from "./src/ui";
+import * as ghost from "./src/ghostCar"
 
 export {
   physics,
   utils,
   racetrack,
   car,
-  ui
+  ui,
+  ghost
 }
