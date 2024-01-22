@@ -30,7 +30,7 @@ export class Obstacle {
             const transformedPoint = applyTransformToPoint(_position, { position: TrackManager.trackTransform.position, rotation: TrackManager.trackTransform.rotation, scale: TrackManager.trackTransform.scale })
 
             const boxShape = new BoxShapeDefinition({
-                position: transformedPoint,
+                position: Vector3.create(transformedPoint.x, (_position.y + TrackManager.trackTransform.position.y) * TrackManager.trackTransform.scale.y, transformedPoint.z),
                 rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(_rotation.x, _rotation.y, _rotation.z)),
                 scale: Vector3.multiply(_scale, TrackManager.trackTransform.scale),
                 mass: mass
