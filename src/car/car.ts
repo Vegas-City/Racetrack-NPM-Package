@@ -384,6 +384,9 @@ export class Car {
 
                         self.occupied = true
                         Car.activeCarEntity = self.carEntity
+
+                        TrackManager.ghostRecorder.start() // This shouldn't really be here, it should start after a count down but as that doesn't exist lets start it here for now.
+                        
                     }, 50)
 
                     Animator.playSingleAnimation(self.carModelEntity, "CloseDoor")
