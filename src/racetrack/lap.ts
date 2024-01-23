@@ -6,7 +6,7 @@ export class Lap {
     static readonly checkpointThresholdDistance: number = 2
 
     static checkpoints: LapCheckpoint[] = []
-    static currentIndex: number = 0
+    static checkpointIndex: number = 0
     static lapsCompleted: number = -1
     static lapElapsed: number = 0
     static totalLaps: number = 3 // make the default 3
@@ -37,20 +37,22 @@ export class Lap {
         if (Lap.checkpoints.length < 1) return
 
         if (Lap.lapsCompleted >= 0) Lap.lapElapsed += _dt
-        const currentCheckpoint = Lap.checkpoints[Lap.currentIndex]
+        const currentCheckpoint = Lap.checkpoints[Lap.checkpointIndex]
         const distance = pointToLineDistance(_carPos, currentCheckpoint.point1, currentCheckpoint.point2)
 
         if (distance < Lap.checkpointThresholdDistance) {
             // crossed checkpoint
-            if (Lap.currentIndex == 0) {
+            if (Lap.checkpointIndex == 0) {
                 // completed a lap
                 Lap.lapsCompleted++
                 Lap.lapElapsed = 0
             }
-            Lap.currentIndex++
-            if (Lap.currentIndex >= Lap.checkpoints.length) {
-                Lap.currentIndex = 0
+            currentCheckpoint.hide()
+            Lap.checkpointIndex++
+            if (Lap.checkpointIndex >= Lap.checkpoints.length) {
+                Lap.checkpointIndex = 0
             }
+            Lap.checkpoints[Lap.checkpointIndex].show()
         }
     }
 }
