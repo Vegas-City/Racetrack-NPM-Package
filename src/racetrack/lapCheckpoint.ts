@@ -1,12 +1,13 @@
-import { Color4, Vector3 } from "@dcl/sdk/math";
+import { Color4, Quaternion, Vector3 } from "@dcl/sdk/math";
 import { TrackManager } from "./trackManager";
-import { Entity, Material, MeshRenderer, Transform, engine } from "@dcl/ecs";
+import { Entity, GltfContainer, Material, MeshRenderer, Transform, engine } from "@dcl/ecs";
 import { applyTransformToPoint } from "../utils";
 
 export class LapCheckpoint {
     index: number = 0
     point1: Vector3 = Vector3.Zero()
     point2: Vector3 = Vector3.Zero()
+    glowEntity: Entity | undefined
     debugEntity1: Entity | undefined
     debugEntity2: Entity | undefined
 
@@ -48,6 +49,40 @@ export class LapCheckpoint {
                     albedoColor: this.index == 0 ? Color4.Blue() : Color4.Black()
                 })
             }
+
+            this.addGlowEffect()
+        }
+    }
+
+    show(): void {
+        if(this.glowEntity === undefined) return
+
+        const distance = Vector3.distance(this.point1, this.point2)
+        Transform.getMutable(this.glowEntity).scale = Vector3.create(distance / 2, 2.5, 1)
+    }
+
+    hide(): void {
+        if(this.glowEntity === undefined) return
+
+        Transform.getMutable(this.glowEntity).scale = Vector3.Zero()
+    }
+
+    private addGlowEffect(): void {
+        this.glowEntity = engine.addEntity()
+        GltfContainer.create(this.glowEntity, {
+            src: "models/checkpointGlow.glb"
+        })
+
+        const center = Vector3.lerp(this.point1, this.point2, 0.5)
+        const angle = Math.atan2(this.point2.z - this.point1.z, this.point2.x - this.point1.x) * 180 / Math.PI
+        Transform.create(this.glowEntity, {
+            position: Vector3.create(center.x, 2, center.z),
+            rotation: Quaternion.fromEulerDegrees(0, angle, 0),
+            scale: Vector3.Zero()
+        })
+
+        if(this.index == 0) {
+            this.show()
         }
     }
 }
