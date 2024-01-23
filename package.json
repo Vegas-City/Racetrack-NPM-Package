@@ -1,6 +1,6 @@
 {
   "name": "@vegascity/racetrack",
-  "version": "1.0.19",
+  "version": "1.0.21",
   "description": "DCL RaceTrack Library",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -23,7 +23,8 @@
     "src/physics",
     "src/racetrack",
     "src/ui",
-    "src/utils"
+    "src/utils",
+    "src/ghostCar"
   ],
   "dependencies": {
     "@dcl-sdk/utils": "^1.1.3",
