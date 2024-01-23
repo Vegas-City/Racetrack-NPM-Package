@@ -1,6 +1,7 @@
 import { Vector3 } from "@dcl/sdk/math";
 import { LapCheckpoint } from "./lapCheckpoint";
 import { pointToLineDistance } from "../utils/utils";
+import { TrackManager } from "./trackManager";
 
 export class Lap {
     static readonly checkpointThresholdDistance: number = 2
@@ -46,6 +47,8 @@ export class Lap {
                 // completed a lap
                 Lap.lapsCompleted++
                 Lap.lapElapsed = 0
+                TrackManager.ghostRecorder.completeLap()
+                TrackManager.ghostCar.startGhost()
             }
             currentCheckpoint.hide()
             Lap.checkpointIndex++

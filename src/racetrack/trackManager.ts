@@ -5,6 +5,7 @@ import { Hotspot } from "./hotspot"
 import { Obstacle } from "./obstacle"
 import { HotspotActionManager } from "./hotspotActionManager"
 import { Lap } from "./lap"
+import { GhostCar, GhostRecorder } from "./../ghostCar"
 
 export class TrackManager {
     static debugMode: boolean = false
@@ -13,6 +14,8 @@ export class TrackManager {
     static hotspots: Hotspot[] = []
     static obstacles: Obstacle[] = []
     static carPoints: Vector3[] = []
+    static ghostRecorder: GhostRecorder
+    static ghostCar:GhostCar
 
     static trackTransform: TransformType = {
         position: Vector3.Zero(),
@@ -32,6 +35,9 @@ export class TrackManager {
         TrackManager.loadHotspots(_config)
         TrackManager.loadObstacles(_config)
         TrackManager.loadLapCheckpoints(_config)
+        
+        TrackManager.ghostRecorder = new GhostRecorder()
+        TrackManager.ghostCar = new GhostCar()
 
         engine.addSystem(TrackManager.update)
     }
