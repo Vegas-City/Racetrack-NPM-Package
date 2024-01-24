@@ -1,9 +1,10 @@
-import { Transform, engine } from "@dcl/sdk/ecs"
+import { Transform, TransformComponentExtended, engine } from "@dcl/sdk/ecs"
 import { Car } from "./../car"
 import { GhostPoint} from "./ghostPoint"
 import { GhostData } from "./ghostData"
 import { Vector3 } from "@dcl/sdk/math"
 import { Lap, TrackManager } from "./../racetrack"
+import { Quaternion } from "cannon"
 
 export class GhostRecorder {
 
@@ -64,9 +65,21 @@ export class GhostRecorder {
             return
         }
 
+        // Don't save the data to a high dp as we may need to transfer the positions over the network
+        let recordAccuracy:number = 3
+        let carTransform = Transform.get(car.carEntity)
+
+        let position :Vector3 = Vector3.create(Number.parseFloat(carTransform.position.x.toFixed(recordAccuracy)),
+                                               Number.parseFloat(carTransform.position.y.toFixed(recordAccuracy)),
+                                               Number.parseFloat(carTransform.position.z.toFixed(recordAccuracy)))
+        let rotation: Quaternion = new Quaternion(Number.parseFloat(carTransform.rotation.x.toFixed(recordAccuracy)),
+                                                  Number.parseFloat(carTransform.rotation.y.toFixed(recordAccuracy)),
+                                                  Number.parseFloat(carTransform.rotation.z.toFixed(recordAccuracy)),
+                                                  Number.parseFloat(carTransform.rotation.w.toFixed(recordAccuracy)))
+
         let ghostPoint:GhostPoint = {checkPoint:Lap.checkpointIndex,
-                                     position:Transform.get(car.carEntity).position, 
-                                     rotation: Transform.get(car.carEntity).rotation}
+                                     position: position, 
+                                     rotation: rotation}
 
         this.ghostData.points.push(ghostPoint)
     }
