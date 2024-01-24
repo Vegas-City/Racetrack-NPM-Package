@@ -1,4 +1,4 @@
-import { TrackManager } from "@vegascity/racetrack/src/racetrack/trackManager"
+import { TrackManager } from "./trackManager"
 import { Countdown } from "./countdown"
 import { InputManager } from "./inputManager"
 import { Lap } from "./lap"
