@@ -1,3 +1,4 @@
+import { TrackManager } from "./trackManager"
 import { Countdown } from "./countdown"
 import { InputManager } from "./inputManager"
 import { Lap } from "./lap"
@@ -17,6 +18,7 @@ export class GameManager {
             Lap.lapElapsed = 0
             Lap.checkpointIndex = 1
             Lap.checkpoints[Lap.checkpointIndex].show()
+            TrackManager.ghostRecorder.start()
         })
     }
 }

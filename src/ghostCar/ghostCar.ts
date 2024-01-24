@@ -16,11 +16,10 @@ export class GhostCar {
 
     constructor(){
         this.entity = engine.addEntity()
-        Transform.create(this.entity, {position: Vector3.create(15.39,1,23.84)})
+        Transform.create(this.entity, {position: Vector3.create(15.39,-20,23.84)})
 
         this.entityModel = engine.addEntity()
         Transform.create(this.entityModel, {parent: this.entity, position: Vector3.create(0,-0.8,0), rotation: Quaternion.fromEulerDegrees(0,0,0), scale:Vector3.create(1,1,1)})
-        //MeshRenderer.setBox(this.entity)
 
         GltfContainer.create(this.entityModel, {src: "models/ghostCar.glb"})
 
@@ -51,7 +50,7 @@ export class GhostCar {
         this.currentUpdateTime = 0
         this.pointIndex = 0
         this.ghostCarRunning = false 
-        this.hide() 
+        this.hide()  
     } 
 
     update(_dt:number){ 
@@ -80,12 +79,6 @@ export class GhostCar {
         } else {
             return
         }
-
-        
-        console.log("Point index: " + this.pointIndex)
-        console.log("Point length: " + this.ghostData.points.length)
-        console.log("Last Position : " + this.lastPoint.position.x + " " + this.lastPoint.position.y + " " + this.lastPoint.position.z)
-        console.log("Target Position : " + this.targetPoint.position.x + " " + this.targetPoint.position.y + " " + this.targetPoint.position.z)
 
         // Drive the course //
         utils.tweens.startTranslation(this.entity, this.lastPoint.position, this.targetPoint.position, this.ghostData.frequecy)
