@@ -6,6 +6,7 @@ import { Obstacle } from "./obstacle"
 import { HotspotActionManager } from "./hotspotActionManager"
 import { Lap } from "./lap"
 import { GhostCar, GhostRecorder } from "./../ghostCar"
+import { GameManager } from "./gameManager"
 
 export class TrackManager {
     static debugMode: boolean = false
@@ -93,5 +94,6 @@ export class TrackManager {
             Lap.update(dt, TrackManager.carPoints[0])
         }
         HotspotActionManager.update(dt)
+        GameManager.update(dt)
     }
 }
