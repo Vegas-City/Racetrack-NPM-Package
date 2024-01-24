@@ -1,6 +1,7 @@
 import { Vector3 } from "@dcl/sdk/math";
 import { LapCheckpoint } from "./lapCheckpoint";
 import { pointToLineDistance } from "../utils/utils";
+import { TrackManager } from "./trackManager";
 import { InputManager } from "./inputManager";
 import { Countdown } from "./countdown";
 
@@ -48,6 +49,8 @@ export class Lap {
                 // completed a lap
                 Lap.lapsCompleted++
                 Lap.lapElapsed = 0
+                TrackManager.ghostRecorder.completeLap()
+                TrackManager.ghostCar.startGhost()
                 if(Lap.lapsCompleted >= Lap.totalLaps) {
                     Lap.started = false
                 }
