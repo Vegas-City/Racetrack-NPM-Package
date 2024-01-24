@@ -9,7 +9,7 @@ export class GhostRecorder {
 
     recording:boolean = false
     currentRecordtime:number = 0
-    recordFrequncy:number = 0.5 // Half a second
+    recordFrequncy:number = 0.1 // Half a second
     ghostData: GhostData
 
     constructor(){
@@ -30,7 +30,7 @@ export class GhostRecorder {
 
     stop(){
         this.recording = false
-    }
+    } 
 
     update(_dt:number){
         if(!this.record){
