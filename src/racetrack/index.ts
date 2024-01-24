@@ -8,6 +8,7 @@ import { InputManager } from "./inputManager";
 import { HotspotActionManager } from "./hotspotActionManager";
 import { LapCheckpoint } from "./lapCheckpoint";
 import { Lap } from "./lap";
+import { Countdown } from "./countdown";
 
 export { HotspotType, ObstacleType }
 export { Hotspot }
@@ -18,3 +19,4 @@ export { InputManager }
 export { HotspotActionManager }
 export { LapCheckpoint }
 export { Lap }
+export { Countdown }
