@@ -2,8 +2,6 @@ import { Vector3 } from "@dcl/sdk/math";
 import { LapCheckpoint } from "./lapCheckpoint";
 import { pointToLineDistance } from "../utils/utils";
 import { TrackManager } from "./trackManager";
-import { InputManager } from "./inputManager";
-import { Countdown } from "./countdown";
 
 export class Lap {
     static readonly checkpointThresholdDistance: number = 2
@@ -31,11 +29,6 @@ export class Lap {
 
     static update(_dt: number, _carPos: Vector3): void {
         if (Lap.checkpoints.length < 1) return
-
-        if (InputManager.isStartPressed && !Lap.triggeredStart) {
-            Lap.triggeredStart = true
-            Lap.start()
-        }
 
         if (!Lap.started) return
 
@@ -71,16 +64,5 @@ export class Lap {
             }
         }
         return null
-    }
-
-    private static start(): void {
-        Countdown.Start(() => {
-            Lap.started = true
-            Lap.lapsCompleted++
-            Lap.lapElapsed = 0
-            Lap.checkpoints[Lap.checkpointIndex].hide()
-            Lap.checkpointIndex++
-            Lap.checkpoints[Lap.checkpointIndex].show()
-        })
     }
 }

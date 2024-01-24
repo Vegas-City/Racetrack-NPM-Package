@@ -80,9 +80,5 @@ export class LapCheckpoint {
             rotation: Quaternion.fromEulerDegrees(0, angle, 0),
             scale: Vector3.Zero()
         })
-
-        if(this.index == 0) {
-            this.show()
-        }
     }
 }

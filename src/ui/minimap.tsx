@@ -63,7 +63,7 @@ export class Minimap {
         </UiEntity>
     )
 
-    static LoadMinimap(_data: MinimapConfig): void {
+    static Load(_data: MinimapConfig): void {
         Minimap.imageSrc = _data.src
         Minimap.imageWidth = _data.srcWidth
         Minimap.imageHeight = _data.srcHeight
