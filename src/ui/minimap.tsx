@@ -32,7 +32,7 @@ export class Minimap {
     private static component = () => (
         <UiEntity
             uiTransform={{
-                position: { right: '150px', top: '30px' },
+                position: { right: '0px', top: '170px' },
                 width: Minimap.imageWidth * Minimap.SCALE,
                 height: Minimap.imageHeight * Minimap.SCALE,
                 positionType: 'absolute',
