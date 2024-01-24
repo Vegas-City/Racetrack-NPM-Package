@@ -108,6 +108,17 @@ export class Obstacle {
         }
     }
 
+    unload(): void {
+        if(this.entity) {
+            engine.removeEntity(this.entity)
+        }
+        if(this.debugEntity) {
+            engine.removeEntity(this.debugEntity)
+        }
+        this.entity = undefined
+        this.debugEntity = undefined
+    }
+
     static getBounceFactor(_type: ObstacleType): number {
         switch (_type) {
             case ObstacleType.none: return 0

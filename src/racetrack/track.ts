@@ -1,11 +1,12 @@
 import { Vector3 } from "@dcl/sdk/math";
 import { TrackManager } from "./trackManager";
-import { MeshRenderer, Transform, engine } from "@dcl/sdk/ecs";
+import { Entity, MeshRenderer, Transform, engine } from "@dcl/sdk/ecs";
 import { applyTransformToPoint, isPointInsidePolygon } from "../utils";
 
 export class Track {
     polygons: Vector3[][] = []
     inside: boolean = false
+    debugEntities: Entity[] = []
 
     constructor(_polygons: Vector3[][]) {
         for (let poly of _polygons) {
@@ -21,6 +22,7 @@ export class Track {
                         position: transformedPoint,
                         scale: Vector3.create(0.3, 0.3, 0.3)
                     })
+                    this.debugEntities.push(entity)
                 }
                 polyPoints.push(transformedPoint)
             }
@@ -43,5 +45,11 @@ export class Track {
         }
 
         this.inside = isInside
+    }
+
+    unload(): void {
+        this.debugEntities.forEach(entity => {
+            engine.removeEntity(entity)
+        })
     }
 }
