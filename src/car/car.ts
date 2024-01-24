@@ -589,7 +589,7 @@ export class Car {
         this.updateSteerValue(dt)
 
         CarUI.Update(this.speed)
-        Minimap.Update(carTransform.position.z, carTransform.position.x)
+        Minimap.Update(carTransform.position.x, carTransform.position.z)
 
         const forwardDir = Vector3.normalize(Vector3.rotate(Vector3.Forward(), carTransform.rotation))
         const upDir = Vector3.normalize(Vector3.rotate(Vector3.Up(), carTransform.rotation))
