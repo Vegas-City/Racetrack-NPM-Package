@@ -48,6 +48,9 @@ export class Lap {
                 // completed a lap
                 Lap.lapsCompleted++
                 Lap.lapElapsed = 0
+                if(Lap.lapsCompleted >= Lap.totalLaps) {
+                    Lap.started = false
+                }
             }
             currentCheckpoint.hide()
             Lap.checkpointIndex++
