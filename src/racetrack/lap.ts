@@ -1,6 +1,8 @@
 import { Vector3 } from "@dcl/sdk/math";
 import { LapCheckpoint } from "./lapCheckpoint";
 import { pointToLineDistance } from "../utils/utils";
+import { InputManager } from "./inputManager";
+import { Countdown } from "./countdown";
 
 export class Lap {
     static readonly checkpointThresholdDistance: number = 2
@@ -10,6 +12,8 @@ export class Lap {
     static lapsCompleted: number = -1
     static lapElapsed: number = 0
     static totalLaps: number = 3 // make the default 3
+    static triggeredStart: boolean = false
+    static started: boolean = false
 
     static addCheckpoint(_index: number, _pos: Vector3): void {
         let checkpoint = Lap.findCheckpoint(_index)
@@ -24,17 +28,15 @@ export class Lap {
         Lap.totalLaps = _laps
     }
 
-    private static findCheckpoint(_index: number): LapCheckpoint | null {
-        for (let checkpoint of Lap.checkpoints) {
-            if (checkpoint.index == _index) {
-                return checkpoint
-            }
-        }
-        return null
-    }
-
     static update(_dt: number, _carPos: Vector3): void {
         if (Lap.checkpoints.length < 1) return
+
+        if (InputManager.isStartPressed && !Lap.triggeredStart) {
+            Lap.triggeredStart = true
+            Lap.start()
+        }
+
+        if (!Lap.started) return
 
         if (Lap.lapsCompleted >= 0) Lap.lapElapsed += _dt
         const currentCheckpoint = Lap.checkpoints[Lap.checkpointIndex]
@@ -54,5 +56,25 @@ export class Lap {
             }
             Lap.checkpoints[Lap.checkpointIndex].show()
         }
+    }
+
+    private static findCheckpoint(_index: number): LapCheckpoint | null {
+        for (let checkpoint of Lap.checkpoints) {
+            if (checkpoint.index == _index) {
+                return checkpoint
+            }
+        }
+        return null
+    }
+
+    private static start(): void {
+        Countdown.Start(() => {
+            Lap.started = true
+            Lap.lapsCompleted++
+            Lap.lapElapsed = 0
+            Lap.checkpoints[Lap.checkpointIndex].hide()
+            Lap.checkpointIndex++
+            Lap.checkpoints[Lap.checkpointIndex].show()
+        })
     }
 }

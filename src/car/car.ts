@@ -4,7 +4,7 @@ import { CarConfig } from './carConfig'
 import { localToWorldPosition } from '../utils/utils'
 import { PhysicsManager, Body } from '../physics'
 import { BoxShapeDefinition } from '../physics/shapes'
-import { Obstacle, TrackManager } from '../racetrack'
+import { Lap, Obstacle, TrackManager } from '../racetrack'
 import { InputManager } from '../racetrack/inputManager'
 import { CarUI, LapUI, Minimap } from '../ui'
 import { movePlayerTo, triggerSceneEmote } from '../utils/setup'
@@ -430,7 +430,7 @@ export class Car {
         const minSpeed = this.carAttributes.calculateMinSpeed()
         const maxSpeed = this.carAttributes.calculateMaxSpeed()
 
-        if (this.occupied && InputManager.isForwardPressed) {
+        if (this.occupied && InputManager.isForwardPressed && Lap.started) {
             if (this.speed - maxSpeed > 2) {
                 this.speed -= (deceleration * dt)
             }
@@ -443,7 +443,7 @@ export class Car {
                 }
             }
         }
-        else if (this.occupied && InputManager.isBackwardPressed) {
+        else if (this.occupied && InputManager.isBackwardPressed && Lap.started) {
             if (minSpeed - this.speed > 2) {
                 this.speed += (deceleration * dt)
             }
