@@ -55,16 +55,28 @@ export class LapCheckpoint {
     }
 
     show(): void {
-        if(this.glowEntity === undefined) return
+        if (this.glowEntity === undefined) return
 
         const distance = Vector3.distance(this.point1, this.point2)
         Transform.getMutable(this.glowEntity).scale = Vector3.create(distance / 2, 2.5, 1)
     }
 
     hide(): void {
-        if(this.glowEntity === undefined) return
+        if (this.glowEntity === undefined) return
 
         Transform.getMutable(this.glowEntity).scale = Vector3.Zero()
+    }
+
+    unload(): void {
+        if (this.glowEntity) {
+            engine.removeEntity(this.glowEntity)
+        }
+        if (this.debugEntity1) {
+            engine.removeEntity(this.debugEntity1)
+        }
+        if (this.debugEntity2) {
+            engine.removeEntity(this.debugEntity2)
+        }
     }
 
     private addGlowEffect(): void {

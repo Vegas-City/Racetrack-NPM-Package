@@ -44,7 +44,7 @@ export class Lap {
                 Lap.lapElapsed = 0
                 TrackManager.ghostRecorder.completeLap()
                 TrackManager.ghostCar.startGhost()
-                if(Lap.lapsCompleted >= Lap.totalLaps) {
+                if (Lap.lapsCompleted >= Lap.totalLaps) {
                     Lap.started = false
                 }
             }
@@ -55,6 +55,13 @@ export class Lap {
             }
             Lap.checkpoints[Lap.checkpointIndex].show()
         }
+    }
+
+    static unload(): void {
+        Lap.checkpoints.forEach(checkpoint => {
+            checkpoint.unload()
+        })
+        Lap.checkpoints.splice(0)
     }
 
     private static findCheckpoint(_index: number): LapCheckpoint | null {
