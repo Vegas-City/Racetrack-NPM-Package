@@ -2,6 +2,7 @@ import { Vector3 } from "@dcl/sdk/math";
 import { LapCheckpoint } from "./lapCheckpoint";
 import { pointToLineDistance } from "../utils/utils";
 import { TrackManager } from "./trackManager";
+import { GameManager } from "./gameManager";
 
 export class Lap {
     static readonly checkpointThresholdDistance: number = 2
@@ -10,7 +11,7 @@ export class Lap {
     static checkpointIndex: number = 0
     static lapsCompleted: number = -1
     static lapElapsed: number = 0
-    static totalLaps: number = 3 // make the default 3
+    static totalLaps: number = 1 // make the default 1
     static triggeredStart: boolean = false
     static started: boolean = false
 
@@ -45,7 +46,7 @@ export class Lap {
                 TrackManager.ghostRecorder.completeLap()
                 TrackManager.ghostCar.startGhost()
                 if (Lap.lapsCompleted >= Lap.totalLaps) {
-                    Lap.started = false
+                    GameManager.end()
                 }
             }
             currentCheckpoint.hide()

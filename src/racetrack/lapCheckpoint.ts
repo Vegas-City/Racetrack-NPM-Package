@@ -51,6 +51,9 @@ export class LapCheckpoint {
             }
 
             this.addGlowEffect()
+            if (this.index == 0) {
+                this.show()
+            }
         }
     }
 

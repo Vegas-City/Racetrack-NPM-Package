@@ -62,6 +62,7 @@ export class Car {
     collisionBounceB: number = 1
 
     carAttributes: CarAttributes
+    startPos: Vector3 = Vector3.Zero()
 
     constructor(_config: CarConfig, _position: Vector3, _rot: number) {
         this.carAttributes = new CarAttributes(_config)
@@ -73,6 +74,7 @@ export class Car {
         this.wheelY = _config.wheelY
         this.carScale = _config.carScale
 
+        this.startPos = Vector3.clone(_position)
         const scale = Vector3.create(3 * this.carScale, 1 * this.carScale, 7 * this.carScale)
         this.initialiseCannon(_position, Quaternion.fromEulerDegrees(0, _rot, 0), scale)
 
@@ -157,6 +159,30 @@ export class Car {
         }
 
         Car.instances.push(this)
+    }
+
+    public exitCar(): void {
+        if (this.carEntity === undefined || this.carEntity === null) return
+
+        this.occupied = false
+        Car.activeCarEntity = null
+
+        const carTransform = Transform.getMutable(this.carEntity)
+
+        if (this.carColliderEntity !== undefined && this.carColliderEntity !== null) {
+            Transform.getMutable(this.carColliderEntity).scale = Vector3.One()
+        }
+
+        const targetPos = localToWorldPosition(Vector3.create(-2.3, -2, -0.2), carTransform.position, carTransform.rotation)
+        const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carTransform.position, carTransform.rotation)
+        movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
+
+        this.attachPointerEvent()
+        CarUI.Hide()
+        LapUI.Hide()
+        Minimap.Hide()
+
+        if (this.playerCageEntity) CameraModeArea.deleteFrom(this.playerCageEntity)
     }
 
     private initialiseCannon(_position: Vector3, _rot: Quaternion, _scale: Vector3): void {
@@ -386,7 +412,7 @@ export class Car {
                         Car.activeCarEntity = self.carEntity
 
                         TrackManager.ghostRecorder.start() // This shouldn't really be here, it should start after a count down but as that doesn't exist lets start it here for now.
-                        
+
                     }, 50)
 
                     Animator.playSingleAnimation(self.carModelEntity, "CloseDoor")
@@ -394,30 +420,6 @@ export class Car {
                 }, 1200)
             }, 1650) // Open car door 
         }, 500) // Play animation after teleport  
-    }
-
-    private exitCar(): void {
-        if (this.carEntity === undefined || this.carEntity === null) return
-
-        this.occupied = false
-        Car.activeCarEntity = null
-
-        const carTransform = Transform.getMutable(this.carEntity)
-
-        if (this.carColliderEntity !== undefined && this.carColliderEntity !== null) {
-            Transform.getMutable(this.carColliderEntity).scale = Vector3.One()
-        }
-
-        const targetPos = localToWorldPosition(Vector3.create(-2.3, -2, -0.2), carTransform.position, carTransform.rotation)
-        const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carTransform.position, carTransform.rotation)
-        movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
-
-        this.attachPointerEvent()
-        CarUI.Hide()
-        LapUI.Hide()
-        Minimap.Hide()
-
-        if (this.playerCageEntity) CameraModeArea.deleteFrom(this.playerCageEntity)
     }
 
     private isFreeFalling(): boolean {
