@@ -44,7 +44,6 @@ export class Lap {
                 Lap.lapsCompleted++
                 Lap.lapElapsed = 0
                 TrackManager.ghostRecorder.completeLap()
-                TrackManager.ghostCar.startGhost()
                 if (Lap.lapsCompleted >= Lap.totalLaps) {
                     GameManager.end()
                 }
