@@ -140,36 +140,42 @@ export class Car {
             scale: Vector3.Zero()
         })
         GltfContainer.create(this.playerCageEntity, {
-            src: 'models/playerLocker.glb'
+            src: 'models/playerLocker.glb' 
         })
-
-        this.steeringWheel = engine.addEntity()
-        GltfContainer.create(this.steeringWheel, { src: _config.steeringWheelGLB })
-        Transform.create(this.steeringWheel, {
-            parent: this.carModelEntity
-        })
-        Animator.create(this.steeringWheel, {
-            states: [
-                {
-                    clip:"Idle",
-                    playing:true,
-                    loop: true, 
-                    weight:1
-                },
-                {
-                    clip:"RightTurn",
-                    playing:true,
-                    loop: true,
-                    weight:1
-                },
-                {
-                    clip:"LeftTurn",
-                    playing:true,
-                    loop: true,
-                    weight:1
-                }
-            ]
-        })
+ 
+        let self = this
+        utils.timers.setTimeout(function () {
+       
+            self.steeringWheel = engine.addEntity()
+            GltfContainer.create(self.steeringWheel, { src: _config.steeringWheelGLB })
+            if(self.carModelEntity!=null){
+                Transform.create(self.steeringWheel, {
+                    parent: self.carModelEntity
+                })
+            } 
+            Animator.create(self.steeringWheel, {
+                states: [
+                    {
+                        clip:"Idle",
+                        playing:true,
+                        loop: true, 
+                        weight:1
+                    },
+                    {
+                        clip:"RightTurn",
+                        playing:true,
+                        loop: true,
+                        weight:0
+                    },
+                    {
+                        clip:"LeftTurn",
+                        playing:true,
+                        loop: true,
+                        weight:0
+                    }
+                ]
+            })
+        }, 2000) // Give some time for the steering animations to load
 
         this.attachPointerEvent()
 
@@ -202,6 +208,8 @@ export class Car {
         CarUI.Hide()
         LapUI.Hide()
         Minimap.Hide()
+
+        this.putTheCarBackOnTheGround() // Make sure the car isn't still in the air
 
         if (this.playerCageEntity) {
             CameraModeArea.deleteFrom(this.playerCageEntity)
@@ -378,16 +386,25 @@ export class Car {
         //Update cage and car transform
         const scale = Vector3.create(3 * this.carScale, 1 * this.carScale, 7 * this.carScale)
         if (this.thirdPersonView) {
-            Transform.getMutable(this.playerCageEntity).position = Vector3.create(0, 2, -1.5)
-            Transform.getMutable(this.carModelEntity).position = Vector3.create(0, 0, -0.02)
-
+            this.putTheCarBackOnTheGround()
         } else {
-            Transform.getMutable(this.playerCageEntity).position = Vector3.create(-0.15, 0, -0.3)
-            Transform.getMutable(this.carModelEntity).position = Vector3.create(0, 1.27, -0.02 - 0.3)
+            this.putTheCarInTheAir()
         }
 
         const forwardDir = Vector3.add(this.getCagePos(), Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
         movePlayerTo({ newRelativePosition: Vector3.add(this.getCagePos(), _deltaDistance), cameraTarget: forwardDir })
+    }
+
+    private putTheCarBackOnTheGround(){
+        if (this.carEntity === undefined || this.carEntity === null || this.playerCageEntity === undefined || this.playerCageEntity === null || this.carModelEntity === undefined || this.carModelEntity === null) return
+        Transform.getMutable(this.playerCageEntity).position = Vector3.create(0, 2, -1.5)
+        Transform.getMutable(this.carModelEntity).position = Vector3.create(0, 0, -0.02)
+    }
+
+    private putTheCarInTheAir(){
+        if (this.carEntity === undefined || this.carEntity === null || this.playerCageEntity === undefined || this.playerCageEntity === null || this.carModelEntity === undefined || this.carModelEntity === null) return
+        Transform.getMutable(this.playerCageEntity).position = Vector3.create(-0.15, 0, -0.3)
+        Transform.getMutable(this.carModelEntity).position = Vector3.create(0, 1.27, -0.02 - 0.3)
     }
 
     private enterCar(): void {
@@ -421,7 +438,7 @@ export class Car {
                         Minimap.Show()
 
                         if (self.playerCageEntity) {
-                            CameraModeArea.create(self.playerCageEntity, {
+                            CameraModeArea.createOrReplace(self.playerCageEntity, {
                                 area: Vector3.create(3, 2, 7),
                                 mode: CameraType.CT_FIRST_PERSON,
                             })
@@ -559,8 +576,6 @@ export class Car {
             const animRight = Animator.getClip(this.steeringWheel, 'RightTurn')
             const animLeft = Animator.getClip(this.steeringWheel, 'LeftTurn')
 
-            console.log("SteerValue: " + this.steerValue)
-            console.log("Weight:" + this.steerValue/Car.MAX_STEERING_VALUE)
             if(this.steerValue>0){
                 animLeft.weight = 0
                 animRight.weight = Math.abs(this.steerValue/Car.MAX_STEERING_VALUE)
