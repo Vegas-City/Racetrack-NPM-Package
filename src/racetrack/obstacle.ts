@@ -122,8 +122,8 @@ export class Obstacle {
     static getBounceFactor(_type: ObstacleType): number {
         switch (_type) {
             case ObstacleType.none: return 0
-            case ObstacleType.boundary: return 1.5
-            case ObstacleType.tree: return 1
+            case ObstacleType.boundary: return 3
+            case ObstacleType.tree: return 2
             case ObstacleType.barrel: return 0
         }
     }

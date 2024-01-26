@@ -59,8 +59,7 @@ export class Car {
     colliding: boolean = false
     collisionDir: Vector3 = Vector3.Zero()
     collisionCooldown: number = 0
-    collisionBounceF: number = 0.5
-    collisionBounceB: number = 1
+    collisionBounce: number = 0.5
 
     carAttributes: CarAttributes
     startPos: Vector3 = Vector3.Zero()
@@ -138,7 +137,7 @@ export class Car {
         Transform.create(this.playerCageEntity, {
             parent: this.carEntity,
             position: Vector3.create(0, 2, -1.5),
-            scale: Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
+            scale: Vector3.Zero()
         })
         GltfContainer.create(this.playerCageEntity, {
             src: 'models/playerLocker.glb'
@@ -204,7 +203,10 @@ export class Car {
         LapUI.Hide()
         Minimap.Hide()
 
-        if (this.playerCageEntity) CameraModeArea.deleteFrom(this.playerCageEntity)
+        if (this.playerCageEntity) {
+            CameraModeArea.deleteFrom(this.playerCageEntity)
+            Transform.getMutable(this.playerCageEntity).scale = Vector3.Zero()
+        }
     }
 
     private initialiseCannon(_position: Vector3, _rot: Quaternion, _scale: Vector3): void {
@@ -243,12 +245,7 @@ export class Car {
             self.collisionCooldown = 0.5
 
             const bounceFactor = Obstacle.getBounceFactorFromId(colId)
-            if (self.speed > 0) {
-                self.speed = -self.collisionBounceF * bounceFactor
-            }
-            else {
-                self.speed = self.collisionBounceB * bounceFactor
-            }
+            self.speed = -Math.sign(self.speed) * self.collisionBounce * bounceFactor
         }).bind(this))
     }
 
@@ -428,6 +425,8 @@ export class Car {
                                 area: Vector3.create(3, 2, 7),
                                 mode: CameraType.CT_FIRST_PERSON,
                             })
+                            const scale = Vector3.create(3 * self.carScale, 1 * self.carScale, 7 * self.carScale)
+                            Transform.getMutable(self.playerCageEntity).scale = Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
                         }
 
                         self.occupied = true
@@ -577,12 +576,10 @@ export class Car {
         let collisionCounterVelocity = Vector3.Zero()
         if (this.occupied && this.colliding) {
             if (this.collisionDir.y < 0.1 || (_forwardDir.y < 0.05 && this.collisionDir.y > 0.999)) {
-                const sign = this.speed > 0 ? 1 : -1
-
                 const impactCoef = Math.max(0.2, Math.abs(Vector3.dot(_forwardDir, this.collisionDir)))
-                this.speed -= (sign * this.speed * impactCoef)
+                this.speed += (this.speed * impactCoef)
 
-                const energyLoss: number = this.speed * sign * impactCoef * 7
+                const energyLoss: number = Math.abs(this.speed) * impactCoef * 7
                 collisionCounterVelocity = Vector3.create(this.collisionDir.x * energyLoss, 0, this.collisionDir.z * energyLoss)
             }
 
