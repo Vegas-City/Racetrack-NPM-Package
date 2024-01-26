@@ -38,6 +38,7 @@ export class Car {
     carColliderEntity: Entity | null = null
     playerCageEntity: Entity | null = null
     carBody: Body | null = null
+    steeringWheel: Entity | null = null
     wheelL1: Entity | null = null
     wheelL2: Entity | null = null
     wheelR1: Entity | null = null
@@ -142,11 +143,32 @@ export class Car {
             src: 'models/playerLocker.glb'
         })
 
-        const steeringWheel = engine.addEntity()
-        GltfContainer.create(steeringWheel, { src: _config.steeringWheelGLB })
-        Transform.create(steeringWheel, {
-            parent: this.carModelEntity,
-            position: Vector3.create(0.85, 0.15, 0.5)
+        this.steeringWheel = engine.addEntity()
+        GltfContainer.create(this.steeringWheel, { src: _config.steeringWheelGLB })
+        Transform.create(this.steeringWheel, {
+            parent: this.carModelEntity
+        })
+        Animator.create(this.steeringWheel, {
+            states: [
+                {
+                    clip:"Idle",
+                    playing:true,
+                    loop: true, 
+                    weight:1
+                },
+                {
+                    clip:"RightTurn",
+                    playing:true,
+                    loop: true,
+                    weight:1
+                },
+                {
+                    clip:"LeftTurn",
+                    playing:true,
+                    loop: true,
+                    weight:1
+                }
+            ]
         })
 
         this.attachPointerEvent()
@@ -267,7 +289,7 @@ export class Car {
         CarWheelComponent.create(this.wheelL1, {
             child: wheelL1Child,
             isFrontWheel: true,
-            localPosition: Vector3.create(this.wheelX_R, -0.4, this.wheelZ_F)
+            localPosition: Vector3.create(this.wheelX_R, this.wheelY, this.wheelZ_F)
         })
 
         // L2
@@ -286,7 +308,7 @@ export class Car {
 
         CarWheelComponent.create(this.wheelL2, {
             child: wheelL2Child,
-            localPosition: Vector3.create(this.wheelX_R, -0.4, -this.wheelZ_B)
+            localPosition: Vector3.create(this.wheelX_R, this.wheelY, -this.wheelZ_B)
         })
 
         // R1
@@ -306,7 +328,7 @@ export class Car {
         CarWheelComponent.create(this.wheelR1, {
             child: wheelR1Child,
             isFrontWheel: true,
-            localPosition: Vector3.create(-this.wheelX_L, -0.4, this.wheelZ_F)
+            localPosition: Vector3.create(-this.wheelX_L, this.wheelY, this.wheelZ_F)
         })
 
         // R2
@@ -315,7 +337,7 @@ export class Car {
 
         const wheelR2Child = engine.addEntity()
         GltfContainer.create(wheelR2Child, {
-            src: _rightWheelGLB
+            src: _rightWheelGLB 
         })
         Transform.create(wheelR2Child, {
             parent: this.wheelR2,
@@ -325,7 +347,7 @@ export class Car {
 
         CarWheelComponent.create(this.wheelR2, {
             child: wheelR2Child,
-            localPosition: Vector3.create(-this.wheelX_L, -0.4, -this.wheelZ_B)
+            localPosition: Vector3.create(-this.wheelX_L, this.wheelY, -this.wheelZ_B)
         })
     }
 
@@ -411,7 +433,7 @@ export class Car {
                         Car.activeCarEntity = self.carEntity
 
                         TrackManager.ghostRecorder.start() // This shouldn't really be here, it should start after a count down but as that doesn't exist lets start it here for now.
-
+                        
                     }, 50)
 
                     Animator.playSingleAnimation(self.carModelEntity, "CloseDoor")
@@ -531,6 +553,23 @@ export class Car {
                 }
             }
         }
+
+        // Update steering wheel based on steer value
+        if(this.steeringWheel!=null){
+            const animRight = Animator.getClip(this.steeringWheel, 'RightTurn')
+            const animLeft = Animator.getClip(this.steeringWheel, 'LeftTurn')
+
+            console.log("SteerValue: " + this.steerValue)
+            console.log("Weight:" + this.steerValue/Car.MAX_STEERING_VALUE)
+            if(this.steerValue>0){
+                animLeft.weight = 0
+                animRight.weight = Math.abs(this.steerValue/Car.MAX_STEERING_VALUE)
+            } else {
+                animRight.weight = 0
+                animLeft.weight = Math.abs(this.steerValue/Car.MAX_STEERING_VALUE)
+            }
+        }
+
     }
 
     private handleCollisions(_forwardDir: Vector3): Vector3 {

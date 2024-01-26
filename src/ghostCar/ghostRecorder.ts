@@ -50,7 +50,14 @@ export class GhostRecorder {
         // Send the recorded data to the ghost car
         this.stop()
         // Clone the data
-        Object.assign(TrackManager.ghostCar.ghostData,this.ghostData)
+        if(TrackManager.ghostCar.ghostData.points.length == 0){
+            // No previous data so copy over
+            Object.assign(TrackManager.ghostCar.ghostData,this.ghostData)
+        } else if((TrackManager.ghostCar.ghostData.points.length*TrackManager.ghostCar.ghostData.frequecy) > (this.ghostData.points.length*this.ghostData.frequecy)){
+            // The latest lap took less time so copy over
+            Object.assign(TrackManager.ghostCar.ghostData,this.ghostData)
+        }
+        
         // Start recording again
         this.start()
     }
