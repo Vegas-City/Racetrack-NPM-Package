@@ -8,6 +8,9 @@ import { Lap } from "./lap"
 import { GhostCar, GhostRecorder } from "./../ghostCar"
 import { GameManager } from "./gameManager"
 
+/**
+ * Manages all track logic and setup.
+ */
 export class TrackManager {
     static debugMode: boolean = false
 
@@ -26,6 +29,15 @@ export class TrackManager {
         scale: Vector3.One()
     }
 
+    /**
+     * Creates a TrackManager instance.
+     *
+     * @param _position the position of the entire track.
+     * @param _rotation the rotation of the entire track.
+     * @param _scale the scale of the entire track.
+     * @param _debugMode a flag to toggle debug mode.
+     *
+     */
     constructor(_position: Vector3, _rotation: Quaternion, _scale: Vector3, _debugMode: boolean = false) {
         TrackManager.debugMode = _debugMode
         TrackManager.trackTransform = {
@@ -40,6 +52,11 @@ export class TrackManager {
         engine.addSystem(TrackManager.update)
     }
 
+    /**
+     * Loads a track with the provided config (json file).
+     *
+     * @param _config the config (json file) that represents the track and all of its components like track points, hotspots, obstacles, and lap checkpoints.
+     */
     static Load(_config: any): void {
         TrackManager.Unload()
 
@@ -49,6 +66,10 @@ export class TrackManager {
         TrackManager.loadLapCheckpoints(_config)
     }
 
+    /**
+     * Unloads a track and removes all of its components from the engine.
+     *
+     */
     static Unload(): void {
         if(TrackManager.trackEntity === undefined) return
 
@@ -70,6 +91,11 @@ export class TrackManager {
         Lap.unload()
     }
 
+    /**
+     * Loads the track data (the roads).
+     *
+     * @param _trackData the track json config.
+     */
     private static loadTrack(_trackData: any): void {
         TrackManager.trackEntity = engine.addEntity()
         GltfContainer.create(TrackManager.trackEntity, {
@@ -90,6 +116,11 @@ export class TrackManager {
         TrackManager.track = new Track(trackPolygons)
     }
 
+    /**
+     * Loads all hotspots.
+     *
+     * @param _trackData the track json config.
+     */
     private static loadHotspots(_trackData: any): void {
         TrackManager.hotspots.splice(0)
         for (let hotspot of _trackData.hotspots) {
@@ -97,6 +128,11 @@ export class TrackManager {
         }
     }
 
+    /**
+     * Loads all obstacles.
+     *
+     * @param _trackData the track json config.
+     */
     private static loadObstacles(_trackData: any): void {
         TrackManager.obstacles.splice(0)
         for (let obstacle of _trackData.obstacles) {
@@ -104,12 +140,22 @@ export class TrackManager {
         }
     }
 
+    /**
+     * Loads all lap checkpoints.
+     *
+     * @param _trackData the track json config.
+     */
     private static loadLapCheckpoints(_trackData: any): void {
         for (let checkpoint of _trackData.lapCheckpoints) {
             Lap.addCheckpoint(checkpoint.index, checkpoint.position)
         }
     }
 
+    /**
+     * Update method that is called every frame.
+     *
+     * @param dt elapsed time between frames.
+     */
     private static update(dt: number) {
         if(TrackManager.trackEntity === undefined) return
 

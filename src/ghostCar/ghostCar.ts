@@ -3,6 +3,8 @@ import { GhostData } from "./ghostData";
 import { GhostPoint } from "./ghostPoint";
 import { Quaternion, Vector3 } from "@dcl/sdk/math";
 import * as utils from '@dcl-sdk/utils'
+import { TrackManager } from "../racetrack";
+import { Car } from "../car";
 
 export class GhostCar {
     entity: Entity
@@ -61,9 +63,20 @@ export class GhostCar {
         if(!this.ghostCarRunning){
             return
         }
+        
+        // If we are too close to the ghost car and in first person hide it. So we can see where we are going and so its not obvious we've raised the car
+        if(!Car.instances[0].thirdPersonView){
+            if(Car.instances[0].carEntity != null) {
+                if(Vector3.distance(Transform.get(Car.instances[0].carEntity).position, Transform.get(this.entity).position)<15){
+                    Transform.getMutable(this.entity).scale = Vector3.Zero()
+                } else {
+                    Transform.getMutable(this.entity).scale = Vector3.One()
+                }
+            }
+        }
 
         this.currentUpdateTime+=_dt
-
+ 
         // Plot the course //
         let newIndex:number = Math.floor((this.currentUpdateTime/ this.ghostData.frequecy))
         
