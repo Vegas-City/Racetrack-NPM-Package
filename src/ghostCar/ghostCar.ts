@@ -97,13 +97,17 @@ export class GhostCar {
         if(this.oldIndex<newIndex){
 
             // Drive the course //
-            utils.tweens.stopTranslation(this.entity)
-            utils.tweens.stopRotation(this.entity)
-            utils.tweens.startTranslation(this.entity, this.lastPoint.position, this.targetPoint.position, this.ghostData.frequecy)
-            utils.tweens.startRotation(this.entity, this.lastPoint.rotation, this.targetPoint.rotation, this.ghostData.frequecy)
+            try{
+                utils.tweens.stopTranslation(this.entity)
+                utils.tweens.stopRotation(this.entity)
+                utils.tweens.startTranslation(this.entity, this.lastPoint.position, this.targetPoint.position, this.ghostData.frequecy)
+                utils.tweens.startRotation(this.entity, this.lastPoint.rotation, this.targetPoint.rotation, this.ghostData.frequecy)
+            } catch (error){
+                console.log("Tween error : " + error)
+            }
 
         }
-        
+
         this.oldIndex = newIndex
 
     }
