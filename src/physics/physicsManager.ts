@@ -15,7 +15,7 @@ export class PhysicsManager {
         PhysicsManager.world = World.getInstance()
 
         const groundShape = new PlaneShapeDefinition({
-            position: Vector3.create(0, 0, 0),
+            position: Vector3.create(0, 1, 0),
             rotation: Quaternion.fromEulerDegrees(-90, 0, 0)
         })
         PhysicsManager.groundBody = new Body(groundShape)
