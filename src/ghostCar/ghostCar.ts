@@ -11,6 +11,7 @@ export class GhostCar {
     entityModel: Entity
     ghostData: GhostData = new GhostData()
     pointIndex: number = 0
+    oldIndex:number = -1
     currentUpdateTime:number = 0
     ghostCarRunning : boolean = false
     targetPoint: GhostPoint
@@ -93,10 +94,17 @@ export class GhostCar {
             return
         }
 
-        // Drive the course //
-        utils.tweens.startTranslation(this.entity, this.lastPoint.position, this.targetPoint.position, this.ghostData.frequecy)
-        utils.tweens.startRotation(this.entity, this.lastPoint.rotation, this.targetPoint.rotation, this.ghostData.frequecy)
+        if(this.oldIndex<newIndex){
 
+            // Drive the course //
+            utils.tweens.stopTranslation(this.entity)
+            utils.tweens.stopRotation(this.entity)
+            utils.tweens.startTranslation(this.entity, this.lastPoint.position, this.targetPoint.position, this.ghostData.frequecy)
+            utils.tweens.startRotation(this.entity, this.lastPoint.rotation, this.targetPoint.rotation, this.ghostData.frequecy)
+
+        }
+        
+        this.oldIndex = newIndex
 
     }
 }
