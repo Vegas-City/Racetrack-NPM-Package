@@ -11,11 +11,12 @@ export class GhostCar {
     entityModel: Entity
     ghostData: GhostData = new GhostData()
     pointIndex: number = 0
-    oldIndex:number = -1
+
     currentUpdateTime:number = 0
     ghostCarRunning : boolean = false
     targetPoint: GhostPoint
     lastPoint: GhostPoint
+    currentLerp:number = 0
 
     constructor(){
         this.entity = engine.addEntity()
@@ -77,7 +78,8 @@ export class GhostCar {
         }
 
         this.currentUpdateTime+=_dt
- 
+        this.currentLerp+=_dt
+
         // Plot the course //
         let newIndex:number = Math.floor((this.currentUpdateTime/ this.ghostData.frequecy))
         
@@ -90,25 +92,12 @@ export class GhostCar {
             this.pointIndex = newIndex
             this.lastPoint = this.targetPoint
             this.targetPoint = this.ghostData.points[this.pointIndex]
-        } else {
-            return
+            this.currentLerp = 0
         }
 
-        if(this.oldIndex<newIndex){
-
-            // Drive the course //
-            try{
-                utils.tweens.stopTranslation(this.entity)
-                utils.tweens.stopRotation(this.entity)
-                utils.tweens.startTranslation(this.entity, this.lastPoint.position, this.targetPoint.position, this.ghostData.frequecy)
-                utils.tweens.startRotation(this.entity, this.lastPoint.rotation, this.targetPoint.rotation, this.ghostData.frequecy)
-            } catch (error){
-                console.log("Tween error : " + error)
-            }
-
-        }
-
-        this.oldIndex = newIndex
-
+        // Drive the course //
+        Transform.getMutable(this.entity).position = Vector3.lerp(this.lastPoint.position,this.targetPoint.position,this.currentLerp/this.ghostData.frequecy)
+        Transform.getMutable(this.entity).rotation = this.targetPoint.rotation
+        
     }
 }
