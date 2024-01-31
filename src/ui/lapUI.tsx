@@ -8,50 +8,33 @@ export class LapUI {
     private static component = () => (
         <UiEntity
             uiTransform={{
-                position: { right: '0px', top: '270px' },
+                position: { right: '4%', top: '1%' },
                 height: 100,
                 width: 100,
                 positionType: 'absolute',
                 display: LapUI.visibility ? 'flex' : 'none'
             }}
         >
-            <UiEntity
+            <Label // Lap
+                value={LapUI.formatLap()}
+                color={Color4.White()}
+                fontSize={38}
+                font="sans-serif"
+                textAlign="top-center"
                 uiTransform={{
-                    position: { bottom: "30px", right: "0px" },
-                    height: 256,
-                    width: 256,
-                    positionType: 'absolute',
-                    display: "flex"
+                    position: { right: '180px' }
                 }}
-                uiBackground={{
-                    textureMode: 'center',
-                    texture: {
-                        src: "images/ui/lapUI.png",
-                        wrapMode: 'repeat'
-                    }
+            />
+            <Label // Time
+                value={LapUI.formatTime()}
+                color={Color4.White()}
+                fontSize={38}
+                font="sans-serif"
+                textAlign="top-center"
+                uiTransform={{
+                    position: { right: '0px' }
                 }}
-            >
-                <Label // Lap
-                    value={LapUI.formatLap()}
-                    color={Color4.Black()}
-                    fontSize={24}
-                    font="serif"
-                    textAlign="top-center"
-                    uiTransform={{
-                        position: { left: '230px', top: "6px" }
-                    }}
-                />
-                <Label // Time
-                    value={LapUI.formatTime()}
-                    color={Color4.Black()}
-                    fontSize={38}
-                    font="serif"
-                    textAlign="top-center"
-                    uiTransform={{
-                        position: { left: '180px', top: "36px" }
-                    }}
-                />
-            </UiEntity>
+            />
         </UiEntity>
     )
 
@@ -71,10 +54,14 @@ export class LapUI {
 
     private static formatLap(): string {
         if (Lap.lapsCompleted < 0) return ""
-        return (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
+        return "Lap " + (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
     }
 
     private static formatTime(): string {
-        return (Math.round(Lap.lapElapsed * 10) / 10).toFixed(1).toString()
+        let date = new Date(0)
+        date.setSeconds(Math.round(Lap.lapElapsed))
+
+        let timeString = date.toISOString().substring(11, 19)
+        return timeString
     }
 }
