@@ -216,11 +216,11 @@ export class Car {
             Transform.getMutable(this.carColliderEntity).scale = Vector3.One()
         }
 
-        const targetPos = localToWorldPosition(Vector3.create(-2.3, -2, -0.2), carTransform.position, carTransform.rotation)
+        const targetPos = localToWorldPosition(Vector3.create(-2.3, -1, -0.2), carTransform.position, carTransform.rotation)
         const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carTransform.position, carTransform.rotation)
         movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
  
-        this.attachPointerEvent()
+        this.attachPointerEvent() 
         CarUI.Hide() 
         LapUI.Hide()
         Minimap.Hide()
@@ -537,7 +537,7 @@ export class Car {
         // Move player cage based on max speed
         if(this.playerCageEntity!=null){
             if(this.thirdPersonView && this.speed>0){
-                Transform.getMutable(this.playerCageEntity).position.z = this.thirdPersonCagePosition.z - (this.speed/maxSpeed)/3
+                Transform.getMutable(this.playerCageEntity).position.z = this.thirdPersonCagePosition.z - (this.speed/this.carAttributes.maxSpeed)/3
             }
         }
     }
