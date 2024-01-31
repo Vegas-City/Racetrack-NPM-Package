@@ -220,7 +220,7 @@ export class Car {
         const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carTransform.position, carTransform.rotation)
         movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
  
-        this.attachPointerEvent() 
+        this.attachPointerEvent()
         CarUI.Hide() 
         LapUI.Hide()
         Minimap.Hide()
