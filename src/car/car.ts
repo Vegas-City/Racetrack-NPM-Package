@@ -202,6 +202,9 @@ export class Car {
     }
 
     public exitCar(): void {
+
+        TrackManager.showAvatarTrackCollider()
+
         if (this.carEntity === undefined || this.carEntity === null) return
 
         this.occupied = false
@@ -216,9 +219,9 @@ export class Car {
         const targetPos = localToWorldPosition(Vector3.create(-2.3, -2, -0.2), carTransform.position, carTransform.rotation)
         const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carTransform.position, carTransform.rotation)
         movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
-
+ 
         this.attachPointerEvent()
-        CarUI.Hide()
+        CarUI.Hide() 
         LapUI.Hide()
         Minimap.Hide()
 
@@ -382,11 +385,7 @@ export class Car {
         const carEntityTransform = Transform.get(this.carEntity)
         const playerCageTransform = Transform.get(this.playerCageEntity)
 
-        if (this.thirdPersonView) {
-            return localToWorldPosition(Vector3.create(0 * this.carScale, 3 * this.carScale, -10.5 * this.carScale), carEntityTransform.position, carEntityTransform.rotation) //3rd person
-        } else {
-            return localToWorldPosition(Vector3.multiply(playerCageTransform.position, carEntityTransform.scale), carEntityTransform.position, carEntityTransform.rotation) //1st person
-        }
+        return localToWorldPosition(Vector3.multiply(playerCageTransform.position, carEntityTransform.scale), carEntityTransform.position, carEntityTransform.rotation)
     }
 
     public switchToCarPerspective(_deltaDistance: Vector3 = Vector3.Zero()): void {
@@ -408,7 +407,7 @@ export class Car {
 
     private thirdPersonCar(){
         if (this.playerCageEntity === undefined || this.playerCageEntity === null) return
-        Transform.getMutable(this.playerCageEntity).position = this.thirdPersonCagePosition
+        Transform.getMutable(this.playerCageEntity).position = Vector3.create(this.thirdPersonCagePosition.x,this.thirdPersonCagePosition.y,this.thirdPersonCagePosition.z)
     }
 
     private firstPersonCar(){
@@ -441,6 +440,7 @@ export class Car {
                             Transform.getMutable(self.carColliderEntity).scale = Vector3.Zero()
                         }
 
+                        TrackManager.hideAvatarTrackCollider()
                         self.switchToCarPerspective()
                         CarUI.Show()
                         LapUI.Show()
@@ -532,9 +532,16 @@ export class Car {
             } else {
                 Transform.getMutable(this.brakeLight).scale = Vector3.Zero()
             }
+        }  
+
+        // Move player cage based on max speed
+        if(this.playerCageEntity!=null){
+            if(this.thirdPersonView && this.speed>0){
+                Transform.getMutable(this.playerCageEntity).position.z = this.thirdPersonCagePosition.z - (this.speed/maxSpeed)/3
+            }
         }
     }
-
+ 
     private updateSteerValue(dt: number): void {
         if (this.carEntity === undefined || this.carEntity === null) return
 
