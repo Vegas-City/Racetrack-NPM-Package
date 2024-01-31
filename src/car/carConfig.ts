@@ -1,3 +1,5 @@
+import { Vector3 } from "@dcl/sdk/math"
+
 export type CarConfig = {
     mass: number
     accelerationF: number
@@ -15,6 +17,7 @@ export type CarConfig = {
     leftWheelGLB: string
     rightWheelGLB: string
     steeringWheelGLB: string
+    brakeLightsGLB: string
 
     wheelX_L: number
     wheelX_R: number
@@ -23,4 +26,6 @@ export type CarConfig = {
     wheelY: number
 
     carScale: number
+    firstPersonCagePosition: Vector3
+    thirdPersonCagePosition: Vector3
 }

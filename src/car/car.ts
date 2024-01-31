@@ -39,6 +39,7 @@ export class Car {
     playerCageEntity: Entity | null = null
     carBody: Body | null = null
     steeringWheel: Entity | null = null
+    brakeLight: Entity | null = null
     wheelL1: Entity | null = null
     wheelL2: Entity | null = null
     wheelR1: Entity | null = null
@@ -64,6 +65,9 @@ export class Car {
     carAttributes: CarAttributes
     startPos: Vector3 = Vector3.Zero()
 
+    firstPersonCagePosition:Vector3 = Vector3.Zero()
+    thirdPersonCagePosition:Vector3 = Vector3.Zero()
+
     constructor(_config: CarConfig, _position: Vector3, _rot: number) {
         this.carAttributes = new CarAttributes(_config)
 
@@ -73,6 +77,9 @@ export class Car {
         this.wheelZ_B = _config.wheelZ_B
         this.wheelY = _config.wheelY
         this.carScale = _config.carScale
+
+        this.firstPersonCagePosition = _config.firstPersonCagePosition
+        this.thirdPersonCagePosition = _config.thirdPersonCagePosition
 
         this.startPos = Vector3.clone(_position)
         const scale = Vector3.create(3 * this.carScale, 1 * this.carScale, 7 * this.carScale)
@@ -142,6 +149,12 @@ export class Car {
         GltfContainer.create(this.playerCageEntity, {
             src: 'models/playerLocker.glb' 
         })
+
+        this.brakeLight = engine.addEntity()
+        GltfContainer.create(this.brakeLight, {src: _config.brakeLightsGLB})
+        Transform.create(this.brakeLight, {
+            parent: this.carModelEntity
+        })
  
         let self = this
         utils.timers.setTimeout(function () {
@@ -208,8 +221,6 @@ export class Car {
         CarUI.Hide()
         LapUI.Hide()
         Minimap.Hide()
-
-        this.putTheCarBackOnTheGround() // Make sure the car isn't still in the air
 
         if (this.playerCageEntity) {
             CameraModeArea.deleteFrom(this.playerCageEntity)
@@ -386,25 +397,23 @@ export class Car {
         //Update cage and car transform
         const scale = Vector3.create(3 * this.carScale, 1 * this.carScale, 7 * this.carScale)
         if (this.thirdPersonView) {
-            this.putTheCarBackOnTheGround()
+            this.thirdPersonCar()
         } else {
-            this.putTheCarInTheAir()
+            this.firstPersonCar()
         }
 
         const forwardDir = Vector3.add(this.getCagePos(), Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
         movePlayerTo({ newRelativePosition: Vector3.add(this.getCagePos(), _deltaDistance), cameraTarget: forwardDir })
     }
 
-    private putTheCarBackOnTheGround(){
-        if (this.carEntity === undefined || this.carEntity === null || this.playerCageEntity === undefined || this.playerCageEntity === null || this.carModelEntity === undefined || this.carModelEntity === null) return
-        Transform.getMutable(this.playerCageEntity).position = Vector3.create(0, 2, -1.5)
-        Transform.getMutable(this.carModelEntity).position = Vector3.create(0, 0, -0.02)
+    private thirdPersonCar(){
+        if (this.playerCageEntity === undefined || this.playerCageEntity === null) return
+        Transform.getMutable(this.playerCageEntity).position = this.thirdPersonCagePosition
     }
 
-    private putTheCarInTheAir(){
-        if (this.carEntity === undefined || this.carEntity === null || this.playerCageEntity === undefined || this.playerCageEntity === null || this.carModelEntity === undefined || this.carModelEntity === null) return
-        Transform.getMutable(this.playerCageEntity).position = Vector3.create(-0.15, 0, -0.3)
-        Transform.getMutable(this.carModelEntity).position = Vector3.create(0, 1.27, -0.02 - 0.3)
+    private firstPersonCar(){
+         if (this.playerCageEntity === undefined || this.playerCageEntity === null) return
+         Transform.getMutable(this.playerCageEntity).position = this.firstPersonCagePosition
     }
 
     private enterCar(): void {
@@ -473,6 +482,8 @@ export class Car {
         const minSpeed = this.carAttributes.calculateMinSpeed()
         const maxSpeed = this.carAttributes.calculateMaxSpeed()
 
+        let braking:boolean = false
+
         if (this.occupied && InputManager.isForwardPressed && Lap.started) {
             if (this.speed - maxSpeed > 2) {
                 this.speed -= (deceleration * dt)
@@ -487,6 +498,8 @@ export class Car {
             }
         }
         else if (this.occupied && InputManager.isBackwardPressed && Lap.started) {
+            braking = true
+
             if (minSpeed - this.speed > 2) {
                 this.speed += (deceleration * dt)
             }
@@ -509,6 +522,15 @@ export class Car {
 
             if (Math.abs(this.speed) < Car.stopSpeed) {
                 this.speed = 0
+            }
+        }
+
+        // Show break light
+        if(this.brakeLight!=null){
+            if(braking){
+                Transform.getMutable(this.brakeLight).scale = Vector3.One()
+            } else {
+                Transform.getMutable(this.brakeLight).scale = Vector3.Zero()
             }
         }
     }
