@@ -20,6 +20,7 @@ export class TrackManager {
     static carPoints: Vector3[] = []
     static ghostRecorder: GhostRecorder
     static ghostCar: GhostCar
+    static trackCollider: Entity
 
     static trackEntity: Entity | undefined
 
@@ -48,6 +49,14 @@ export class TrackManager {
 
         TrackManager.ghostRecorder = new GhostRecorder()
         TrackManager.ghostCar = new GhostCar()
+
+        TrackManager.trackCollider = engine.addEntity()
+        GltfContainer.create(TrackManager.trackCollider, {src: "models/trackCollider.glb"})
+        Transform.create(TrackManager.trackCollider, {
+            position: _position,
+            rotation: _rotation,
+            scale: _scale
+        })
 
         engine.addSystem(TrackManager.update)
     }
@@ -89,6 +98,18 @@ export class TrackManager {
         })
 
         Lap.unload()
+    }
+
+    static showAvatarTrackCollider(){
+        if(TrackManager.trackCollider!=null){
+            Transform.getMutable(TrackManager.trackCollider).scale = TrackManager.trackTransform.scale
+        }
+    }
+
+    static hideAvatarTrackCollider(){
+        if(TrackManager.trackCollider!=null){
+            Transform.getMutable(TrackManager.trackCollider).scale = Vector3.Zero()
+        }
     }
 
     /**
