@@ -1,4 +1,5 @@
 import { engine, InputAction, PointerEventType, inputSystem } from "@dcl/sdk/ecs"
+import { Car } from "../car"
 
 export class InputManager {
     static isForwardPressed: boolean = false
@@ -62,11 +63,20 @@ export class InputManager {
         }
 
         // Start
-        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_DOWN)) {
+        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_DOWN)&& Car.instances[0].occupied) {
             InputManager.isStartPressed = true
         }
-        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_UP)) {
+        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_UP)&& Car.instances[0].occupied) {
             InputManager.isStartPressed = false
         }
+
+        // Switch car view with numbers 1 and 2
+        if (inputSystem.isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_DOWN) && Car.instances[0].occupied) {
+            Car.instances[0].thirdPersonView = true
+            Car.instances[0].switchToCarPerspective()
+        } else if (inputSystem.isTriggered(InputAction.IA_ACTION_4, PointerEventType.PET_DOWN)&& Car.instances[0].occupied) {
+            Car.instances[0].thirdPersonView = false
+            Car.instances[0].switchToCarPerspective()
+        } 
     }
 }
