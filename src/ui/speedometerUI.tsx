@@ -1,7 +1,7 @@
 import { Color4 } from "@dcl/sdk/math"
 import ReactEcs, { Label, UiEntity } from "@dcl/sdk/react-ecs"
 
-export class CarUI {
+export class SpeedometerUI {
     static visibility: boolean = false
     static racerPosition: string = "1st"
     static speed: string = "250 MPH"
@@ -13,7 +13,7 @@ export class CarUI {
                 height: 100,
                 width: 100,
                 positionType: 'absolute',
-                display: CarUI.visibility ? 'flex' : 'none'
+                display: SpeedometerUI.visibility ? 'flex' : 'none'
             }}
         >
             <UiEntity
@@ -33,7 +33,7 @@ export class CarUI {
                 }}
             >
                 <Label // Speed
-                    value={CarUI.speed}
+                    value={SpeedometerUI.speed}
                     color={Color4.Black()}
                     fontSize={56}
                     font="serif"
@@ -48,19 +48,19 @@ export class CarUI {
 
     static Render() {
         return [
-            CarUI.component()
+            SpeedometerUI.component()
         ]
     }
 
     static Show() {
-        CarUI.visibility = true
+        SpeedometerUI.visibility = true
     }
 
     static Hide() {
-        CarUI.visibility = false
+        SpeedometerUI.visibility = false
     }
 
     static Update(_speed: number) {
-        CarUI.speed = (Math.round(_speed * 4 * 100) / 100).toFixed(1).toString()
+        SpeedometerUI.speed = (Math.round(_speed * 4 * 100) / 100).toFixed(1).toString()
     }
 }
