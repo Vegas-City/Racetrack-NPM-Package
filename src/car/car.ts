@@ -6,7 +6,7 @@ import { PhysicsManager, Body } from '../physics'
 import { BoxShapeDefinition } from '../physics/shapes'
 import { Lap, Obstacle, TrackManager } from '../racetrack'
 import { InputManager } from '../racetrack/inputManager'
-import { CarUI, LapUI, Minimap } from '../ui'
+import { SpeedometerUI, LapUI, Minimap } from '../ui'
 import { movePlayerTo, triggerSceneEmote } from '../utils/setup'
 import { CarAttributes } from './carAttributes'
 import { Dashboard } from '../ui'
@@ -235,7 +235,7 @@ export class Car {
         movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
 
         this.attachPointerEvent()
-        CarUI.Hide()
+        SpeedometerUI.Hide()
         LapUI.Hide()
         Minimap.Hide()
 
@@ -409,10 +409,10 @@ export class Car {
         //Update cage and car transform
         if (this.thirdPersonView) {
             this.thirdPersonCar()
-            CarUI.Show()
+            SpeedometerUI.Show()
         } else {
             this.firstPersonCar()
-            CarUI.Hide()
+            SpeedometerUI.Hide()
         }
 
         const forwardDir = Vector3.add(this.getCagePos(), Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
@@ -456,7 +456,7 @@ export class Car {
 
                         TrackManager.hideAvatarTrackCollider()
                         self.switchToCarPerspective()
-                        CarUI.Show()
+                        SpeedometerUI.Show()
                         LapUI.Show()
                         Minimap.Show()
 
@@ -718,7 +718,7 @@ export class Car {
         this.updateSpeed(dt)
         this.updateSteerValue(dt)
 
-        CarUI.Update(this.speed)
+        SpeedometerUI.Update(this.speed)
         Minimap.Update(carTransform.position.x, carTransform.position.z)
 
         const forwardDir = Vector3.normalize(Vector3.rotate(Vector3.Forward(), this.carRot))
