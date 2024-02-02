@@ -96,15 +96,15 @@ export class InputManager {
                 InputManager.rightPressedDuration = 0
                 InputManager.leftPressedDuration = 0
             }
-        }
 
-        // Switch car view with numbers 1 and 2
-        if (inputSystem.isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_DOWN) && Car.instances[0].occupied) {
-            Car.instances[0].thirdPersonView = true
-            Car.instances[0].switchToCarPerspective()
-        } else if (inputSystem.isTriggered(InputAction.IA_ACTION_4, PointerEventType.PET_DOWN)&& Car.instances[0].occupied) {
-            Car.instances[0].thirdPersonView = false
-            Car.instances[0].switchToCarPerspective()
-        } 
+            // Switch car view with numbers 1 and 2
+            if (inputSystem.isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_DOWN) && Car.instances[0].occupied) {
+                Car.instances[0].thirdPersonView = true
+                Car.instances[0].switchToCarPerspective()
+            } else if (inputSystem.isTriggered(InputAction.IA_ACTION_4, PointerEventType.PET_DOWN)&& Car.instances[0].occupied) {
+                Car.instances[0].thirdPersonView = false
+                Car.instances[0].switchToCarPerspective()
+            } 
+        }
     }
 }
