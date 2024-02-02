@@ -1,6 +1,6 @@
 {
   "name": "@vegascity/racetrack",
-  "version": "1.0.43",
+  "version": "1.0.44",
   "description": "DCL RaceTrack Library",
   "main": "index.js",
   "typings": "index.d.ts",
