@@ -1,4 +1,5 @@
 import { engine, InputAction, PointerEventType, inputSystem } from "@dcl/sdk/ecs"
+import { Car } from "../car"
 
 export class InputManager {
     static isForwardPressed: boolean = false
@@ -7,8 +8,11 @@ export class InputManager {
     static isRightPressed: boolean = false
     static isExitPressed: boolean = false
     static isStartPressed: boolean = false
+    static isDriftPressed: boolean = false
+    static mouseSteering: boolean = true
+    static rightPressedDuration: number = 0
+    static leftPressedDuration: number = 0
 
-    static readonly MOUSE_STEERING: boolean = true
     private static readonly KEY_FORWARD: InputAction = InputAction.IA_FORWARD
     private static readonly KEY_BACKWARD: InputAction = InputAction.IA_BACKWARD
     private static readonly KEY_LEFT: InputAction = InputAction.IA_LEFT
@@ -20,7 +24,7 @@ export class InputManager {
         engine.addSystem(InputManager.update)
     }
 
-    private static update(): void {
+    private static update(dt: number): void {
         // Forward
         if (inputSystem.isTriggered(InputManager.KEY_FORWARD, PointerEventType.PET_DOWN)) {
             InputManager.isForwardPressed = true
@@ -39,17 +43,21 @@ export class InputManager {
 
         // Left
         if (inputSystem.isTriggered(InputManager.KEY_LEFT, PointerEventType.PET_DOWN)) {
+            InputManager.mouseSteering = false
             InputManager.isLeftPressed = true
         }
         if (inputSystem.isTriggered(InputManager.KEY_LEFT, PointerEventType.PET_UP)) {
+            InputManager.mouseSteering = true
             InputManager.isLeftPressed = false
         }
 
         // Right
         if (inputSystem.isTriggered(InputManager.KEY_RIGHT, PointerEventType.PET_DOWN)) {
+            InputManager.mouseSteering = false
             InputManager.isRightPressed = true
         }
         if (inputSystem.isTriggered(InputManager.KEY_RIGHT, PointerEventType.PET_UP)) {
+            InputManager.mouseSteering = true
             InputManager.isRightPressed = false
         }
 
@@ -67,6 +75,27 @@ export class InputManager {
         }
         if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_UP)) {
             InputManager.isStartPressed = false
+        }
+
+        if (InputManager.isRightPressed) {
+            InputManager.rightPressedDuration += dt
+        }
+        else {
+            InputManager.rightPressedDuration = 0
+        }
+
+        if (InputManager.isLeftPressed) {
+            InputManager.leftPressedDuration += dt
+        }
+        else {
+            InputManager.leftPressedDuration = 0
+        }
+
+        if (Car.instances.length > 0) {
+            if(Car.instances[0].speed == 0) {
+                InputManager.rightPressedDuration = 0
+                InputManager.leftPressedDuration = 0
+            }
         }
     }
 }
