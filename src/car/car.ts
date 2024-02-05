@@ -465,7 +465,7 @@ export class Car {
                                 area: Vector3.create(3, 2, 7),
                                 mode: CameraType.CT_FIRST_PERSON,
                             })
-                            const scale = Vector3.create(3 * self.carScale, 1 * self.carScale, 7 * self.carScale)
+                            const scale = Vector3.create(5 * self.carScale, 1 * self.carScale, 10 * self.carScale)
                             Transform.getMutable(self.playerCageEntity).scale = Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
                         }
 
