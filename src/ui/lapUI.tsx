@@ -53,7 +53,6 @@ export class LapUI {
     }
 
     private static formatLap(): string {
-        if (Lap.lapsCompleted < 0) return ""
         return "Lap " + (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
     }
 
