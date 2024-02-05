@@ -24,6 +24,7 @@ export class GameManager {
     static end(): void {
         Lap.lapsCompleted--
         Lap.started = false
+        TrackManager.onEndEvent()
 
         utils.timers.setTimeout(() => {
             GameManager.reset()
@@ -54,6 +55,7 @@ export class GameManager {
             }
             // Start recording
             TrackManager.ghostRecorder.start()
+            TrackManager.onStartEvent()
         })
     }
 }
