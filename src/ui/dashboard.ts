@@ -1,12 +1,14 @@
 import { Entity, GltfContainer, Material, MeshRenderer, TextAlignMode, TextShape, Transform, engine } from "@dcl/sdk/ecs";
 import { Color3, Color4, Quaternion, Vector3 } from "@dcl/sdk/math";
+import { Lap } from "../racetrack";
 
 export class Dashboard {
     dashboardEntity: Entity
     containerEntity: Entity
     speedometerEntity: Entity
     speedometerBarsEntity: Entity
-    reverseEntity: Entity
+    stateEntity: Entity
+    lapEntity: Entity
 
     constructor(_pos: Vector3, _glb: string, _parent: Entity) {
         this.dashboardEntity = engine.addEntity()
@@ -27,37 +29,53 @@ export class Dashboard {
 
         this.speedometerEntity = engine.addEntity()
         Transform.create(this.speedometerEntity, {
-            parent: this.containerEntity
+            parent: this.containerEntity,
+            position: Vector3.create(-6.05, -1, -3.7),
+            rotation: Quaternion.fromEulerDegrees(-20, 0, 0)
         })
         TextShape.create(this.speedometerEntity, {
             text: "",
-            fontSize: 4,
+            fontSize: 3,
             textAlign: TextAlignMode.TAM_MIDDLE_LEFT
         })
 
         this.speedometerBarsEntity = engine.addEntity()
         Transform.create(this.speedometerBarsEntity, {
             parent: this.containerEntity,
-            position: Vector3.create(1.4, 0.1, 0),
+            position: Vector3.create(-4.85, -0.87, -3.7),
+            rotation: Quaternion.fromEulerDegrees(-20, 0, 0),
             scale: Vector3.Zero()
         })
         MeshRenderer.setPlane(this.speedometerBarsEntity)
 
-        this.reverseEntity = engine.addEntity()
-        Transform.create(this.reverseEntity, {
+        this.stateEntity = engine.addEntity()
+        Transform.create(this.stateEntity, {
             parent: this.containerEntity,
-            position: Vector3.create(2, 0, 0),
-            scale: Vector3.Zero()
+            position: Vector3.create(-4.25, -0.97, -3.7),
+            rotation: Quaternion.fromEulerDegrees(-20, 0, 0)
         })
-        TextShape.create(this.reverseEntity, {
-            text: "R",
+        TextShape.create(this.stateEntity, {
+            text: "",
             fontSize: 4,
-            textColor: Color4.Red()
+            textColor: Color4.White()
+        })
+
+        this.lapEntity = engine.addEntity()
+        Transform.create(this.lapEntity, {
+            parent: this.containerEntity,
+            position: Vector3.create(0.5, 0, 0)
+        })
+        TextShape.create(this.lapEntity, {
+            text: "",
+            fontSize: 4,
+            textColor: Color4.White()
         })
     }
 
     update(_speed: number, _minSpeed: number, _maxSpeed: number) {
-        Transform.getMutable(this.reverseEntity).scale = _speed < 0 ? Vector3.One() : Vector3.Zero()
+        TextShape.getMutable(this.lapEntity).text = "Lap " + (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
+        TextShape.getMutable(this.stateEntity).text = _speed > 0 ? "D" : (_speed < 0 ? "R" : "N")
+        TextShape.getMutable(this.stateEntity).textColor = _speed > 0 ? Color4.Green() : (_speed < 0 ? Color4.Red() : Color4.White())
         TextShape.getMutable(this.speedometerEntity).text = (Math.round(Math.abs(_speed) * 4 * 100) / 100).toFixed(1).toString()
 
         if (_speed == 0) {
