@@ -10,7 +10,7 @@ export class Lap {
     static checkpoints: LapCheckpoint[] = []
     static checkpointIndex: number = 0
     static lapsCompleted: number = -1
-    static lapElapsed: number = 0
+    static timeElapsed: number = 0
     static totalLaps: number = 1 // make the default 1
     static triggeredStart: boolean = false
     static started: boolean = false
@@ -33,7 +33,7 @@ export class Lap {
 
         if (!Lap.started) return
 
-        if (Lap.lapsCompleted >= 0) Lap.lapElapsed += _dt
+        if (Lap.lapsCompleted >= 0) Lap.timeElapsed += _dt
         const currentCheckpoint = Lap.checkpoints[Lap.checkpointIndex]
         const distance = pointToLineDistance(_carPos, currentCheckpoint.point1, currentCheckpoint.point2)
 
@@ -42,7 +42,6 @@ export class Lap {
             if (Lap.checkpointIndex == 0) {
                 // completed a lap
                 Lap.lapsCompleted++
-                Lap.lapElapsed = 0
                 TrackManager.ghostRecorder.completeLap()
                 if (Lap.lapsCompleted >= Lap.totalLaps) {
                     GameManager.end()

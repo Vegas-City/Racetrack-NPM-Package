@@ -45,7 +45,7 @@ export class GameManager {
         Countdown.Start(() => {
             Lap.started = true
             Lap.lapsCompleted = 0
-            Lap.lapElapsed = 0
+            Lap.timeElapsed = 0
             Lap.checkpointIndex = 1
             Lap.checkpoints[0].hide()
             Lap.checkpoints[Lap.checkpointIndex].show()
