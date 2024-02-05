@@ -6,7 +6,7 @@ import { PhysicsManager, Body } from '../physics'
 import { BoxShapeDefinition } from '../physics/shapes'
 import { Lap, Obstacle, TrackManager } from '../racetrack'
 import { InputManager } from '../racetrack/inputManager'
-import { SpeedometerUI, LapUI, Minimap } from '../ui'
+import { SpeedometerUI, LapUI, Minimap, CarChoiceUI } from '../ui'
 import { movePlayerTo, triggerSceneEmote } from '../utils/setup'
 import { CarAttributes } from './carAttributes'
 import { Dashboard } from '../ui'
@@ -77,6 +77,7 @@ export class Car {
     thirdPersonCagePosition: Vector3 = Vector3.Zero()
 
     dashboard: Dashboard | null = null
+    carIcon: string
 
     constructor(_config: CarConfig, _position: Vector3, _rot: number) {
         this.carAttributes = new CarAttributes(_config)
@@ -90,6 +91,8 @@ export class Car {
 
         this.firstPersonCagePosition = _config.firstPersonCagePosition
         this.thirdPersonCagePosition = _config.thirdPersonCagePosition
+
+        this.carIcon = _config.carIcon
 
         this.startPos = Vector3.clone(_position)
         const scale = Vector3.create(3 * this.carScale, 1 * this.carScale, 7 * this.carScale)
@@ -237,6 +240,7 @@ export class Car {
         this.attachPointerEvent()
         SpeedometerUI.Hide()
         LapUI.Hide()
+        CarChoiceUI.Hide()
         Minimap.Hide()
 
         if (this.playerCageEntity) {
@@ -458,6 +462,7 @@ export class Car {
                         self.switchToCarPerspective()
                         SpeedometerUI.Show()
                         LapUI.Show()
+                        CarChoiceUI.Show()
                         Minimap.Show()
 
                         if (self.playerCageEntity) {
