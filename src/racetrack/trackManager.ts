@@ -30,6 +30,9 @@ export class TrackManager {
         scale: Vector3.One()
     }
 
+    static onStartEvent: Function = () => {}
+    static onEndEvent: Function = () => {}
+
     /**
      * Creates a TrackManager instance.
      *
@@ -39,7 +42,7 @@ export class TrackManager {
      * @param _debugMode a flag to toggle debug mode.
      *
      */
-    constructor(_position: Vector3, _rotation: Quaternion, _scale: Vector3, _debugMode: boolean = false) {
+    constructor(_position: Vector3, _rotation: Quaternion, _scale: Vector3, _debugMode: boolean = false, _onStartEvent?: Function, _onEndEvent?: Function) {
         TrackManager.debugMode = _debugMode
         TrackManager.trackTransform = {
             position: _position,
@@ -57,6 +60,9 @@ export class TrackManager {
             rotation: _rotation,
             scale: _scale
         })
+
+        if(_onStartEvent) TrackManager.onStartEvent = _onStartEvent
+        if(_onEndEvent) TrackManager.onEndEvent = _onEndEvent
 
         engine.addSystem(TrackManager.update)
     }
