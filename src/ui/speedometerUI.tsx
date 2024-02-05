@@ -61,6 +61,6 @@ export class SpeedometerUI {
     }
 
     static Update(_speed: number) {
-        SpeedometerUI.speed = (Math.round(_speed * 4 * 100) / 100).toFixed(1).toString()
+        SpeedometerUI.speed = (Math.round(_speed * 4 * 100) / 100).toFixed(0).toString()
     }
 }

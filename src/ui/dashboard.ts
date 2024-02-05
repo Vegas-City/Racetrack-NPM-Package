@@ -30,12 +30,12 @@ export class Dashboard {
         this.speedometerEntity = engine.addEntity()
         Transform.create(this.speedometerEntity, {
             parent: this.containerEntity,
-            position: Vector3.create(-6.05, -1, -3.7),
+            position: Vector3.create(-5.95, -0.97, -3.7),
             rotation: Quaternion.fromEulerDegrees(-20, 0, 0)
         })
         TextShape.create(this.speedometerEntity, {
             text: "",
-            fontSize: 3,
+            fontSize: 4,
             textAlign: TextAlignMode.TAM_MIDDLE_LEFT
         })
 
@@ -76,7 +76,7 @@ export class Dashboard {
         TextShape.getMutable(this.lapEntity).text = "Lap " + (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
         TextShape.getMutable(this.stateEntity).text = _speed > 0 ? "D" : (_speed < 0 ? "R" : "N")
         TextShape.getMutable(this.stateEntity).textColor = _speed > 0 ? Color4.Green() : (_speed < 0 ? Color4.Red() : Color4.White())
-        TextShape.getMutable(this.speedometerEntity).text = (Math.round(Math.abs(_speed) * 4 * 100) / 100).toFixed(1).toString()
+        TextShape.getMutable(this.speedometerEntity).text = (Math.round(Math.abs(_speed) * 4 * 100) / 100).toFixed(0).toString()
 
         if (_speed == 0) {
             Transform.getMutable(this.speedometerBarsEntity).scale = Vector3.Zero()

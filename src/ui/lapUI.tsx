@@ -58,7 +58,7 @@ export class LapUI {
 
     private static formatTime(): string {
         let date = new Date(0)
-        date.setSeconds(Math.round(Lap.lapElapsed))
+        date.setSeconds(Math.round(Lap.timeElapsed))
 
         let timeString = date.toISOString().substring(11, 19)
         return timeString
