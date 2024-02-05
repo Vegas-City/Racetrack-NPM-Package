@@ -31,4 +31,6 @@ export type CarConfig = {
     carScale: number
     firstPersonCagePosition: Vector3
     thirdPersonCagePosition: Vector3
+
+    carIcon: string
 }
