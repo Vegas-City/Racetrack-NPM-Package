@@ -32,6 +32,7 @@ export class TrackManager {
 
     static onStartEvent: Function = () => {}
     static onEndEvent: Function = () => {}
+    static onCheckpointEvent: Function = () => {}
 
     /**
      * Creates a TrackManager instance.
@@ -42,7 +43,7 @@ export class TrackManager {
      * @param _debugMode a flag to toggle debug mode.
      *
      */
-    constructor(_position: Vector3, _rotation: Quaternion, _scale: Vector3, _debugMode: boolean = false, _onStartEvent?: Function, _onEndEvent?: Function) {
+    constructor(_position: Vector3, _rotation: Quaternion, _scale: Vector3, _debugMode: boolean = false, _onStartEvent?: Function, _onEndEvent?: Function, _onCheckpointEvent?: Function) {
         TrackManager.debugMode = _debugMode
         TrackManager.trackTransform = {
             position: _position,
@@ -63,6 +64,7 @@ export class TrackManager {
 
         if(_onStartEvent) TrackManager.onStartEvent = _onStartEvent
         if(_onEndEvent) TrackManager.onEndEvent = _onEndEvent
+        if(_onCheckpointEvent) TrackManager.onCheckpointEvent = _onCheckpointEvent
 
         engine.addSystem(TrackManager.update)
     }
