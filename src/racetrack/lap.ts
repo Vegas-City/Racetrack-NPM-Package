@@ -46,6 +46,9 @@ export class Lap {
                 if (Lap.lapsCompleted >= Lap.totalLaps) {
                     GameManager.end()
                 }
+                else {
+                    TrackManager.onCheckpointEvent()
+                }
             }
             currentCheckpoint.hide()
             Lap.checkpointIndex++
