@@ -20,6 +20,7 @@ export type CarConfig = {
     brakeLightsGLB: string
     dashboardGLB: string
 
+    steeringWheelPosition: Vector3
     dashboardPosition: Vector3
 
     wheelX_L: number
