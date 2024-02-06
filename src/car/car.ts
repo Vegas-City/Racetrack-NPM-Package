@@ -169,39 +169,16 @@ export class Car {
             parent: this.carModelEntity
         })
 
-        let self = this
-        utils.timers.setTimeout(function () {
 
-            self.steeringWheel = engine.addEntity()
-            GltfContainer.create(self.steeringWheel, { src: _config.steeringWheelGLB })
-            if (self.carModelEntity != null) {
-                Transform.create(self.steeringWheel, {
-                    parent: self.carModelEntity
-                })
-            }
-            Animator.create(self.steeringWheel, {
-                states: [
-                    {
-                        clip: "Idle",
-                        playing: true,
-                        loop: true,
-                        weight: 1
-                    },
-                    {
-                        clip: "RightTurn",
-                        playing: true,
-                        loop: true,
-                        weight: 0
-                    },
-                    {
-                        clip: "LeftTurn",
-                        playing: true,
-                        loop: true,
-                        weight: 0
-                    }
-                ]
+        this.steeringWheel = engine.addEntity()
+        GltfContainer.create(this.steeringWheel, { src: _config.steeringWheelGLB })
+        if (this.carModelEntity != null) {
+            Transform.create(this.steeringWheel, {
+                parent: this.carModelEntity,
+                position: _config.steeringWheelPosition
             })
-        }, 2000) // Give some time for the steering animations to load
+        }
+
 
         this.attachPointerEvent()
 
@@ -648,18 +625,10 @@ export class Car {
         }
 
         // Update steering wheel based on steer value
-        if (this.steeringWheel != null) {
-            const animRight = Animator.getClip(this.steeringWheel, 'RightTurn')
-            const animLeft = Animator.getClip(this.steeringWheel, 'LeftTurn')
-
-            if (this.steerValue > 0) {
-                animLeft.weight = 0
-                animRight.weight = Math.abs(this.steerValue / Car.MAX_STEERING_VALUE)
-            } else {
-                animRight.weight = 0
-                animLeft.weight = Math.abs(this.steerValue / Car.MAX_STEERING_VALUE)
-            }
+        if(this.steeringWheel!=null){
+            Transform.getMutable(this.steeringWheel).rotation = Quaternion.fromEulerDegrees(this.steerValue*-45,0,0)
         }
+
 
     }
 
