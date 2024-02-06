@@ -30,6 +30,7 @@ export class GameManager {
             GameManager.reset()
             utils.timers.setTimeout(() => {
                 Car.instances[0].exitCar()
+                Lap.timeElapsed = 0
             }, 200)
         }, 4000)
     }

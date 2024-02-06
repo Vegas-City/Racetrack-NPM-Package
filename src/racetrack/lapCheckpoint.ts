@@ -61,7 +61,7 @@ export class LapCheckpoint {
         if (this.glowEntity === undefined) return
 
         const distance = Vector3.distance(this.point1, this.point2)
-        Transform.getMutable(this.glowEntity).scale = Vector3.create(distance / 2, 2.5, 1)
+        Transform.getMutable(this.glowEntity).scale = Vector3.create(distance / 2, 2, 1)
     }
 
     hide(): void {
@@ -91,7 +91,7 @@ export class LapCheckpoint {
         const center = Vector3.lerp(this.point1, this.point2, 0.5)
         const angle = Math.atan2(this.point2.z - this.point1.z, this.point2.x - this.point1.x) * 180 / Math.PI
         Transform.create(this.glowEntity, {
-            position: Vector3.create(center.x, 2, center.z),
+            position: Vector3.create(center.x, TrackManager.trackTransform.position.y + 2, center.z),
             rotation: Quaternion.fromEulerDegrees(0, angle, 0),
             scale: Vector3.Zero()
         })
