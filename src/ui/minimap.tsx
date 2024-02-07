@@ -13,6 +13,8 @@ export type MinimapConfig = {
     bottomLeftZ: number,
     offsetX?: number,
     offsetZ?: number,
+    checkpointOffsetX?: number,
+    checkpointOffsetZ?: number,
     srcPaddingX?: number,
     srcPaddingZ?: number
 }
@@ -20,7 +22,7 @@ export type MinimapConfig = {
 export class Minimap {
     private static readonly SCALE: number = 0.4
 
-    static visibility: boolean = false
+    static visibility: boolean = true
     private static posX: number = 0
     private static posZ: number = 0
     private static checkpointPosX: number = 0
@@ -36,6 +38,8 @@ export class Minimap {
     private static bottomLeftZ: number = 0
     private static offsetX: number = 0
     private static offsetZ: number = 0
+    private static checkpointOffsetX: number = 0
+    private static checkpointOffsetZ: number = 0
     private static srcPaddingX: number = 0
     private static srcPaddingZ: number = 0
 
@@ -73,8 +77,8 @@ export class Minimap {
             <UiEntity
                 uiTransform={{
                     position: { bottom: Minimap.checkpointPosZ, left: Minimap.checkpointPosX },
-                    width: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? 5 : 22,
-                    height: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? 22 : 5,
+                    width: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? 5 : 20,
+                    height: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? 20 : 5,
                     positionType: 'absolute',
                 }}
                 uiBackground={{ color: Color4.Yellow() }}
@@ -93,6 +97,8 @@ export class Minimap {
         Minimap.bottomLeftZ = _data.bottomLeftZ
         Minimap.offsetX = _data.offsetX ?? 0
         Minimap.offsetZ = _data.offsetZ ?? 0
+        Minimap.checkpointOffsetX = _data.checkpointOffsetX ?? 0
+        Minimap.checkpointOffsetZ = _data.checkpointOffsetZ ?? 0
         Minimap.srcPaddingX = _data.srcPaddingX ?? 0
         Minimap.srcPaddingZ = _data.srcPaddingZ ?? 0
     }
@@ -134,8 +140,8 @@ export class Minimap {
         const center = Vector3.lerp(checkpoint.point1, checkpoint.point2, 0.5)
         Minimap.checkpointAngle = Math.atan2(checkpoint.point2.z - checkpoint.point1.z, checkpoint.point2.x - checkpoint.point1.x) * 180 / Math.PI
 
-        const relX = center.x - Minimap.bottomLeftX - (Minimap.offsetX * 1.7)
-        const relZ = center.z - Minimap.bottomLeftZ - (Minimap.offsetZ * 1.7)
+        const relX = center.x - Minimap.bottomLeftX - Minimap.checkpointOffsetX
+        const relZ = center.z - Minimap.bottomLeftZ - Minimap.checkpointOffsetZ
 
         Minimap.checkpointPosX = (Minimap.srcPaddingX * Minimap.SCALE) + ((relX / width) * (Minimap.imageWidth - Minimap.srcPaddingX) * Minimap.SCALE)
         Minimap.checkpointPosZ = (Minimap.srcPaddingZ * Minimap.SCALE) + ((relZ / height) * (Minimap.imageHeight - Minimap.srcPaddingZ) * Minimap.SCALE)
