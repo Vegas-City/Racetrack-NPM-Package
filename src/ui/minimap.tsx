@@ -1,6 +1,7 @@
 import { Color4, Vector3 } from "@dcl/sdk/math"
 import ReactEcs, { UiEntity } from "@dcl/sdk/react-ecs"
 import { Lap } from "../racetrack/lap";
+import { Transform, engine } from "@dcl/sdk/ecs";
 
 export type MinimapConfig = {
     src: string,
@@ -10,8 +11,10 @@ export type MinimapConfig = {
     parcelHeight: number,
     bottomLeftX: number,
     bottomLeftZ: number,
-    paddingX?: number,
-    paddingZ?: number
+    offsetX?: number,
+    offsetZ?: number,
+    srcPaddingX?: number,
+    srcPaddingZ?: number
 }
 
 export class Minimap {
@@ -31,8 +34,10 @@ export class Minimap {
     private static parcelHeight: number = 0
     private static bottomLeftX: number = 0
     private static bottomLeftZ: number = 0
-    private static paddingX: number = 0
-    private static paddingZ: number = 0
+    private static offsetX: number = 0
+    private static offsetZ: number = 0
+    private static srcPaddingX: number = 0
+    private static srcPaddingZ: number = 0
 
     private static component = () => (
         <UiEntity
@@ -53,14 +58,14 @@ export class Minimap {
             <UiEntity
                 uiTransform={{
                     position: { bottom: Minimap.posZ, left: Minimap.posX },
-                    width: 15,
-                    height: 15,
+                    width: 10,
+                    height: 10,
                     positionType: 'absolute',
                 }}
                 uiBackground={{
                     textureMode: 'stretch',
                     texture: {
-                        src: "images/red_dot.png"
+                        src: "images/ui/minimapUI/car_tracking.png"
                     }
                 }}
             >
@@ -68,8 +73,8 @@ export class Minimap {
             <UiEntity
                 uiTransform={{
                     position: { bottom: Minimap.checkpointPosZ, left: Minimap.checkpointPosX },
-                    width: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? 4 : 15,
-                    height: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? 15 : 4,
+                    width: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? 5 : 22,
+                    height: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? 22 : 5,
                     positionType: 'absolute',
                 }}
                 uiBackground={{ color: Color4.Yellow() }}
@@ -86,8 +91,10 @@ export class Minimap {
         Minimap.parcelHeight = _data.parcelHeight
         Minimap.bottomLeftX = _data.bottomLeftX
         Minimap.bottomLeftZ = _data.bottomLeftZ
-        Minimap.paddingX = _data.paddingX ?? 0
-        Minimap.paddingZ = _data.paddingZ ?? 0
+        Minimap.offsetX = _data.offsetX ?? 0
+        Minimap.offsetZ = _data.offsetZ ?? 0
+        Minimap.srcPaddingX = _data.srcPaddingX ?? 0
+        Minimap.srcPaddingZ = _data.srcPaddingZ ?? 0
     }
 
     static Render() {
@@ -108,11 +115,11 @@ export class Minimap {
         const width = Minimap.parcelWidth * 16
         const height = Minimap.parcelHeight * 16
 
-        const relX = _x - Minimap.bottomLeftX - Minimap.paddingX
-        const relZ = _z - Minimap.bottomLeftZ - Minimap.paddingZ
+        const relX = _x - Minimap.bottomLeftX - Minimap.offsetX
+        const relZ = _z - Minimap.bottomLeftZ - Minimap.offsetZ
 
-        Minimap.posX = (relX / width) * Minimap.imageWidth * Minimap.SCALE
-        Minimap.posZ = (relZ / height) * Minimap.imageHeight * Minimap.SCALE
+        Minimap.posX = (Minimap.srcPaddingX * Minimap.SCALE) + ((relX / width) * (Minimap.imageWidth - Minimap.srcPaddingX) * Minimap.SCALE)
+        Minimap.posZ = (Minimap.srcPaddingZ * Minimap.SCALE) + ((relZ / height) * (Minimap.imageHeight - Minimap.srcPaddingZ) * Minimap.SCALE)
 
         Minimap.updateLapCheckpoint()
     }
@@ -120,15 +127,17 @@ export class Minimap {
     private static updateLapCheckpoint(): void {
         const width = Minimap.parcelWidth * 16
         const height = Minimap.parcelHeight * 16
-        
-        const checkpoint = Lap.checkpoints[Lap.checkpointIndex]
+
+        const checkpoint = Lap.findCheckpoint(Lap.checkpointIndex)
+        if (checkpoint === null) return
+
         const center = Vector3.lerp(checkpoint.point1, checkpoint.point2, 0.5)
         Minimap.checkpointAngle = Math.atan2(checkpoint.point2.z - checkpoint.point1.z, checkpoint.point2.x - checkpoint.point1.x) * 180 / Math.PI
 
-        const relX = center.x - Minimap.bottomLeftX - Minimap.paddingX
-        const relZ = center.z - Minimap.bottomLeftZ - Minimap.paddingZ
-        
-        Minimap.checkpointPosX = (relX / width) * Minimap.imageWidth * Minimap.SCALE
-        Minimap.checkpointPosZ = (relZ / height) * Minimap.imageHeight * Minimap.SCALE
+        const relX = center.x - Minimap.bottomLeftX - (Minimap.offsetX * 1.7)
+        const relZ = center.z - Minimap.bottomLeftZ - (Minimap.offsetZ * 1.7)
+
+        Minimap.checkpointPosX = (Minimap.srcPaddingX * Minimap.SCALE) + ((relX / width) * (Minimap.imageWidth - Minimap.srcPaddingX) * Minimap.SCALE)
+        Minimap.checkpointPosZ = (Minimap.srcPaddingZ * Minimap.SCALE) + ((relZ / height) * (Minimap.imageHeight - Minimap.srcPaddingZ) * Minimap.SCALE)
     }
 }
