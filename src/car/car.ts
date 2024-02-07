@@ -421,7 +421,7 @@ export class Car {
 
         const self = this
         utils.timers.setTimeout(() => {
-            triggerSceneEmote({ src: 'animations/GetInEmote.glb', loop: false })
+            //triggerSceneEmote({ src: 'animations/GetInEmote.glb', loop: false })
             utils.timers.setTimeout(() => {
                 if (self.carModelEntity === undefined || self.carModelEntity === null) return
 
@@ -460,8 +460,8 @@ export class Car {
 
                     Animator.playSingleAnimation(self.carModelEntity, "CloseDoor")
                     AudioSource.getMutable(self.carEntity).playing = true
-                }, 1200)
-            }, 1650) // Open car door 
+                }, 5)
+            }, 5) // Open car door 
         }, 500) // Play animation after teleport  
     }
 
