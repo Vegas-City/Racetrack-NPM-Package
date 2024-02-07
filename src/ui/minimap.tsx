@@ -1,5 +1,5 @@
 import { Color4, Vector3 } from "@dcl/sdk/math"
-import ReactEcs, { UiEntity } from "@dcl/sdk/react-ecs"
+import ReactEcs, { Label, UiEntity } from "@dcl/sdk/react-ecs"
 import { Lap } from "../racetrack/lap";
 
 export type MinimapConfig = {
@@ -62,6 +62,23 @@ export class Minimap {
                 }
             }}
         >
+            <UiEntity
+                uiTransform={{
+                    position: { right: '-50px', top: '40px' },
+                    positionType: 'absolute',
+                }}
+            >
+                <Label // Lap
+                    value={Minimap.formatLap()}
+                    color={Color4.White()}
+                    fontSize={56}
+                    font="sans-serif"
+                    textAlign="top-center"
+                    uiTransform={{
+                        position: { right: '180px' }
+                    }}
+                />
+            </UiEntity>
             <UiEntity
                 uiTransform={{
                     position: { bottom: Minimap.posZ, left: Minimap.posX },
@@ -150,5 +167,9 @@ export class Minimap {
 
         Minimap.checkpointPosX = (Minimap.srcPaddingX * Minimap.SCALE) + ((relX / width) * (Minimap.imageWidth - Minimap.srcPaddingX) * Minimap.SCALE)
         Minimap.checkpointPosZ = (Minimap.srcPaddingZ * Minimap.SCALE) + ((relZ / height) * (Minimap.imageHeight - Minimap.srcPaddingZ) * Minimap.SCALE)
+    }
+
+    private static formatLap(): string {
+        return "LAP\n" + (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
     }
 }
