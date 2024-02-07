@@ -15,6 +15,8 @@ export type MinimapConfig = {
     offsetZ?: number,
     checkpointOffsetX?: number,
     checkpointOffsetZ?: number,
+    checkpointLength?: number,
+    checkpointWidth?: number,
     srcPaddingX?: number,
     srcPaddingZ?: number
 }
@@ -40,6 +42,8 @@ export class Minimap {
     private static offsetZ: number = 0
     private static checkpointOffsetX: number = 0
     private static checkpointOffsetZ: number = 0
+    private static checkpointLength: number = 20
+    private static checkpointWidth: number = 5
     private static srcPaddingX: number = 0
     private static srcPaddingZ: number = 0
 
@@ -77,8 +81,8 @@ export class Minimap {
             <UiEntity
                 uiTransform={{
                     position: { bottom: Minimap.checkpointPosZ, left: Minimap.checkpointPosX },
-                    width: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? 5 : 20,
-                    height: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? 20 : 5,
+                    width: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? Minimap.checkpointWidth : Minimap.checkpointLength,
+                    height: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? Minimap.checkpointLength : Minimap.checkpointWidth,
                     positionType: 'absolute',
                 }}
                 uiBackground={{ color: Color4.Yellow() }}
@@ -99,6 +103,8 @@ export class Minimap {
         Minimap.offsetZ = _data.offsetZ ?? 0
         Minimap.checkpointOffsetX = _data.checkpointOffsetX ?? 0
         Minimap.checkpointOffsetZ = _data.checkpointOffsetZ ?? 0
+        Minimap.checkpointLength = _data.checkpointLength ?? 20
+        Minimap.checkpointWidth = _data.checkpointWidth ?? 5
         Minimap.srcPaddingX = _data.srcPaddingX ?? 0
         Minimap.srcPaddingZ = _data.srcPaddingZ ?? 0
     }
