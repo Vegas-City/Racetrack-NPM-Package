@@ -40,7 +40,7 @@ export class Countdown {
                     uiBackground={{
                         textureMode: 'stretch',
                         texture: {
-                            src: "images/countdownUI/1.png",
+                            src: "images/ui/countdownUI/1.png",
                             wrapMode: 'clamp'
                         }
                     }}
@@ -56,7 +56,7 @@ export class Countdown {
                     uiBackground={{
                         textureMode: 'stretch',
                         texture: {
-                            src: "images/countdownUI/2.png",
+                            src: "images/ui/countdownUI/2.png",
                             wrapMode: 'clamp'
                         }
                     }}
@@ -72,7 +72,7 @@ export class Countdown {
                     uiBackground={{
                         textureMode: 'stretch',
                         texture: {
-                            src: "images/countdownUI/3.png",
+                            src: "images/ui/countdownUI/3.png",
                             wrapMode: 'clamp'
                         }
                     }}
@@ -88,7 +88,7 @@ export class Countdown {
                     uiBackground={{
                         textureMode: 'stretch',
                         texture: {
-                            src: "images/countdownUI/4.png",
+                            src: "images/ui/countdownUI/4.png",
                             wrapMode: 'clamp'
                         }
                     }}
@@ -104,7 +104,7 @@ export class Countdown {
                     uiBackground={{
                         textureMode: 'stretch',
                         texture: {
-                            src: "images/countdownUI/5.png",
+                            src: "images/ui/countdownUI/5.png",
                             wrapMode: 'clamp'
                         }
                     }}
