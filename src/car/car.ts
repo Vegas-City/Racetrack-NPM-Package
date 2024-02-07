@@ -6,8 +6,8 @@ import { PhysicsManager, Body } from '../physics'
 import { BoxShapeDefinition } from '../physics/shapes'
 import { Lap, Obstacle, TrackManager } from '../racetrack'
 import { InputManager } from '../racetrack/inputManager'
-import { SpeedometerUI, LapUI, Minimap, CarChoiceUI } from '../ui'
-import { movePlayerTo, triggerSceneEmote } from '../utils/setup'
+import { SpeedometerUI, Minimap, CarChoiceUI, TimeUI } from '../ui'
+import { movePlayerTo } from '../utils/setup'
 import { CarAttributes } from './carAttributes'
 import { Dashboard } from '../ui'
 import * as utils from '@dcl-sdk/utils'
@@ -216,7 +216,7 @@ export class Car {
 
         this.attachPointerEvent()
         SpeedometerUI.Hide()
-        LapUI.Hide()
+        TimeUI.Hide()
         CarChoiceUI.Hide() 
         Minimap.Hide()
 
@@ -438,8 +438,8 @@ export class Car {
                         TrackManager.hideAvatarTrackCollider()
                         self.switchToCarPerspective()
                         SpeedometerUI.Show()
-                        LapUI.Show()
-                        CarChoiceUI.Show()
+                        TimeUI.Show()
+                        //CarChoiceUI.Show()
                         Minimap.Show()
 
                         if (self.playerCageEntity) {
