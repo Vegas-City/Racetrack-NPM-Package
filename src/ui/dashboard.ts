@@ -89,13 +89,13 @@ export class Dashboard {
             Transform.getMutable(this.speedometerBarsEntity).scale = Vector3.create(0.7, 0.7, 0.7)
             Material.setPbrMaterial(this.speedometerBarsEntity, {
                 texture: Material.Texture.Common({
-                    src: 'images/ui/speedometerBar' + index.toString() + '.png',
+                    src: 'images/ui/speedometerUI/speedometerBar' + index.toString() + '.png',
                 }),
                 alphaTexture: Material.Texture.Common({
-                    src: 'images/ui/speedometerBar' + index.toString() + '.png',
+                    src: 'images/ui/speedometerUI/speedometerBar' + index.toString() + '.png',
                 }),
                 emissiveTexture: Material.Texture.Common({
-                    src: 'images/ui/speedometerBar' + index.toString() + '.png',
+                    src: 'images/ui/speedometerUI/speedometerBar' + index.toString() + '.png',
                 }),
                 emissiveColor: Color3.White(),
                 emissiveIntensity: 2
