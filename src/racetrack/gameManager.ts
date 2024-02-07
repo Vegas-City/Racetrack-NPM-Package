@@ -4,12 +4,14 @@ import { InputManager } from "./inputManager"
 import { Lap } from "./lap"
 import { Car } from "../car/car"
 import * as utils from '@dcl-sdk/utils'
+import { Quaternion } from "@dcl/sdk/math"
 
 export class GameManager {
     static reset(): void {
         if (Car.instances.length <= 0) return
 
         Car.instances[0].carBody?.setPosition(Car.instances[0].startPos)
+        Car.instances[0].carBody?.setRotation(Quaternion.fromEulerDegrees(0, Car.instances[0].startRotY, 0))
         Car.instances[0].speed = 0
         Lap.triggeredStart = false
         Lap.started = false
@@ -49,9 +51,9 @@ export class GameManager {
             Lap.timeElapsed = 0
             Lap.checkpointIndex = 1
             Lap.checkpoints[0].hide()
-            Lap.checkpoints[Lap.checkpointIndex].show()
+            Lap.findCheckpoint(Lap.checkpointIndex)?.show()
             // Do we have any data to show a ghost?
-            if(TrackManager.ghostRecorder.ghostData.points.length>0){
+            if (TrackManager.ghostRecorder.ghostData.points.length > 0) {
                 TrackManager.ghostCar.startGhost()
             }
             // Start recording
