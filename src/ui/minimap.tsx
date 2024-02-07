@@ -1,7 +1,6 @@
 import { Color4, Vector3 } from "@dcl/sdk/math"
 import ReactEcs, { UiEntity } from "@dcl/sdk/react-ecs"
 import { Lap } from "../racetrack/lap";
-import { Transform, engine } from "@dcl/sdk/ecs";
 
 export type MinimapConfig = {
     src: string,
@@ -24,7 +23,7 @@ export type MinimapConfig = {
 export class Minimap {
     private static readonly SCALE: number = 0.4
 
-    static visibility: boolean = true
+    static visibility: boolean = false
     private static posX: number = 0
     private static posZ: number = 0
     private static checkpointPosX: number = 0
@@ -50,7 +49,7 @@ export class Minimap {
     private static component = () => (
         <UiEntity
             uiTransform={{
-                position: { right: '30px', top: '170px' },
+                position: { right: '30px', top: '130px' },
                 width: Minimap.imageWidth * Minimap.SCALE,
                 height: Minimap.imageHeight * Minimap.SCALE,
                 positionType: 'absolute',
