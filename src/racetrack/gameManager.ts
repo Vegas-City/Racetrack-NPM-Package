@@ -1,5 +1,5 @@
 import { TrackManager } from "./trackManager"
-import { Countdown } from "./countdown"
+import { Countdown } from "../ui"
 import { InputManager } from "./inputManager"
 import { Lap } from "./lap"
 import { Car } from "../car/car"
