@@ -11,7 +11,7 @@ export class Lap {
     static checkpointIndex: number = 0
     static lapsCompleted: number = -1
     static timeElapsed: number = 0
-    static totalLaps: number = 1 // make the default 1
+    static totalLaps: number = 2 // make the default 2
     static triggeredStart: boolean = false
     static started: boolean = false
 
@@ -34,7 +34,10 @@ export class Lap {
         if (!Lap.started) return
 
         if (Lap.lapsCompleted >= 0) Lap.timeElapsed += _dt
-        const currentCheckpoint = Lap.checkpoints[Lap.checkpointIndex]
+        const currentCheckpoint = Lap.findCheckpoint(Lap.checkpointIndex)
+
+        if(currentCheckpoint === null) return
+
         const distance = pointToLineDistance(_carPos, currentCheckpoint.point1, currentCheckpoint.point2)
 
         if (distance < Lap.checkpointThresholdDistance) {
@@ -50,12 +53,15 @@ export class Lap {
                     TrackManager.onCheckpointEvent()
                 }
             }
+            else {
+                TrackManager.onCheckpointEvent()
+            }
             currentCheckpoint.hide()
             Lap.checkpointIndex++
             if (Lap.checkpointIndex >= Lap.checkpoints.length) {
                 Lap.checkpointIndex = 0
             }
-            Lap.checkpoints[Lap.checkpointIndex].show()
+            Lap.findCheckpoint(Lap.checkpointIndex)?.show()
         }
     }
 
@@ -66,7 +72,7 @@ export class Lap {
         Lap.checkpoints.splice(0)
     }
 
-    private static findCheckpoint(_index: number): LapCheckpoint | null {
+    static findCheckpoint(_index: number): LapCheckpoint | null {
         for (let checkpoint of Lap.checkpoints) {
             if (checkpoint.index == _index) {
                 return checkpoint
