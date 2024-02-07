@@ -210,14 +210,14 @@ export class Car {
             Transform.getMutable(this.carColliderEntity).scale = Vector3.One()
         }
 
-        const targetPos = localToWorldPosition(Vector3.create(-2.3, -1, -0.2), carTransform.position, this.carRot)
+        const targetPos = localToWorldPosition(Vector3.create(-2.3, 1, -0.2), carTransform.position, this.carRot)
         const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carTransform.position, this.carRot)
         movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
 
         this.attachPointerEvent()
         SpeedometerUI.Hide()
         LapUI.Hide()
-        CarChoiceUI.Hide()
+        CarChoiceUI.Hide() 
         Minimap.Hide()
 
         if (this.playerCageEntity) {

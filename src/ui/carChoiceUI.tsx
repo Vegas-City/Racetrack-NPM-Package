@@ -7,7 +7,7 @@ export class CarChoiceUI {
     private static component = () => (
         <UiEntity
             uiTransform={{
-                position: { right: '4%', top: '-2%' },
+                position: { right: '4%', top: '0%' },
                 positionType: 'absolute',
                 display: CarChoiceUI.visibility ? 'flex' : 'none'
             }}
@@ -16,7 +16,7 @@ export class CarChoiceUI {
                 uiTransform={{
                     height: 128,
                     width: 128,
-                    position: { right: "360" }
+                    position: { right: "360",top:-10 }
                 }}
                 uiBackground={{
                     textureMode: "stretch",
