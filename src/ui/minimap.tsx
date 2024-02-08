@@ -10,20 +10,23 @@ export type MinimapConfig = {
     parcelHeight: number,
     bottomLeftX: number,
     bottomLeftZ: number,
+    checkpointLength: number,
+    checkpointWidth: number,
+    scale: number
     offsetX?: number,
     offsetZ?: number,
-    checkpointOffsetX?: number,
-    checkpointOffsetZ?: number,
-    checkpointLength?: number,
-    checkpointWidth?: number,
-    srcPaddingX?: number,
-    srcPaddingZ?: number
+    paddingBottom?: number,
+    paddingTop?: number,
+    paddingLeft?: number,
+    paddingRight?: number
 }
 
 export class Minimap {
-    private static readonly SCALE: number = 0.4
+    static visibility: boolean = true
 
-    static visibility: boolean = false
+    private static readonly DOT_SIZE: number = 10
+    private static readonly DOT_SIZE_ADD: number = 5
+
     private static posX: number = 0
     private static posZ: number = 0
     private static checkpointPosX: number = 0
@@ -39,19 +42,20 @@ export class Minimap {
     private static bottomLeftZ: number = 0
     private static offsetX: number = 0
     private static offsetZ: number = 0
-    private static checkpointOffsetX: number = 0
-    private static checkpointOffsetZ: number = 0
     private static checkpointLength: number = 20
     private static checkpointWidth: number = 5
-    private static srcPaddingX: number = 0
-    private static srcPaddingZ: number = 0
+    private static scale: number = 0.5
+    private static paddingBottom: number = 0
+    private static paddingTop: number = 0
+    private static paddingLeft: number = 0
+    private static paddingRight: number = 0
 
     private static component = () => (
         <UiEntity
             uiTransform={{
                 position: { right: '30px', top: '130px' },
-                width: Minimap.imageWidth * Minimap.SCALE,
-                height: Minimap.imageHeight * Minimap.SCALE,
+                width: Minimap.imageWidth * Minimap.scale,
+                height: Minimap.imageHeight * Minimap.scale,
                 positionType: 'absolute',
                 display: Minimap.visibility ? 'flex' : 'none'
             }}
@@ -64,26 +68,25 @@ export class Minimap {
         >
             <UiEntity
                 uiTransform={{
-                    position: { right: '-50px', top: '40px' },
+                    position: { right: '80px', top: '75px' },
+                    width: 100,
+                    height: 100,
                     positionType: 'absolute',
+                    display: Lap.started ? 'flex' : 'none'
+                }}
+                uiBackground={{
+                    textureMode: 'stretch',
+                    texture: {
+                        src:Minimap.getLapImage()
+                    }
                 }}
             >
-                <Label // Lap
-                    value={Minimap.formatLap()}
-                    color={Color4.White()}
-                    fontSize={56}
-                    font="sans-serif"
-                    textAlign="top-center"
-                    uiTransform={{
-                        position: { right: '180px' }
-                    }}
-                />
             </UiEntity>
             <UiEntity
                 uiTransform={{
                     position: { bottom: Minimap.posZ, left: Minimap.posX },
-                    width: 10,
-                    height: 10,
+                    width: Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale),
+                    height: Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale),
                     positionType: 'absolute',
                 }}
                 uiBackground={{
@@ -117,12 +120,13 @@ export class Minimap {
         Minimap.bottomLeftZ = _data.bottomLeftZ
         Minimap.offsetX = _data.offsetX ?? 0
         Minimap.offsetZ = _data.offsetZ ?? 0
-        Minimap.checkpointOffsetX = _data.checkpointOffsetX ?? 0
-        Minimap.checkpointOffsetZ = _data.checkpointOffsetZ ?? 0
+        Minimap.paddingBottom = _data.paddingBottom ?? 0
+        Minimap.paddingTop = _data.paddingTop ?? 0
+        Minimap.paddingLeft = _data.paddingLeft ?? 0
+        Minimap.paddingRight = _data.paddingRight ?? 0
         Minimap.checkpointLength = _data.checkpointLength ?? 20
         Minimap.checkpointWidth = _data.checkpointWidth ?? 5
-        Minimap.srcPaddingX = _data.srcPaddingX ?? 0
-        Minimap.srcPaddingZ = _data.srcPaddingZ ?? 0
+        Minimap.scale = _data.scale ?? 0.5
     }
 
     static Render() {
@@ -140,14 +144,22 @@ export class Minimap {
     }
 
     static Update(_x: number, _z: number) {
-        const width = Minimap.parcelWidth * 16
-        const height = Minimap.parcelHeight * 16
+        const width = (Minimap.parcelWidth * 16) - (2 * Minimap.offsetX)
+        const height = (Minimap.parcelHeight * 16) - (2 * Minimap.offsetZ)
 
         const relX = _x - Minimap.bottomLeftX - Minimap.offsetX
         const relZ = _z - Minimap.bottomLeftZ - Minimap.offsetZ
 
-        Minimap.posX = (Minimap.srcPaddingX * Minimap.SCALE) + ((relX / width) * (Minimap.imageWidth - Minimap.srcPaddingX) * Minimap.SCALE)
-        Minimap.posZ = (Minimap.srcPaddingZ * Minimap.SCALE) + ((relZ / height) * (Minimap.imageHeight - Minimap.srcPaddingZ) * Minimap.SCALE)
+        const ratioX = relX / width
+        const ratioZ = relZ / height
+
+        const srcWidth = Minimap.imageWidth - Minimap.paddingLeft - Minimap.paddingRight
+        const srcHeight = Minimap.imageHeight - Minimap.paddingBottom - Minimap.paddingTop
+
+        const dotOffset = (Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale)) * 0.5
+
+        Minimap.posX = ((Minimap.paddingLeft + (ratioX * srcWidth)) * Minimap.scale) - dotOffset
+        Minimap.posZ = ((Minimap.paddingBottom + (ratioZ * srcHeight)) * Minimap.scale) - dotOffset
 
         Minimap.updateLapCheckpoint()
     }
@@ -162,14 +174,27 @@ export class Minimap {
         const center = Vector3.lerp(checkpoint.point1, checkpoint.point2, 0.5)
         Minimap.checkpointAngle = Math.atan2(checkpoint.point2.z - checkpoint.point1.z, checkpoint.point2.x - checkpoint.point1.x) * 180 / Math.PI
 
-        const relX = center.x - Minimap.bottomLeftX - Minimap.checkpointOffsetX
-        const relZ = center.z - Minimap.bottomLeftZ - Minimap.checkpointOffsetZ
+        const relX = center.x - Minimap.bottomLeftX - Minimap.offsetX
+        const relZ = center.z - Minimap.bottomLeftZ - Minimap.offsetZ
 
-        Minimap.checkpointPosX = (Minimap.srcPaddingX * Minimap.SCALE) + ((relX / width) * (Minimap.imageWidth - Minimap.srcPaddingX) * Minimap.SCALE)
-        Minimap.checkpointPosZ = (Minimap.srcPaddingZ * Minimap.SCALE) + ((relZ / height) * (Minimap.imageHeight - Minimap.srcPaddingZ) * Minimap.SCALE)
+        const ratioX = relX / width
+        const ratioZ = relZ / height
+
+        const srcWidth = Minimap.imageWidth - Minimap.paddingLeft - Minimap.paddingRight
+        const srcHeight = Minimap.imageHeight - Minimap.paddingBottom - Minimap.paddingTop
+
+        const checkpointOffsetX = (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? Minimap.checkpointWidth * 0.5 : Minimap.checkpointLength * 0.5
+        const checkpointOffsetZ = (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? Minimap.checkpointLength * 0.5 : Minimap.checkpointWidth * 0.5
+
+        Minimap.checkpointPosX = ((Minimap.paddingLeft + (ratioX * srcWidth)) * Minimap.scale) - checkpointOffsetX
+        Minimap.checkpointPosZ = ((Minimap.paddingBottom + (ratioZ * srcHeight)) * Minimap.scale) - checkpointOffsetZ
     }
 
-    private static formatLap(): string {
-        return "LAP\n" + (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
+    private static getLapImage(): string {
+        switch(Lap.lapsCompleted) {
+            case 0: return "images/ui/minimapUI/lap1.png"
+            case 1: return "images/ui/minimapUI/lap2.png"
+        }
+        return "images/ui/minimapUI/lap1.png"
     }
 }
