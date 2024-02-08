@@ -2,14 +2,16 @@ import { Color4 } from "@dcl/sdk/math"
 import ReactEcs, { Label, UiEntity } from "@dcl/sdk/react-ecs"
 
 export class SpeedometerUI {
+    private static readonly SCALE: number = 0.35
+
     static visibility: boolean = false
     static racerPosition: string = "1st"
-    static speed: string = "250 MPH"
+    static speed: string = "0\nkm/h"
 
     private static component = () => (
         <UiEntity
             uiTransform={{
-                position: { right: '0px', bottom: '0px' },
+                position: { right: '50px', bottom: '10px' },
                 height: 100,
                 width: 100,
                 positionType: 'absolute',
@@ -18,28 +20,27 @@ export class SpeedometerUI {
         >
             <UiEntity
                 uiTransform={{
-                    position: { bottom: "30px", right: "0px" },
-                    height: 256,
-                    width: 256,
+                    position: { bottom: "0px", right: "0px" },
+                    width: 605 * SpeedometerUI.SCALE,
+                    height: 470 * SpeedometerUI.SCALE,
                     positionType: 'absolute',
-                    display: "flex"
                 }}
                 uiBackground={{
-                    textureMode: 'center',
+                    textureMode: 'stretch',
                     texture: {
-                        src: "images/ui/speedUI.png",
+                        src: "images/ui/speedometerUI/speedBg.png",
                         wrapMode: 'repeat'
                     }
                 }}
             >
                 <Label // Speed
                     value={SpeedometerUI.speed}
-                    color={Color4.Black()}
-                    fontSize={56}
+                    color={Color4.White()}
+                    fontSize={45}
                     font="serif"
                     textAlign="top-center"
                     uiTransform={{
-                        position: { left: '165px', top: "108px" }
+                        position: { left: '100px', top: "20px" }
                     }}
                 />
             </UiEntity>
@@ -61,6 +62,6 @@ export class SpeedometerUI {
     }
 
     static Update(_speed: number) {
-        SpeedometerUI.speed = (Math.round(_speed * 4 * 100) / 100).toFixed(0).toString()
+        SpeedometerUI.speed = (Math.round(_speed * 4 * 100) / 100).toFixed(0).toString() + "\nkm/h"
     }
 }
