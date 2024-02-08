@@ -26,6 +26,8 @@ export const CarWheelComponent = engine.defineComponent(
 
 export class Car {
     private static readonly MAX_STEERING_VALUE: number = Math.PI / 2
+    private static readonly INITIAL_CAGE_SCALE_INV: Vector3 = Vector3.create(0.5, 1, 1)
+    private static readonly TARGET_CAGE_SCALE_INV: Vector3 = Vector3.create(5, 1, 10)
     public static instances: Car[] = []
 
     private static stopSpeed: number = 0.2
@@ -217,7 +219,7 @@ export class Car {
         this.attachPointerEvent()
         SpeedometerUI.Hide()
         TimeUI.Hide()
-        CarChoiceUI.Hide() 
+        CarChoiceUI.Hide()
         Minimap.Hide()
 
         if (this.playerCageEntity) {
@@ -396,6 +398,9 @@ export class Car {
             SpeedometerUI.Hide()
         }
 
+        const scale = Vector3.create(Car.INITIAL_CAGE_SCALE_INV.x * this.carScale, Car.INITIAL_CAGE_SCALE_INV.y * this.carScale, Car.INITIAL_CAGE_SCALE_INV.z * this.carScale)
+        Transform.getMutable(this.playerCageEntity).scale = Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
+
         const forwardDir = Vector3.add(this.getCagePos(), Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
         movePlayerTo({ newRelativePosition: Vector3.add(this.getCagePos(), _deltaDistance), cameraTarget: forwardDir })
     }
@@ -447,7 +452,7 @@ export class Car {
                                 area: Vector3.create(3, 2, 7),
                                 mode: CameraType.CT_FIRST_PERSON,
                             })
-                            const scale = Vector3.create(5 * self.carScale, 1 * self.carScale, 10 * self.carScale)
+                            const scale = Vector3.create(Car.INITIAL_CAGE_SCALE_INV.x * self.carScale, Car.INITIAL_CAGE_SCALE_INV.y * self.carScale, Car.INITIAL_CAGE_SCALE_INV.z * self.carScale)
                             Transform.getMutable(self.playerCageEntity).scale = Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
                         }
 
@@ -622,8 +627,8 @@ export class Car {
         }
 
         // Update steering wheel based on steer value
-        if(this.steeringWheel!=null){
-            Transform.getMutable(this.steeringWheel).rotation = Quaternion.fromEulerDegrees(this.steerValue*-45,0,0)
+        if (this.steeringWheel != null) {
+            Transform.getMutable(this.steeringWheel).rotation = Quaternion.fromEulerDegrees(this.steerValue * -45, 0, 0)
         }
 
 
@@ -698,9 +703,12 @@ export class Car {
 
         let collisionCounterVelocity = this.handleCollisions(forwardDir)
 
-        if (Car.camFollow && this.occupied) {
+        if (Car.camFollow && this.occupied && this.playerCageEntity) {
             const targetPos = localToWorldPosition(Vector3.create(0, 3, -6), carTransform.position, this.carRot)
             const targetCameraPos = Vector3.add(targetPos, Vector3.add(forwardDir, Vector3.create(0, -0.3, 0)))
+
+            const scale = Vector3.create(Car.INITIAL_CAGE_SCALE_INV.x * this.carScale, Car.INITIAL_CAGE_SCALE_INV.y * this.carScale, Car.INITIAL_CAGE_SCALE_INV.z * this.carScale)
+            Transform.getMutable(this.playerCageEntity).scale = Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
             movePlayerTo({ newRelativePosition: this.getCagePos(), cameraTarget: targetCameraPos })
         }
 
@@ -761,6 +769,8 @@ export class Car {
                 this.switchToCarPerspective(deltaDistance)
             }
         }
+
+        this.updatePlayerCage(dt)
     }
 
     private updateWheel(wheel: Entity): void {
@@ -780,5 +790,21 @@ export class Car {
         if (Math.abs(this.speed) > 0) {
             childTransform.rotation = Quaternion.multiply(childTransform.rotation, Quaternion.fromEulerDegrees(0, (this.speed > 0 ? -1 : 1) * (Math.max(1, Math.abs(this.speed) * 2.5)), 0))
         }
+    }
+
+    private updatePlayerCage(dt: number): void {
+        if (!this.playerCageEntity || !Transform.getMutable(this.playerCageEntity)) return
+
+        const cageScale = Transform.getMutable(this.playerCageEntity).scale
+        let currentScaleFactor = Vector3.create(1 / cageScale.x, 1 / cageScale.y, 1 / cageScale.z)
+        currentScaleFactor = Vector3.create(currentScaleFactor.x / this.carScale, currentScaleFactor.y / this.carScale, currentScaleFactor.z / this.carScale)
+
+        const dif = Vector3.subtract(Car.TARGET_CAGE_SCALE_INV, Car.INITIAL_CAGE_SCALE_INV)
+        const step = Vector3.create(dif.x * dt, dif.y * dt, dif.z * dt)
+        currentScaleFactor = Vector3.add(currentScaleFactor, step)
+        currentScaleFactor = Vector3.create(Math.min(currentScaleFactor.x, Car.TARGET_CAGE_SCALE_INV.x), Math.min(currentScaleFactor.y, Car.TARGET_CAGE_SCALE_INV.y), Math.min(currentScaleFactor.z, Car.TARGET_CAGE_SCALE_INV.z))
+
+        const newScale = Vector3.create(currentScaleFactor.x * this.carScale, currentScaleFactor.y * this.carScale, currentScaleFactor.z * this.carScale)
+        Transform.getMutable(this.playerCageEntity).scale = Vector3.create(1 / newScale.x, 1 / newScale.y, 1 / newScale.z)
     }
 }
