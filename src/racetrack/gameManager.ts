@@ -53,7 +53,7 @@ export class GameManager {
             Lap.checkpoints[0].hide()
             Lap.findCheckpoint(Lap.checkpointIndex)?.show()
             // Do we have any data to show a ghost?
-            if (TrackManager.ghostRecorder.ghostData.points.length > 0) {
+            if(TrackManager.ghostRecorder.currentGhostData.points.length>0){
                 TrackManager.ghostCar.startGhost()
             }
             // Start recording
