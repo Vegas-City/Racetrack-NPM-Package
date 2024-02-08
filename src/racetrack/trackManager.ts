@@ -14,6 +14,7 @@ import { GameManager } from "./gameManager"
 export class TrackManager {
     static debugMode: boolean = false
 
+    static trackID: number = -1
     static track: Track
     static hotspots: Hotspot[] = []
     static obstacles: Obstacle[] = []
