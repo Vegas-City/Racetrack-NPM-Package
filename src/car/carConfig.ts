@@ -11,6 +11,12 @@ export type CarConfig = {
     grip: number
 
     engineStartAudio: string
+    brakeAudio: string
+    skidAudio: string
+    crashAudio: string
+    checkPointAudio: string
+    countDownAudio: string
+    startRaceAudio: string
     
     carGLB: string
     carColliderGLB: string

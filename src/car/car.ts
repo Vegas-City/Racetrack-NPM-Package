@@ -11,6 +11,7 @@ import { movePlayerTo } from '../utils/setup'
 import { CarAttributes } from './carAttributes'
 import { Dashboard } from '../ui'
 import * as utils from '@dcl-sdk/utils'
+import { AudioManager } from '../audio/audioManager'
 
 export const CarWheelComponent = engine.defineComponent(
     "carWheelComponent",
@@ -79,8 +80,16 @@ export class Car {
     dashboard: Dashboard | null = null
     carIcon: string
 
+    static audioManager: AudioManager
+
     constructor(_config: CarConfig, _position: Vector3, _rot: number) {
         this.carAttributes = new CarAttributes(_config)
+
+        if(Car.audioManager!=null){
+            AudioManager.clearDown()
+        }
+
+        Car.audioManager = new AudioManager(_config)
 
         this.wheelX_L = _config.wheelX_L
         this.wheelX_R = _config.wheelX_R
@@ -111,11 +120,7 @@ export class Car {
             rotation: Quaternion.fromEulerDegrees(0, _rot, 0),
             scale: scale
         })
-        AudioSource.createOrReplace(this.carEntity, {
-            audioClipUrl: _config.engineStartAudio,
-            loop: false,
-            playing: false
-        })
+
         this.startRotY = _rot
 
         this.carModelEntity = engine.addEntity()
@@ -456,7 +461,7 @@ export class Car {
                     }, 50)
 
                     Animator.playSingleAnimation(self.carModelEntity, "CloseDoor")
-                    AudioSource.getMutable(self.carEntity).playing = true
+                    AudioManager.playEngineStartAudio()
                 }, 5)
             }, 5) // Open car door 
         }, 500) // Play animation after teleport  
