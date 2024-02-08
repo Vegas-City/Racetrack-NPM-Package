@@ -27,7 +27,7 @@ export class GhostRecorder {
         this.currentGhostData.frequecy = this.recordFrequncy 
         this.currentGhostData.createDate = new Date() 
         this.currentGhostData.points = [] 
-        this.currentGhostData.userWallet = "FillThisIn" 
+        this.currentGhostData.track = TrackManager.trackID
  
         this.recording = true 
         this.currentRecordtime = 0 

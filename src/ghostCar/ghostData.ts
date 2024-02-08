@@ -1,9 +1,8 @@
 import { GhostPoint } from "./ghostPoint" 
  
 export class GhostData { 
-    track:number = 0 
+    track:number = -1
     car:number = 0 
-    userWallet:string = "" 
     createDate:Date = new Date() 
     duration: number = 0 
     frequecy:number = 0 
