@@ -45,8 +45,8 @@ export class Lap {
             if (Lap.checkpointIndex == 0) {
                 // completed a lap
                 Lap.lapsCompleted++
-                TrackManager.ghostRecorder.completeLap()
                 if (Lap.lapsCompleted >= Lap.totalLaps) {
+                    TrackManager.ghostRecorder.completeRace()
                     GameManager.end()
                 }
                 else {

@@ -50,7 +50,7 @@ export class GhostRecorder {
         } 
     } 
  
-    completeLap(){ 
+    completeRace(){ 
         // Send the recorded data to the ghost car 
         this.stop() 
         // Clone the data 
