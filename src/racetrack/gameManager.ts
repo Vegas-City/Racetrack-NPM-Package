@@ -10,9 +10,9 @@ export class GameManager {
     static reset(): void {
         if (Car.instances.length <= 0) return
 
-        Car.instances[0].carBody?.setPosition(Car.instances[0].startPos)
-        Car.instances[0].carBody?.setRotation(Quaternion.fromEulerDegrees(0, Car.instances[0].startRotY, 0))
-        Car.instances[0].speed = 0
+        Car.instances[0].data.carBody?.setPosition(Car.instances[0].data.startPos)
+        Car.instances[0].data.carBody?.setRotation(Quaternion.fromEulerDegrees(0, Car.instances[0].data.startRotY, 0))
+        Car.instances[0].data.speed = 0
         Lap.triggeredStart = false
         Lap.started = false
         Lap.lapsCompleted = -1

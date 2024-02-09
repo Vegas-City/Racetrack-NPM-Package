@@ -37,7 +37,7 @@ export class Car {
     static camFollow: boolean = false
     static activeCarEntity: Entity | null = null
 
-    private data: CarData = new CarData()
+    data: CarData = new CarData()
 
     constructor(_config: CarConfig, _position: Vector3, _rot: number) {
         this.data.carAttributes = new CarAttributes(_config)
