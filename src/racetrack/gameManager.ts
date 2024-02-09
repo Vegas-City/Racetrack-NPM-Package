@@ -4,10 +4,9 @@ import { InputManager } from "./inputManager"
 import { Lap } from "./lap"
 import { Car } from "../car/car"
 import { Quaternion } from "@dcl/sdk/math"
-import * as utils from '@dcl-sdk/utils'
-import { Quaternion } from "@dcl/sdk/math"
 import { AudioManager } from "../audio/audioManager"
 import { CarPerspectives } from "../car/helpers/carPerspectives"
+import * as utils from '@dcl-sdk/utils'
 
 export class GameManager {
     static reset(): void {

@@ -7,6 +7,7 @@ import { CarData } from "../carData"
 import { localToWorldPosition } from "../../utils/utils"
 import { Car } from "../car"
 import { TrackManager } from "../../racetrack"
+import { AudioManager } from "../../audio"
 import * as utils from '@dcl-sdk/utils'
 
 export class CarPerspectives {
@@ -85,7 +86,7 @@ export class CarPerspectives {
                     }, 50)
 
                     Animator.playSingleAnimation(_data.carModelEntity, "CloseDoor")
-                    AudioSource.getMutable(_data.carEntity).playing = true
+                    AudioManager.playEngineStartAudio()
                 }, 5)
             }, 5) // Open car door 
         }, 500) // Play animation after teleport  

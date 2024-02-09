@@ -62,7 +62,7 @@ export class Car {
             scale: scale
         })
 
-        this.startRotY = _rot
+        this.data.startRotY = _rot
 
         this.data.carModelEntity = engine.addEntity()
         Transform.create(this.data.carModelEntity, {
