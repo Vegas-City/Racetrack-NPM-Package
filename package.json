@@ -24,7 +24,8 @@
     "src/racetrack",
     "src/ui",
     "src/utils",
-    "src/ghostCar"
+    "src/ghostCar",
+    "src/audio"
   ],
   "dependencies": {
     "@dcl-sdk/utils": "^1.1.3",
