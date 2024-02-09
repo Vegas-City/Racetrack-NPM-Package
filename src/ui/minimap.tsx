@@ -1,4 +1,3 @@
-import { Color4, Vector3 } from "@dcl/sdk/math"
 import ReactEcs, { UiEntity } from "@dcl/sdk/react-ecs"
 import { Lap } from "../racetrack/lap";
 import { TrackManager } from "../racetrack/trackManager";
