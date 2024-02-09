@@ -22,7 +22,7 @@ export type MinimapConfig = {
 }
 
 export class Minimap {
-    static visibility: boolean = true
+    static visibility: boolean = false
 
     private static readonly DOT_SIZE: number = 10
     private static readonly DOT_SIZE_ADD: number = 5
