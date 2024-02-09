@@ -1,17 +1,21 @@
 import { Color4, Vector3 } from "@dcl/sdk/math"
 import ReactEcs, { UiEntity } from "@dcl/sdk/react-ecs"
 import { Lap } from "../racetrack/lap";
+import { TrackManager } from "../racetrack/trackManager";
+
+export type MinimapAssetConfig = {
+    lapImages: string[],
+    minimapImages: string[],
+    checkpointImages: string[][]
+}
 
 export type MinimapConfig = {
-    src: string,
     srcWidth: number,
     srcHeight: number,
     parcelWidth: number,
     parcelHeight: number,
     bottomLeftX: number,
     bottomLeftZ: number,
-    checkpointLength: number,
-    checkpointWidth: number,
     scale: number
     offsetX?: number,
     offsetZ?: number,
@@ -22,19 +26,18 @@ export type MinimapConfig = {
 }
 
 export class Minimap {
-    static visibility: boolean = false
+    static visibility: boolean = true
 
     private static readonly DOT_SIZE: number = 10
     private static readonly DOT_SIZE_ADD: number = 5
-    private static readonly LAP_IMAGES: string[] = ["images/ui/minimapUI/lap1.png", "images/ui/minimapUI/lap2.png"]
+
+    private static lapImages: string[] = []
+    private static minimapImages: string[] = []
+    private static checkpointImages: string[][] = []
 
     private static posX: number = 0
     private static posZ: number = 0
-    private static checkpointPosX: number = 0
-    private static checkpointPosZ: number = 0
-    private static checkpointAngle: number = 0
 
-    private static imageSrc: string = ""
     private static imageWidth: number = 0
     private static imageHeight: number = 0
     private static parcelWidth: number = 0
@@ -43,8 +46,6 @@ export class Minimap {
     private static bottomLeftZ: number = 0
     private static offsetX: number = 0
     private static offsetZ: number = 0
-    private static checkpointLength: number = 20
-    private static checkpointWidth: number = 5
     private static scale: number = 0.5
     private static paddingBottom: number = 0
     private static paddingTop: number = 0
@@ -55,24 +56,22 @@ export class Minimap {
         <UiEntity
             uiTransform={{
                 position: { right: '30px', top: '130px' },
-                width: Minimap.imageWidth * Minimap.scale,
-                height: Minimap.imageHeight * Minimap.scale,
                 positionType: 'absolute',
                 display: Minimap.visibility ? 'flex' : 'none'
             }}
-            uiBackground={{
-                textureMode: 'stretch',
-                texture: {
-                    src: Minimap.imageSrc
-                }
-            }}
         >
             <UiEntity>
-                {this.generateScoreImages()}
+                {this.generateMinimapImages()}
+            </UiEntity>
+            <UiEntity>
+                {this.generateCheckpointImages()}
+            </UiEntity>
+            <UiEntity>
+                {this.generateLapImages()}
             </UiEntity>
             <UiEntity
                 uiTransform={{
-                    position: { bottom: Minimap.posZ, left: Minimap.posX },
+                    position: { left: Minimap.posX - (Minimap.imageWidth * Minimap.scale), bottom: Minimap.posZ - (Minimap.imageHeight * Minimap.scale) },
                     width: Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale),
                     height: Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale),
                     positionType: 'absolute',
@@ -85,21 +84,16 @@ export class Minimap {
                 }}
             >
             </UiEntity>
-            <UiEntity
-                uiTransform={{
-                    position: { bottom: Minimap.checkpointPosZ, left: Minimap.checkpointPosX },
-                    width: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? Minimap.checkpointWidth : Minimap.checkpointLength,
-                    height: (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? Minimap.checkpointLength : Minimap.checkpointWidth,
-                    positionType: 'absolute',
-                }}
-                uiBackground={{ color: Color4.Yellow() }}
-            >
-            </UiEntity>
         </UiEntity>
     )
 
+    static InitialiseAssets(_data: MinimapAssetConfig): void {
+        Minimap.lapImages = _data.lapImages
+        Minimap.minimapImages = _data.minimapImages
+        Minimap.checkpointImages = _data.checkpointImages
+    }
+
     static Load(_data: MinimapConfig): void {
-        Minimap.imageSrc = _data.src
         Minimap.imageWidth = _data.srcWidth
         Minimap.imageHeight = _data.srcHeight
         Minimap.parcelWidth = _data.parcelWidth
@@ -112,8 +106,6 @@ export class Minimap {
         Minimap.paddingTop = _data.paddingTop ?? 0
         Minimap.paddingLeft = _data.paddingLeft ?? 0
         Minimap.paddingRight = _data.paddingRight ?? 0
-        Minimap.checkpointLength = _data.checkpointLength ?? 20
-        Minimap.checkpointWidth = _data.checkpointWidth ?? 5
         Minimap.scale = _data.scale ?? 0.5
     }
 
@@ -148,42 +140,60 @@ export class Minimap {
 
         Minimap.posX = ((Minimap.paddingLeft + (ratioX * srcWidth)) * Minimap.scale) - dotOffset
         Minimap.posZ = ((Minimap.paddingBottom + (ratioZ * srcHeight)) * Minimap.scale) - dotOffset
-
-        Minimap.updateLapCheckpoint()
     }
 
-    private static updateLapCheckpoint(): void {
-        const width = Minimap.parcelWidth * 16
-        const height = Minimap.parcelHeight * 16
-
-        const checkpoint = Lap.findCheckpoint(Lap.checkpointIndex)
-        if (checkpoint === null) return
-
-        const center = Vector3.lerp(checkpoint.point1, checkpoint.point2, 0.5)
-        Minimap.checkpointAngle = Math.atan2(checkpoint.point2.z - checkpoint.point1.z, checkpoint.point2.x - checkpoint.point1.x) * 180 / Math.PI
-
-        const relX = center.x - Minimap.bottomLeftX - Minimap.offsetX
-        const relZ = center.z - Minimap.bottomLeftZ - Minimap.offsetZ
-
-        const ratioX = relX / width
-        const ratioZ = relZ / height
-
-        const srcWidth = Minimap.imageWidth - Minimap.paddingLeft - Minimap.paddingRight
-        const srcHeight = Minimap.imageHeight - Minimap.paddingBottom - Minimap.paddingTop
-
-        const checkpointOffsetX = (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? Minimap.checkpointWidth * 0.5 : Minimap.checkpointLength * 0.5
-        const checkpointOffsetZ = (Math.abs(Minimap.checkpointAngle) > 89 && Math.abs(Minimap.checkpointAngle) < 91) ? Minimap.checkpointLength * 0.5 : Minimap.checkpointWidth * 0.5
-
-        Minimap.checkpointPosX = ((Minimap.paddingLeft + (ratioX * srcWidth)) * Minimap.scale) - checkpointOffsetX
-        Minimap.checkpointPosZ = ((Minimap.paddingBottom + (ratioZ * srcHeight)) * Minimap.scale) - checkpointOffsetZ
+    private static generateMinimapImages() {
+        return Minimap.minimapImages.map((image, index) =>
+            <UiEntity
+                key={"minimap_image_" + index.toString()}
+                uiTransform={{
+                    position: { right: '0px', top: '0px' },
+                    width: Minimap.imageWidth * Minimap.scale,
+                    height: Minimap.imageHeight * Minimap.scale,
+                    positionType: 'absolute',
+                    display: Minimap.getMinimapImageVisibility(index) ? 'flex' : 'none'
+                }}
+                uiBackground={{
+                    textureMode: 'stretch',
+                    texture: {
+                        src: image
+                    }
+                }}
+            >
+            </UiEntity>
+        )
     }
 
-    private static generateScoreImages() {
-        return Minimap.LAP_IMAGES.map((image, index) =>
+    private static generateCheckpointImages() {
+        return Minimap.checkpointImages.map((trackCheckpoints, trackIndex) =>
+            trackCheckpoints.map((image, index) =>
+                <UiEntity
+                    key={"checkpoint_image_" + trackIndex.toString() + "_" + index.toString()}
+                    uiTransform={{
+                        position: { right: '0px', top: '0px' },
+                        width: Minimap.imageWidth * Minimap.scale,
+                        height: Minimap.imageHeight * Minimap.scale,
+                        positionType: 'absolute',
+                        display: Minimap.getCheckpointImageVisibility(trackIndex, index) ? 'flex' : 'none'
+                    }}
+                    uiBackground={{
+                        textureMode: 'stretch',
+                        texture: {
+                            src: image
+                        }
+                    }}
+                >
+                </UiEntity>
+            )
+        )
+    }
+
+    private static generateLapImages() {
+        return Minimap.lapImages.map((image, index) =>
             <UiEntity
                 key={"lap_image_" + index.toString()}
                 uiTransform={{
-                    position: { right: '-217px', top: '80px' },
+                    position: { right: '80px', top: '80px' },
                     width: 100,
                     height: 100,
                     positionType: 'absolute',
@@ -198,6 +208,14 @@ export class Minimap {
             >
             </UiEntity>
         )
+    }
+
+    private static getMinimapImageVisibility(_index: number): boolean {
+        return _index == TrackManager.trackID
+    }
+
+    private static getCheckpointImageVisibility(_track: number, _index: number): boolean {
+        return _track == TrackManager.trackID && _index == Lap.checkpointIndex
     }
 
     private static getLapImageVisibility(_index: number): boolean {
