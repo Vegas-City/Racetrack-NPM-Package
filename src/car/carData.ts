@@ -5,7 +5,6 @@ import { Dashboard } from '../ui'
 import { Entity } from '@dcl/ecs'
 
 export class CarData {
-
     thirdPersonView: boolean = true
 
     carEntity: Entity | null = null
