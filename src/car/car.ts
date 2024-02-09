@@ -6,6 +6,7 @@ import { BoxShapeDefinition } from '../physics/shapes'
 import { Obstacle } from '../racetrack'
 import { CarAttributes } from './carAttributes'
 import { Dashboard } from '../ui'
+import { AudioManager } from '../audio/audioManager'
 import { CarData } from './carData'
 import { CarPerspectives } from './helpers/carPerspectives'
 import { CarWheels } from './helpers/carWheels'
@@ -21,9 +22,16 @@ export class Car {
 
     data: CarData = new CarData()
 
+    static audioManager: AudioManager
+
     constructor(_config: CarConfig, _position: Vector3, _rot: number) {
         this.data.carAttributes = new CarAttributes(_config)
 
+        if(Car.audioManager!=null){
+            AudioManager.clearDown()
+        }
+
+        Car.audioManager = new AudioManager(_config)
         this.data.wheelX_L = _config.wheelX_L
         this.data.wheelX_R = _config.wheelX_R
         this.data.wheelZ_F = _config.wheelZ_F
@@ -53,12 +61,8 @@ export class Car {
             rotation: Quaternion.fromEulerDegrees(0, _rot, 0),
             scale: scale
         })
-        AudioSource.createOrReplace(this.data.carEntity, {
-            audioClipUrl: _config.engineStartAudio,
-            loop: false,
-            playing: false
-        })
-        this.data.startRotY = _rot
+
+        this.startRotY = _rot
 
         this.data.carModelEntity = engine.addEntity()
         Transform.create(this.data.carModelEntity, {

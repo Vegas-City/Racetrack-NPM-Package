@@ -3,6 +3,7 @@ import { LapCheckpoint } from "./lapCheckpoint";
 import { pointToLineDistance } from "../utils/utils";
 import { TrackManager } from "./trackManager";
 import { GameManager } from "./gameManager";
+import { AudioManager } from "../audio/audioManager";
 
 export class Lap {
     static readonly checkpointThresholdDistance: number = 2
@@ -51,10 +52,12 @@ export class Lap {
                 }
                 else {
                     TrackManager.onCheckpointEvent()
+                    AudioManager.playCheckPointAudio()
                 }
             }
             else {
                 TrackManager.onCheckpointEvent()
+                AudioManager.playCheckPointAudio()
             }
             currentCheckpoint.hide()
             Lap.checkpointIndex++

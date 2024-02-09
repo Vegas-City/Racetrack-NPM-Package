@@ -1,5 +1,6 @@
 import { engine } from "@dcl/sdk/ecs"
 import ReactEcs, { UiEntity } from "@dcl/sdk/react-ecs"
+import { AudioManager } from "../audio"
 
 export class Countdown {
     static readonly imageScale: number = 0.3
@@ -179,5 +180,6 @@ export class Countdown {
         if (Countdown.numberIndex == _n) return
 
         Countdown.numberIndex = _n
+        AudioManager.playCountDown()
     }
 }
