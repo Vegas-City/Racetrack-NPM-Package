@@ -3,17 +3,18 @@ import { Countdown } from "../ui"
 import { InputManager } from "./inputManager"
 import { Lap } from "./lap"
 import { Car } from "../car/car"
-import * as utils from '@dcl-sdk/utils'
 import { Quaternion } from "@dcl/sdk/math"
 import { AudioManager } from "../audio/audioManager"
+import { CarPerspectives } from "../car/helpers/carPerspectives"
+import * as utils from '@dcl-sdk/utils'
 
 export class GameManager {
     static reset(): void {
         if (Car.instances.length <= 0) return
 
-        Car.instances[0].carBody?.setPosition(Car.instances[0].startPos)
-        Car.instances[0].carBody?.setRotation(Quaternion.fromEulerDegrees(0, Car.instances[0].startRotY, 0))
-        Car.instances[0].speed = 0
+        Car.instances[0].data.carBody?.setPosition(Car.instances[0].data.startPos)
+        Car.instances[0].data.carBody?.setRotation(Quaternion.fromEulerDegrees(0, Car.instances[0].data.startRotY, 0))
+        Car.instances[0].data.speed = 0
         Lap.triggeredStart = false
         Lap.started = false
         Lap.lapsCompleted = -1
@@ -32,7 +33,7 @@ export class GameManager {
         utils.timers.setTimeout(() => {
             GameManager.reset()
             utils.timers.setTimeout(() => {
-                Car.instances[0].exitCar()
+                CarPerspectives.exitCar(Car.instances[0].data)
                 Lap.timeElapsed = 0
             }, 200)
         }, 4000)

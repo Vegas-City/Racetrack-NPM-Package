@@ -46,9 +46,9 @@ export class HotspotActionManager {
                 }
             }
 
-            if (car.carBody) {
-                const newRot = Quaternion.multiply(car.carBody.getRotation(), Quaternion.fromEulerDegrees(0, this.oilSpillSwayElapsed * car.speed * 0.2, 0))
-                car.carBody.setRotation(newRot)
+            if (car.data.carBody) {
+                const newRot = Quaternion.multiply(car.data.carBody.getRotation(), Quaternion.fromEulerDegrees(0, this.oilSpillSwayElapsed * car.data.speed * 0.2, 0))
+                car.data.carBody.setRotation(newRot)
             }
 
         }

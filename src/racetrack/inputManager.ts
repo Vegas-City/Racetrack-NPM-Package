@@ -1,5 +1,5 @@
 import { engine, InputAction, PointerEventType, inputSystem } from "@dcl/sdk/ecs"
-import { Car } from "../car"
+import { Car, CarPerspectives } from "../car"
 
 export class InputManager {
     static isForwardPressed: boolean = false
@@ -70,10 +70,10 @@ export class InputManager {
         }
 
         // Start
-        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_DOWN)&& Car.instances[0].occupied) {
+        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_DOWN) && Car.instances[0].data.occupied) {
             InputManager.isStartPressed = true
         }
-        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_UP)&& Car.instances[0].occupied) {
+        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_UP) && Car.instances[0].data.occupied) {
             InputManager.isStartPressed = false
         }
 
@@ -92,19 +92,19 @@ export class InputManager {
         }
 
         if (Car.instances.length > 0) {
-            if(Car.instances[0].speed == 0) {
+            if (Car.instances[0].data.speed == 0) {
                 InputManager.rightPressedDuration = 0
                 InputManager.leftPressedDuration = 0
             }
 
             // Switch car view with numbers 1 and 2
-            if (inputSystem.isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_DOWN) && Car.instances[0].occupied) {
-                Car.instances[0].thirdPersonView = true
-                Car.instances[0].switchToCarPerspective()
-            } else if (inputSystem.isTriggered(InputAction.IA_ACTION_4, PointerEventType.PET_DOWN)&& Car.instances[0].occupied) {
-                Car.instances[0].thirdPersonView = false
-                Car.instances[0].switchToCarPerspective()
-            } 
+            if (inputSystem.isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_DOWN) && Car.instances[0].data.occupied) {
+                Car.instances[0].data.thirdPersonView = true
+                CarPerspectives.switchToCarPerspective(Car.instances[0].data)
+            } else if (inputSystem.isTriggered(InputAction.IA_ACTION_4, PointerEventType.PET_DOWN) && Car.instances[0].data.occupied) {
+                Car.instances[0].data.thirdPersonView = false
+                CarPerspectives.switchToCarPerspective(Car.instances[0].data)
+            }
         }
     }
 }

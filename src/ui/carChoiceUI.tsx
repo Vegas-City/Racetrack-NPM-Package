@@ -1,4 +1,4 @@
-import ReactEcs, { Label, UiEntity } from "@dcl/sdk/react-ecs"
+import ReactEcs, { UiEntity } from "@dcl/sdk/react-ecs"
 import { Car } from "../car"
 
 export class CarChoiceUI {
@@ -37,7 +37,7 @@ export class CarChoiceUI {
 
     static GetCarImage() {
         if (Car.instances.length > 0) {
-            return Car.instances[0].carIcon
+            return Car.instances[0].data.carIcon
         } else {
             return ""
         }

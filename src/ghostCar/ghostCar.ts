@@ -1,9 +1,7 @@
-import { Entity, GltfContainer, MeshRenderer, Transform, engine } from "@dcl/sdk/ecs";
+import { Entity, GltfContainer, Transform, engine } from "@dcl/sdk/ecs";
 import { GhostData } from "./ghostData";
 import { GhostPoint } from "./ghostPoint";
 import { Quaternion, Vector3 } from "@dcl/sdk/math";
-import * as utils from '@dcl-sdk/utils'
-import { TrackManager } from "../racetrack";
 import { Car } from "../car";
 
 export class GhostCar {
@@ -67,9 +65,9 @@ export class GhostCar {
         }
         
         // If we are too close to the ghost car and in first person hide it. So we can see where we are going and so its not obvious we've raised the car
-        if(!Car.instances[0].thirdPersonView){
-            if(Car.instances[0].carEntity != null) {
-                if(Vector3.distance(Transform.get(Car.instances[0].carEntity).position, Transform.get(this.entity).position)<15){
+        if(!Car.instances[0].data.thirdPersonView){
+            if(Car.instances[0].data.carEntity != null) {
+                if(Vector3.distance(Transform.get(Car.instances[0].data.carEntity).position, Transform.get(this.entity).position)<15){
                     Transform.getMutable(this.entity).scale = Vector3.Zero()
                 } else {
                     Transform.getMutable(this.entity).scale = Vector3.One()
