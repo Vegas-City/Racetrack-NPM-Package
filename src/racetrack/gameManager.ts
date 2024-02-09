@@ -5,6 +5,7 @@ import { Lap } from "./lap"
 import { Car } from "../car/car"
 import * as utils from '@dcl-sdk/utils'
 import { Quaternion } from "@dcl/sdk/math"
+import { AudioManager } from "../audio/audioManager"
 
 export class GameManager {
     static reset(): void {
@@ -59,6 +60,7 @@ export class GameManager {
             // Start recording
             TrackManager.ghostRecorder.start()
             TrackManager.onStartEvent()
+            AudioManager.playStartRaceAudio()
         })
     }
 }
