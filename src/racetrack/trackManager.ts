@@ -7,6 +7,7 @@ import { HotspotActionManager } from "./hotspotActionManager"
 import { Lap } from "./lap"
 import { GhostCar, GhostRecorder } from "./../ghostCar"
 import { GameManager } from "./gameManager"
+import { AudioManager } from "../audio/audioManager"
 
 /**
  * Manages all track logic and setup.
