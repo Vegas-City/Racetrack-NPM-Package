@@ -4,6 +4,7 @@ import * as racetrack from "./src/racetrack";
 import * as car from "./src/car";
 import * as ui from "./src/ui";
 import * as ghost from "./src/ghostCar"
+import * as audio from "./src/audio"
 
 export {
   physics,
@@ -11,5 +12,6 @@ export {
   racetrack,
   car,
   ui,
-  ghost
+  ghost,
+  audio
 }
