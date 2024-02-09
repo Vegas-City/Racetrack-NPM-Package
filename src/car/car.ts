@@ -11,6 +11,7 @@ import { movePlayerTo } from '../utils/setup'
 import { CarAttributes } from './carAttributes'
 import { Dashboard } from '../ui'
 import * as utils from '@dcl-sdk/utils'
+import { CarData } from './carData'
 
 export const CarWheelComponent = engine.defineComponent(
     "carWheelComponent",
@@ -25,112 +26,69 @@ export const CarWheelComponent = engine.defineComponent(
 )
 
 export class Car {
-    private static readonly MAX_STEERING_VALUE: number = Math.PI / 2
-    private static readonly INITIAL_CAGE_SCALE_INV: Vector3 = Vector3.create(0.5, 1, 1)
-    private static readonly TARGET_CAGE_SCALE_INV: Vector3 = Vector3.create(5, 1, 10)
-    public static instances: Car[] = []
+    static readonly MAX_STEERING_VALUE: number = Math.PI / 2
+    static readonly INITIAL_CAGE_SCALE_INV: Vector3 = Vector3.create(0.5, 1, 1)
+    static readonly TARGET_CAGE_SCALE_INV: Vector3 = Vector3.create(5, 1, 10)
 
-    private static stopSpeed: number = 0.2
-    private static debugMode: boolean = false
-    private static camFollow: boolean = false
+    static instances: Car[] = []
+
+    static stopSpeed: number = 0.2
+    static debugMode: boolean = false
+    static camFollow: boolean = false
     static activeCarEntity: Entity | null = null
-    public thirdPersonView: boolean = true
 
-    carEntity: Entity | null = null
-    carModelEntity: Entity | null = null
-    carColliderEntity: Entity | null = null
-    playerCageEntity: Entity | null = null
-    carBody: Body | null = null
-    steeringWheel: Entity | null = null
-    brakeLight: Entity | null = null
-    wheelL1: Entity | null = null
-    wheelL2: Entity | null = null
-    wheelR1: Entity | null = null
-    wheelR2: Entity | null = null
-    wheelX_L: number = 1.36
-    wheelX_R: number = 1.29
-    wheelZ_F: number = 1.9
-    wheelZ_B: number = 2.25
-    wheelY: number = 0.4
-    carScale: number = 1
-    speed: number = 0
-    steerValue: number = 0
-    mass: number = 150
-
-    carRot: Quaternion = Quaternion.Identity()
-
-    startRotY: number = 0
-    occupied: boolean = false
-
-    colliding: boolean = false
-    collisionDir: Vector3 = Vector3.Zero()
-    collisionCooldown: number = 0
-    collisionBounceFactor: number = 0
-    collisionBounce: number = 0.5
-
-    isDrifting: boolean = false
-    driftElapsed: number = 0
-    driftFactor: number = 0
-
-    carAttributes: CarAttributes
-    startPos: Vector3 = Vector3.Zero()
-
-    firstPersonCagePosition: Vector3 = Vector3.Zero()
-    thirdPersonCagePosition: Vector3 = Vector3.Zero()
-
-    dashboard: Dashboard | null = null
-    carIcon: string
+    private data: CarData = new CarData()
 
     constructor(_config: CarConfig, _position: Vector3, _rot: number) {
-        this.carAttributes = new CarAttributes(_config)
+        this.data.carAttributes = new CarAttributes(_config)
 
-        this.wheelX_L = _config.wheelX_L
-        this.wheelX_R = _config.wheelX_R
-        this.wheelZ_F = _config.wheelZ_F
-        this.wheelZ_B = _config.wheelZ_B
-        this.wheelY = _config.wheelY
-        this.carScale = _config.carScale
+        this.data.wheelX_L = _config.wheelX_L
+        this.data.wheelX_R = _config.wheelX_R
+        this.data.wheelZ_F = _config.wheelZ_F
+        this.data.wheelZ_B = _config.wheelZ_B
+        this.data.wheelY = _config.wheelY
+        this.data.carScale = _config.carScale
 
-        this.firstPersonCagePosition = _config.firstPersonCagePosition
-        this.thirdPersonCagePosition = _config.thirdPersonCagePosition
+        this.data.firstPersonCagePosition = _config.firstPersonCagePosition
+        this.data.thirdPersonCagePosition = _config.thirdPersonCagePosition
 
-        this.carIcon = _config.carIcon
+        this.data.carIcon = _config.carIcon
 
-        this.startPos = Vector3.clone(_position)
-        const scale = Vector3.create(3 * this.carScale, 1 * this.carScale, 7 * this.carScale)
+        this.data.startPos = Vector3.clone(_position)
+        const scale = Vector3.create(3 * this.data.carScale, 1 * this.data.carScale, 7 * this.data.carScale)
         this.initialiseCannon(_position, Quaternion.fromEulerDegrees(0, _rot, 0), scale)
 
-        this.carEntity = engine.addEntity()
+        this.data.carEntity = engine.addEntity()
 
         if (Car.debugMode) {
-            MeshRenderer.setBox(this.carEntity)
-            Material.setPbrMaterial(this.carEntity, {
+            MeshRenderer.setBox(this.data.carEntity)
+            Material.setPbrMaterial(this.data.carEntity, {
                 albedoColor: Color4.create(0, 0, 0, 0.5)
             })
         }
-        Transform.create(this.carEntity, {
+        Transform.create(this.data.carEntity, {
             position: _position,
             rotation: Quaternion.fromEulerDegrees(0, _rot, 0),
             scale: scale
         })
-        AudioSource.createOrReplace(this.carEntity, {
+        AudioSource.createOrReplace(this.data.carEntity, {
             audioClipUrl: _config.engineStartAudio,
             loop: false,
             playing: false
         })
-        this.startRotY = _rot
+        this.data.startRotY = _rot
 
-        this.carModelEntity = engine.addEntity()
-        Transform.create(this.carModelEntity, {
-            parent: this.carEntity,
+        this.data.carModelEntity = engine.addEntity()
+        Transform.create(this.data.carModelEntity, {
+            parent: this.data.carEntity,
             position: Vector3.create(0, 0, -0.02),
             rotation: Quaternion.fromEulerDegrees(0, -90, 0),
-            scale: Vector3.create(1 / scale.z * this.carScale, 1 / scale.y * this.carScale, 1 / scale.x * this.carScale)
+            scale: Vector3.create(1 / scale.z * this.data.carScale, 1 / scale.y * this.data.carScale, 1 / scale.x * this.data.carScale)
         })
-        GltfContainer.create(this.carModelEntity, {
+        GltfContainer.create(this.data.carModelEntity, {
             src: _config.carGLB
         })
-        Animator.create(this.carModelEntity, {
+        Animator.create(this.data.carModelEntity, {
             states: [
                 {
                     clip: "OpenDoor",
@@ -147,36 +105,36 @@ export class Car {
             ]
         })
 
-        this.carColliderEntity = engine.addEntity()
-        Transform.create(this.carColliderEntity, {
-            parent: this.carModelEntity
+        this.data.carColliderEntity = engine.addEntity()
+        Transform.create(this.data.carColliderEntity, {
+            parent: this.data.carModelEntity
         })
-        GltfContainer.create(this.carColliderEntity, {
+        GltfContainer.create(this.data.carColliderEntity, {
             src: _config.carColliderGLB
         })
 
-        this.playerCageEntity = engine.addEntity()
-        Transform.create(this.playerCageEntity, {
-            parent: this.carEntity,
+        this.data.playerCageEntity = engine.addEntity()
+        Transform.create(this.data.playerCageEntity, {
+            parent: this.data.carEntity,
             position: Vector3.create(0, 2, -1.5),
             scale: Vector3.Zero()
         })
-        GltfContainer.create(this.playerCageEntity, {
+        GltfContainer.create(this.data.playerCageEntity, {
             src: 'models/playerLocker.glb'
         })
 
-        this.brakeLight = engine.addEntity()
-        GltfContainer.create(this.brakeLight, { src: _config.brakeLightsGLB })
-        Transform.create(this.brakeLight, {
-            parent: this.carModelEntity
+        this.data.brakeLight = engine.addEntity()
+        GltfContainer.create(this.data.brakeLight, { src: _config.brakeLightsGLB })
+        Transform.create(this.data.brakeLight, {
+            parent: this.data.carModelEntity
         })
 
 
-        this.steeringWheel = engine.addEntity()
-        GltfContainer.create(this.steeringWheel, { src: _config.steeringWheelGLB })
-        if (this.carModelEntity != null) {
-            Transform.create(this.steeringWheel, {
-                parent: this.carModelEntity,
+        this.data.steeringWheel = engine.addEntity()
+        GltfContainer.create(this.data.steeringWheel, { src: _config.steeringWheelGLB })
+        if (this.data.carModelEntity != null) {
+            Transform.create(this.data.steeringWheel, {
+                parent: this.data.carModelEntity,
                 position: _config.steeringWheelPosition
             })
         }
@@ -192,28 +150,28 @@ export class Car {
 
         Car.instances.push(this)
 
-        this.carRot = Quaternion.fromEulerDegrees(0, _rot, 0)
+        this.data.carRot = Quaternion.fromEulerDegrees(0, _rot, 0)
 
-        this.dashboard = new Dashboard(_config.dashboardPosition, _config.dashboardGLB, this.carModelEntity)
+        this.data.dashboard = new Dashboard(_config.dashboardPosition, _config.dashboardGLB, this.data.carModelEntity)
     }
 
     public exitCar(): void {
 
         TrackManager.showAvatarTrackCollider()
 
-        if (this.carEntity === undefined || this.carEntity === null) return
+        if (this.data.carEntity === undefined || this.data.carEntity === null) return
 
-        this.occupied = false
+        this.data.occupied = false
         Car.activeCarEntity = null
 
-        const carTransform = Transform.getMutable(this.carEntity)
+        const carTransform = Transform.getMutable(this.data.carEntity)
 
-        if (this.carColliderEntity !== undefined && this.carColliderEntity !== null) {
-            Transform.getMutable(this.carColliderEntity).scale = Vector3.One()
+        if (this.data.carColliderEntity !== undefined && this.data.carColliderEntity !== null) {
+            Transform.getMutable(this.data.carColliderEntity).scale = Vector3.One()
         }
 
-        const targetPos = localToWorldPosition(Vector3.create(-2.3, 1, -0.2), carTransform.position, this.carRot)
-        const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carTransform.position, this.carRot)
+        const targetPos = localToWorldPosition(Vector3.create(-2.3, 1, -0.2), carTransform.position, this.data.carRot)
+        const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carTransform.position, this.data.carRot)
         movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
 
         this.attachPointerEvent()
@@ -222,9 +180,9 @@ export class Car {
         CarChoiceUI.Hide()
         Minimap.Hide()
 
-        if (this.playerCageEntity) {
-            CameraModeArea.deleteFrom(this.playerCageEntity)
-            Transform.getMutable(this.playerCageEntity).scale = Vector3.Zero()
+        if (this.data.playerCageEntity) {
+            CameraModeArea.deleteFrom(this.data.playerCageEntity)
+            Transform.getMutable(this.data.playerCageEntity).scale = Vector3.Zero()
         }
     }
 
@@ -233,22 +191,22 @@ export class Car {
             position: Vector3.create(_position.x, _position.y, _position.z),
             rotation: Quaternion.create(_rot.x, _rot.y, _rot.z, _rot.w),
             scale: Vector3.create(_scale.x, _scale.y, _scale.z),
-            mass: this.mass,
+            mass: this.data.mass,
             material: "car"
         })
 
-        this.carBody = new Body(carShape)
-        PhysicsManager.world.addBody(this.carBody)
+        this.data.carBody = new Body(carShape)
+        PhysicsManager.world.addBody(this.data.carBody)
 
         const self = this
-        this.carBody.addEventListener("collide", (function (e: any) {
-            if (self.collisionCooldown > 0) return
+        this.data.carBody.addEventListener("collide", (function (e: any) {
+            if (self.data.collisionCooldown > 0) return
 
             const contact = e.contact
             var contactNormal = Vector3.Zero()
             var colDisplacement = Vector3.Zero()
             var colId: number = 0
-            if (contact.bi.id === self.carBody?.getId()) {
+            if (contact.bi.id === self.data.carBody?.getId()) {
                 contact.ni.negate(contactNormal)
                 colDisplacement = Vector3.create(contact.ri.x, contact.ri.y, contact.ri.z)
                 colId = contact.bj.id
@@ -258,22 +216,22 @@ export class Car {
                 colDisplacement = Vector3.create(contact.rj.x, contact.rj.y, contact.rj.z)
                 colId = contact.bi.id
             }
-            self.colliding = true
-            //self.collisionPoint = Vector3.create(self.carBody.position.x + colDisplacement.x, self.carBody.position.y + colDisplacement.y, self.carBody.position.z + colDisplacement.z)
-            self.collisionDir = Vector3.normalize(Vector3.create(contactNormal.x, contactNormal.y, contactNormal.z))
-            self.collisionCooldown = 0.5
+            self.data.colliding = true
+            //self.data.collisionPoint = Vector3.create(self.data.carBody.position.x + colDisplacement.x, self.data.carBody.position.y + colDisplacement.y, self.data.carBody.position.z + colDisplacement.z)
+            self.data.collisionDir = Vector3.normalize(Vector3.create(contactNormal.x, contactNormal.y, contactNormal.z))
+            self.data.collisionCooldown = 0.5
 
-            self.collisionBounceFactor = Obstacle.getBounceFactorFromId(colId)
+            self.data.collisionBounceFactor = Obstacle.getBounceFactorFromId(colId)
         }).bind(this))
     }
 
     private attachPointerEvent(): void {
-        if (this.carColliderEntity === undefined || this.carColliderEntity === null) return
+        if (this.data.carColliderEntity === undefined || this.data.carColliderEntity === null) return
 
         const self = this
         pointerEventsSystem.onPointerDown(
             {
-                entity: this.carColliderEntity,
+                entity: this.data.carColliderEntity,
                 opts: {
                     button: InputAction.IA_POINTER,
                     hoverText: 'Get in'
@@ -286,111 +244,111 @@ export class Car {
     }
 
     private addWheels(_leftWheelGLB: string, _rightWheelGLB: string): void {
-        if (this.carEntity === undefined || this.carEntity === null) return
+        if (this.data.carEntity === undefined || this.data.carEntity === null) return
 
-        const carBodyTransform = Transform.getMutable(this.carEntity)
+        const carBodyTransform = Transform.getMutable(this.data.carEntity)
 
         // L1
-        this.wheelL1 = engine.addEntity()
-        Transform.create(this.wheelL1)
+        this.data.wheelL1 = engine.addEntity()
+        Transform.create(this.data.wheelL1)
 
         const wheelL1Child = engine.addEntity()
         GltfContainer.create(wheelL1Child, {
             src: _leftWheelGLB
         })
         Transform.create(wheelL1Child, {
-            parent: this.wheelL1,
+            parent: this.data.wheelL1,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(this.carScale, this.carScale, this.carScale)
+            scale: Vector3.create(this.data.carScale, this.data.carScale, this.data.carScale)
         })
 
-        CarWheelComponent.create(this.wheelL1, {
+        CarWheelComponent.create(this.data.wheelL1, {
             child: wheelL1Child,
             isFrontWheel: true,
-            localPosition: Vector3.create(this.wheelX_R, this.wheelY, this.wheelZ_F)
+            localPosition: Vector3.create(this.data.wheelX_R, this.data.wheelY, this.data.wheelZ_F)
         })
 
         // L2
-        this.wheelL2 = engine.addEntity()
-        Transform.create(this.wheelL2)
+        this.data.wheelL2 = engine.addEntity()
+        Transform.create(this.data.wheelL2)
 
         const wheelL2Child = engine.addEntity()
         GltfContainer.create(wheelL2Child, {
             src: _leftWheelGLB
         })
         Transform.create(wheelL2Child, {
-            parent: this.wheelL2,
+            parent: this.data.wheelL2,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(this.carScale, this.carScale, this.carScale)
+            scale: Vector3.create(this.data.carScale, this.data.carScale, this.data.carScale)
         })
 
-        CarWheelComponent.create(this.wheelL2, {
+        CarWheelComponent.create(this.data.wheelL2, {
             child: wheelL2Child,
-            localPosition: Vector3.create(this.wheelX_R, this.wheelY, -this.wheelZ_B)
+            localPosition: Vector3.create(this.data.wheelX_R, this.data.wheelY, -this.data.wheelZ_B)
         })
 
         // R1
-        this.wheelR1 = engine.addEntity()
-        Transform.create(this.wheelR1)
+        this.data.wheelR1 = engine.addEntity()
+        Transform.create(this.data.wheelR1)
 
         const wheelR1Child = engine.addEntity()
         GltfContainer.create(wheelR1Child, {
             src: _rightWheelGLB
         })
         Transform.create(wheelR1Child, {
-            parent: this.wheelR1,
+            parent: this.data.wheelR1,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(this.carScale, this.carScale, this.carScale)
+            scale: Vector3.create(this.data.carScale, this.data.carScale, this.data.carScale)
         })
 
-        CarWheelComponent.create(this.wheelR1, {
+        CarWheelComponent.create(this.data.wheelR1, {
             child: wheelR1Child,
             isFrontWheel: true,
-            localPosition: Vector3.create(-this.wheelX_L, this.wheelY, this.wheelZ_F)
+            localPosition: Vector3.create(-this.data.wheelX_L, this.data.wheelY, this.data.wheelZ_F)
         })
 
         // R2
-        this.wheelR2 = engine.addEntity()
-        Transform.create(this.wheelR2)
+        this.data.wheelR2 = engine.addEntity()
+        Transform.create(this.data.wheelR2)
 
         const wheelR2Child = engine.addEntity()
         GltfContainer.create(wheelR2Child, {
             src: _rightWheelGLB
         })
         Transform.create(wheelR2Child, {
-            parent: this.wheelR2,
+            parent: this.data.wheelR2,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
-            scale: Vector3.create(this.carScale, this.carScale, this.carScale)
+            scale: Vector3.create(this.data.carScale, this.data.carScale, this.data.carScale)
         })
 
-        CarWheelComponent.create(this.wheelR2, {
+        CarWheelComponent.create(this.data.wheelR2, {
             child: wheelR2Child,
-            localPosition: Vector3.create(-this.wheelX_L, this.wheelY, -this.wheelZ_B)
+            localPosition: Vector3.create(-this.data.wheelX_L, this.data.wheelY, -this.data.wheelZ_B)
         })
     }
 
     private getCagePos(): Vector3 {
-        if (this.carEntity === undefined || this.carEntity === null) {
+        if (this.data.carEntity === undefined || this.data.carEntity === null) {
             return Vector3.Zero()
         }
 
-        if (this.playerCageEntity === undefined || this.playerCageEntity === null) {
+        if (this.data.playerCageEntity === undefined || this.data.playerCageEntity === null) {
             return Vector3.Zero()
         }
 
-        const carEntityTransform = Transform.get(this.carEntity)
-        const playerCageTransform = Transform.get(this.playerCageEntity)
+        const carEntityTransform = Transform.get(this.data.carEntity)
+        const playerCageTransform = Transform.get(this.data.playerCageEntity)
 
         return localToWorldPosition(Vector3.multiply(playerCageTransform.position, carEntityTransform.scale), carEntityTransform.position, carEntityTransform.rotation)
     }
 
     public switchToCarPerspective(_deltaDistance: Vector3 = Vector3.Zero()): void {
-        if (this.carEntity === undefined || this.carEntity === null || this.playerCageEntity === undefined || this.playerCageEntity === null || this.carModelEntity === undefined || this.carModelEntity === null) return
+        if (this.data.carEntity === undefined || this.data.carEntity === null || this.data.playerCageEntity === undefined || this.data.playerCageEntity === null || this.data.carModelEntity === undefined || this.data.carModelEntity === null) return
 
-        const carEntityTransform = Transform.getMutable(this.carEntity)
+        const carEntityTransform = Transform.getMutable(this.data.carEntity)
 
         //Update cage and car transform
-        if (this.thirdPersonView) {
+        if (this.data.thirdPersonView) {
             this.thirdPersonCar()
             SpeedometerUI.Show()
         } else {
@@ -398,28 +356,28 @@ export class Car {
             SpeedometerUI.Hide()
         }
 
-        const scale = Vector3.create(Car.INITIAL_CAGE_SCALE_INV.x * this.carScale, Car.INITIAL_CAGE_SCALE_INV.y * this.carScale, Car.INITIAL_CAGE_SCALE_INV.z * this.carScale)
-        Transform.getMutable(this.playerCageEntity).scale = Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
+        const scale = Vector3.create(Car.INITIAL_CAGE_SCALE_INV.x * this.data.carScale, Car.INITIAL_CAGE_SCALE_INV.y * this.data.carScale, Car.INITIAL_CAGE_SCALE_INV.z * this.data.carScale)
+        Transform.getMutable(this.data.playerCageEntity).scale = Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
 
         const forwardDir = Vector3.add(this.getCagePos(), Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
         movePlayerTo({ newRelativePosition: Vector3.add(this.getCagePos(), _deltaDistance), cameraTarget: forwardDir })
     }
 
     private thirdPersonCar() {
-        if (this.playerCageEntity === undefined || this.playerCageEntity === null) return
-        Transform.getMutable(this.playerCageEntity).position = Vector3.create(this.thirdPersonCagePosition.x, this.thirdPersonCagePosition.y, this.thirdPersonCagePosition.z)
+        if (this.data.playerCageEntity === undefined || this.data.playerCageEntity === null) return
+        Transform.getMutable(this.data.playerCageEntity).position = Vector3.create(this.data.thirdPersonCagePosition.x, this.data.thirdPersonCagePosition.y, this.data.thirdPersonCagePosition.z)
     }
 
     private firstPersonCar() {
-        if (this.playerCageEntity === undefined || this.playerCageEntity === null) return
-        Transform.getMutable(this.playerCageEntity).position = this.firstPersonCagePosition
+        if (this.data.playerCageEntity === undefined || this.data.playerCageEntity === null) return
+        Transform.getMutable(this.data.playerCageEntity).position = this.data.firstPersonCagePosition
     }
 
     private enterCar(): void {
-        if (this.carEntity === undefined || this.carEntity === null || this.carModelEntity === undefined || this.carModelEntity === null) return
+        if (this.data.carEntity === undefined || this.data.carEntity === null || this.data.carModelEntity === undefined || this.data.carModelEntity === null) return
 
-        pointerEventsSystem.removeOnPointerDown(this.carModelEntity)
-        const carEntityTransform = Transform.getMutable(this.carEntity)
+        pointerEventsSystem.removeOnPointerDown(this.data.carModelEntity)
+        const carEntityTransform = Transform.getMutable(this.data.carEntity)
         const targetPos = localToWorldPosition(Vector3.create(-2.3, -2, -0.2), carEntityTransform.position, carEntityTransform.rotation)
         const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carEntityTransform.position, carEntityTransform.rotation)
         movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
@@ -428,16 +386,16 @@ export class Car {
         utils.timers.setTimeout(() => {
             //triggerSceneEmote({ src: 'animations/GetInEmote.glb', loop: false })
             utils.timers.setTimeout(() => {
-                if (self.carModelEntity === undefined || self.carModelEntity === null) return
+                if (self.data.carModelEntity === undefined || self.data.carModelEntity === null) return
 
-                Animator.playSingleAnimation(self.carModelEntity, "OpenDoor")
+                Animator.playSingleAnimation(self.data.carModelEntity, "OpenDoor")
                 utils.timers.setTimeout(function () {
-                    if (self.carEntity === undefined || self.carEntity === null || self.carModelEntity === undefined || self.carModelEntity === null) return
+                    if (self.data.carEntity === undefined || self.data.carEntity === null || self.data.carModelEntity === undefined || self.data.carModelEntity === null) return
 
                     utils.timers.setTimeout(function () {
 
-                        if (self.carColliderEntity !== undefined && self.carColliderEntity !== null) {
-                            Transform.getMutable(self.carColliderEntity).scale = Vector3.Zero()
+                        if (self.data.carColliderEntity !== undefined && self.data.carColliderEntity !== null) {
+                            Transform.getMutable(self.data.carColliderEntity).scale = Vector3.Zero()
                         }
 
                         TrackManager.hideAvatarTrackCollider()
@@ -447,128 +405,130 @@ export class Car {
                         //CarChoiceUI.Show()
                         Minimap.Show()
 
-                        if (self.playerCageEntity) {
-                            CameraModeArea.createOrReplace(self.playerCageEntity, {
+                        if (self.data.playerCageEntity) {
+                            CameraModeArea.createOrReplace(self.data.playerCageEntity, {
                                 area: Vector3.create(3, 2, 7),
                                 mode: CameraType.CT_FIRST_PERSON,
                             })
-                            const scale = Vector3.create(Car.INITIAL_CAGE_SCALE_INV.x * self.carScale, Car.INITIAL_CAGE_SCALE_INV.y * self.carScale, Car.INITIAL_CAGE_SCALE_INV.z * self.carScale)
-                            Transform.getMutable(self.playerCageEntity).scale = Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
+                            const scale = Vector3.create(Car.INITIAL_CAGE_SCALE_INV.x * self.data.carScale, Car.INITIAL_CAGE_SCALE_INV.y * self.data.carScale, Car.INITIAL_CAGE_SCALE_INV.z * self.data.carScale)
+                            Transform.getMutable(self.data.playerCageEntity).scale = Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
                         }
 
-                        self.occupied = true
-                        Car.activeCarEntity = self.carEntity
+                        self.data.occupied = true
+                        Car.activeCarEntity = self.data.carEntity
                     }, 50)
 
-                    Animator.playSingleAnimation(self.carModelEntity, "CloseDoor")
-                    AudioSource.getMutable(self.carEntity).playing = true
+                    Animator.playSingleAnimation(self.data.carModelEntity, "CloseDoor")
+                    AudioSource.getMutable(self.data.carEntity).playing = true
                 }, 5)
             }, 5) // Open car door 
         }, 500) // Play animation after teleport  
     }
 
     private isFreeFalling(): boolean {
-        if (!this.carBody) return false
+        if (!this.data.carBody) return false
 
-        return this.carBody.getVelocity().y < 0
+        return this.data.carBody.getVelocity().y < 0
     }
 
     private updateDriftFactor(dt: number): void {
-        if (!this.occupied) return
+        if (!this.data.occupied) return
 
-        if (!this.isDrifting && !InputManager.mouseSteering && this.speed > 1) {
+        if (!this.data.isDrifting && !InputManager.mouseSteering && this.data.speed > 1) {
             // drifting started
-            this.isDrifting = true
+            this.data.isDrifting = true
         }
-        else if (this.isDrifting && (InputManager.mouseSteering || this.speed <= 1)) {
+        else if (this.data.isDrifting && (InputManager.mouseSteering || this.data.speed <= 1)) {
             // drifting ended
-            this.isDrifting = false
-            if (this.carEntity) {
-                const carTransform = Transform.getMutable(this.carEntity)
-                this.carBody?.setRotation(carTransform.rotation)
-                this.driftElapsed = 0
-                this.driftFactor = 0
+            this.data.isDrifting = false
+            if (this.data.carEntity) {
+                const carTransform = Transform.getMutable(this.data.carEntity)
+                this.data.carBody?.setRotation(carTransform.rotation)
+                this.data.driftElapsed = 0
+                this.data.driftFactor = 0
             }
         }
 
-        if (this.isDrifting) {
-            this.driftElapsed += dt
-            this.driftFactor = this.driftElapsed * (InputManager.isRightPressed ? 1 : -1)
+        if (this.data.isDrifting) {
+            this.data.driftElapsed += dt
+            this.data.driftFactor = this.data.driftElapsed * (InputManager.isRightPressed ? 1 : -1)
         }
     }
 
     private updateSpeed(dt: number): void {
-        const accelerationF = this.carAttributes.calculateAccelerationF()
-        const accelerationB = this.carAttributes.calculateAccelerationB()
-        const deceleration = this.carAttributes.calculateDeceleration()
-        const minSpeed = this.carAttributes.calculateMinSpeed()
-        const maxSpeed = this.carAttributes.calculateMaxSpeed()
+        if(!this.data.carAttributes) return
+
+        const accelerationF = this.data.carAttributes.calculateAccelerationF()
+        const accelerationB = this.data.carAttributes.calculateAccelerationB()
+        const deceleration = this.data.carAttributes.calculateDeceleration()
+        const minSpeed = this.data.carAttributes.calculateMinSpeed()
+        const maxSpeed = this.data.carAttributes.calculateMaxSpeed()
 
         let braking: boolean = false
 
-        if (this.occupied && InputManager.isForwardPressed && Lap.started) {
-            if (this.speed - maxSpeed > 2) {
-                this.speed -= (deceleration * dt)
+        if (this.data.occupied && InputManager.isForwardPressed && Lap.started) {
+            if (this.data.speed - maxSpeed > 2) {
+                this.data.speed -= (deceleration * dt)
             }
             else {
-                if (this.speed < maxSpeed) {
-                    this.speed += (accelerationF * dt)
+                if (this.data.speed < maxSpeed) {
+                    this.data.speed += (accelerationF * dt)
                 }
                 else {
-                    this.speed = maxSpeed
+                    this.data.speed = maxSpeed
                 }
             }
         }
-        else if (this.occupied && InputManager.isBackwardPressed && Lap.started) {
+        else if (this.data.occupied && InputManager.isBackwardPressed && Lap.started) {
             braking = true
 
-            if (minSpeed - this.speed > 2) {
-                this.speed += (deceleration * dt)
+            if (minSpeed - this.data.speed > 2) {
+                this.data.speed += (deceleration * dt)
             }
             else {
-                if (this.speed > minSpeed) {
-                    this.speed -= (accelerationB * dt)
+                if (this.data.speed > minSpeed) {
+                    this.data.speed -= (accelerationB * dt)
                 }
                 else {
-                    this.speed = minSpeed
+                    this.data.speed = minSpeed
                 }
             }
         }
         else {
-            if (this.speed > 0) {
-                this.speed -= (deceleration * dt)
+            if (this.data.speed > 0) {
+                this.data.speed -= (deceleration * dt)
             }
-            else if (this.speed < 0) {
-                this.speed += (deceleration * dt)
+            else if (this.data.speed < 0) {
+                this.data.speed += (deceleration * dt)
             }
 
-            if (Math.abs(this.speed) < Car.stopSpeed) {
-                this.speed = 0
+            if (Math.abs(this.data.speed) < Car.stopSpeed) {
+                this.data.speed = 0
             }
         }
 
         // Show break light
-        if (this.brakeLight != null) {
+        if (this.data.brakeLight != null) {
             if (braking) {
-                Transform.getMutable(this.brakeLight).scale = Vector3.One()
+                Transform.getMutable(this.data.brakeLight).scale = Vector3.One()
             } else {
-                Transform.getMutable(this.brakeLight).scale = Vector3.Zero()
+                Transform.getMutable(this.data.brakeLight).scale = Vector3.Zero()
             }
         }
 
         // Move player cage based on max speed
-        if (this.playerCageEntity != null) {
-            if (this.thirdPersonView && this.speed > 0) {
-                Transform.getMutable(this.playerCageEntity).position.z = this.thirdPersonCagePosition.z - (this.speed / this.carAttributes.maxSpeed) / 3
+        if (this.data.playerCageEntity != null) {
+            if (this.data.thirdPersonView && this.data.speed > 0) {
+                Transform.getMutable(this.data.playerCageEntity).position.z = this.data.thirdPersonCagePosition.z - (this.data.speed / this.data.carAttributes.maxSpeed) / 3
             }
         }
     }
 
     private updateSteerValue(dt: number): void {
-        if (this.carEntity === undefined || this.carEntity === null) return
+        if (this.data.carEntity === undefined || this.data.carEntity === null) return
 
         if (InputManager.mouseSteering) {
-            const carRot = Quaternion.toEulerAngles(Quaternion.normalize(Transform.getMutable(this.carEntity).rotation)).y
+            const carRot = Quaternion.toEulerAngles(Quaternion.normalize(Transform.getMutable(this.data.carEntity).rotation)).y
             const cameraRot = Quaternion.toEulerAngles(Quaternion.normalize(Transform.get(engine.CameraEntity).rotation)).y
 
             let angleDif = cameraRot - carRot
@@ -580,55 +540,55 @@ export class Car {
             }
 
             // Left
-            if (this.occupied && angleDif < -3) {
-                this.steerValue = angleDif * 0.1
-                this.steerValue = Math.max(this.steerValue, -Car.MAX_STEERING_VALUE)
+            if (this.data.occupied && angleDif < -3) {
+                this.data.steerValue = angleDif * 0.1
+                this.data.steerValue = Math.max(this.data.steerValue, -Car.MAX_STEERING_VALUE)
             }
             // Right
-            else if (this.occupied && angleDif > 3) {
-                this.steerValue = angleDif * 0.1
-                this.steerValue = Math.min(this.steerValue, Car.MAX_STEERING_VALUE)
+            else if (this.data.occupied && angleDif > 3) {
+                this.data.steerValue = angleDif * 0.1
+                this.data.steerValue = Math.min(this.data.steerValue, Car.MAX_STEERING_VALUE)
             }
             else {
-                this.steerValue = 0
+                this.data.steerValue = 0
             }
         }
         else {
-            let steerSpeed = this.carAttributes.calculateSteerSpeed()
+            let steerSpeed = this.data.carAttributes?.calculateSteerSpeed() ?? 0
 
-            if (this.occupied && InputManager.isLeftPressed) {
+            if (this.data.occupied && InputManager.isLeftPressed) {
                 steerSpeed = steerSpeed
 
-                if (this.steerValue > -Car.MAX_STEERING_VALUE) {
-                    this.steerValue -= (steerSpeed * dt)
+                if (this.data.steerValue > -Car.MAX_STEERING_VALUE) {
+                    this.data.steerValue -= (steerSpeed * dt)
                 }
                 else {
-                    this.steerValue = -Car.MAX_STEERING_VALUE
+                    this.data.steerValue = -Car.MAX_STEERING_VALUE
                 }
             }
-            else if (this.occupied && InputManager.isRightPressed) {
+            else if (this.data.occupied && InputManager.isRightPressed) {
                 steerSpeed = steerSpeed
 
-                if (this.steerValue < Car.MAX_STEERING_VALUE) {
-                    this.steerValue += (steerSpeed * dt)
+                if (this.data.steerValue < Car.MAX_STEERING_VALUE) {
+                    this.data.steerValue += (steerSpeed * dt)
                 }
                 else {
-                    this.steerValue = Car.MAX_STEERING_VALUE
+                    this.data.steerValue = Car.MAX_STEERING_VALUE
                 }
             }
             else {
-                if (this.steerValue > 0) {
-                    this.steerValue = Math.max(0, this.steerValue - (steerSpeed * dt))
+                if (this.data.steerValue > 0) {
+                    this.data.steerValue = Math.max(0, this.data.steerValue - (steerSpeed * dt))
                 }
-                else if (this.steerValue < 0) {
-                    this.steerValue = Math.min(0, this.steerValue + (steerSpeed * dt))
+                else if (this.data.steerValue < 0) {
+                    this.data.steerValue = Math.min(0, this.data.steerValue + (steerSpeed * dt))
                 }
             }
         }
 
         // Update steering wheel based on steer value
-        if (this.steeringWheel != null) {
-            Transform.getMutable(this.steeringWheel).rotation = Quaternion.fromEulerDegrees(this.steerValue * -45, 0, 0)
+        if (this.data.steeringWheel != null) {
+            Transform.getMutable(this.data.steeringWheel).rotation = Quaternion.fromEulerDegrees(this.data.steerValue * -45, 0, 0)
         }
 
 
@@ -636,18 +596,18 @@ export class Car {
 
     private handleCollisions(_forwardDir: Vector3): Vector3 {
         let collisionCounterVelocity = Vector3.Zero()
-        if (this.occupied && this.colliding) {
-            if (this.collisionDir.y < 0.1) {
-                this.speed = -Math.sign(this.speed) * this.collisionBounce * this.collisionBounceFactor
+        if (this.data.occupied && this.data.colliding) {
+            if (this.data.collisionDir.y < 0.1) {
+                this.data.speed = -Math.sign(this.data.speed) * this.data.collisionBounce * this.data.collisionBounceFactor
 
-                const impactCoef = Math.max(0.2, Math.abs(Vector3.dot(_forwardDir, this.collisionDir)))
-                this.speed += (this.speed * impactCoef)
+                const impactCoef = Math.max(0.2, Math.abs(Vector3.dot(_forwardDir, this.data.collisionDir)))
+                this.data.speed += (this.data.speed * impactCoef)
 
-                const energyLoss: number = Math.abs(this.speed) * impactCoef * 7
-                collisionCounterVelocity = Vector3.create(this.collisionDir.x * energyLoss, 0, this.collisionDir.z * energyLoss)
+                const energyLoss: number = Math.abs(this.data.speed) * impactCoef * 7
+                collisionCounterVelocity = Vector3.create(this.data.collisionDir.x * energyLoss, 0, this.data.collisionDir.z * energyLoss)
             }
 
-            this.colliding = false
+            this.data.colliding = false
         }
 
         return collisionCounterVelocity
@@ -655,15 +615,15 @@ export class Car {
 
     private applyCollisions(_velocity: Vector3, _forwardDir: Vector3): Vector3 {
         let adjustedVelocity = Vector3.clone(_velocity)
-        if (this.occupied && this.colliding) {
-            if (this.collisionDir.y < 0.1 || (_forwardDir.y < 0.05 && this.collisionDir.y > 0.999)) {
-                const weightX = 1 - Math.abs(this.collisionDir.x)
-                const weightY = 1 - Math.abs(this.collisionDir.y)
-                const weightZ = 1 - Math.abs(this.collisionDir.z)
+        if (this.data.occupied && this.data.colliding) {
+            if (this.data.collisionDir.y < 0.1 || (_forwardDir.y < 0.05 && this.data.collisionDir.y > 0.999)) {
+                const weightX = 1 - Math.abs(this.data.collisionDir.x)
+                const weightY = 1 - Math.abs(this.data.collisionDir.y)
+                const weightZ = 1 - Math.abs(this.data.collisionDir.z)
                 adjustedVelocity = Vector3.create(weightX * _velocity.x, weightY * _velocity.y, weightZ * _velocity.z)
             }
 
-            this.colliding = false
+            this.data.colliding = false
         }
 
         return adjustedVelocity
@@ -676,17 +636,17 @@ export class Car {
     }
 
     private updateCar(dt: number): void {
-        if (this.carEntity === undefined || this.carEntity === null
-            || this.carBody === undefined || this.carBody === null) return
+        if (this.data.carEntity === undefined || this.data.carEntity === null
+            || this.data.carBody === undefined || this.data.carBody === null) return
 
-        this.collisionCooldown -= dt
-        if (this.collisionCooldown <= 0) {
-            this.collisionCooldown = 0
+        this.data.collisionCooldown -= dt
+        if (this.data.collisionCooldown <= 0) {
+            this.data.collisionCooldown = 0
         }
 
-        const carTransform = Transform.getMutable(this.carEntity)
+        const carTransform = Transform.getMutable(this.data.carEntity)
 
-        if (this.occupied && InputManager.isExitPressed) {
+        if (this.data.occupied && InputManager.isExitPressed) {
             this.exitCar()
         }
 
@@ -694,55 +654,55 @@ export class Car {
         this.updateSpeed(dt)
         this.updateSteerValue(dt)
 
-        SpeedometerUI.Update(this.speed)
+        SpeedometerUI.Update(this.data.speed)
         Minimap.Update(carTransform.position.x, carTransform.position.z)
 
-        const forwardDir = Vector3.normalize(Vector3.rotate(Vector3.Forward(), this.carRot))
-        const upDir = Vector3.normalize(Vector3.rotate(Vector3.Up(), this.carRot))
+        const forwardDir = Vector3.normalize(Vector3.rotate(Vector3.Forward(), this.data.carRot))
+        const upDir = Vector3.normalize(Vector3.rotate(Vector3.Up(), this.data.carRot))
         const sideDir = Vector3.normalize(Vector3.cross(forwardDir, upDir))
 
         let collisionCounterVelocity = this.handleCollisions(forwardDir)
 
-        if (Car.camFollow && this.occupied && this.playerCageEntity) {
-            const targetPos = localToWorldPosition(Vector3.create(0, 3, -6), carTransform.position, this.carRot)
+        if (Car.camFollow && this.data.occupied && this.data.playerCageEntity) {
+            const targetPos = localToWorldPosition(Vector3.create(0, 3, -6), carTransform.position, this.data.carRot)
             const targetCameraPos = Vector3.add(targetPos, Vector3.add(forwardDir, Vector3.create(0, -0.3, 0)))
 
-            const scale = Vector3.create(Car.INITIAL_CAGE_SCALE_INV.x * this.carScale, Car.INITIAL_CAGE_SCALE_INV.y * this.carScale, Car.INITIAL_CAGE_SCALE_INV.z * this.carScale)
-            Transform.getMutable(this.playerCageEntity).scale = Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
+            const scale = Vector3.create(Car.INITIAL_CAGE_SCALE_INV.x * this.data.carScale, Car.INITIAL_CAGE_SCALE_INV.y * this.data.carScale, Car.INITIAL_CAGE_SCALE_INV.z * this.data.carScale)
+            Transform.getMutable(this.data.playerCageEntity).scale = Vector3.create(1 / scale.x, 1 / scale.y, 1 / scale.z)
             movePlayerTo({ newRelativePosition: this.getCagePos(), cameraTarget: targetCameraPos })
         }
 
-        const grip = this.carAttributes.calculateGrip()
+        const grip = this.data.carAttributes?.calculateGrip() ?? 0
 
         // Make the steering angle relative to the speed - the faster the car moves the harder it is to steer left/right
-        const absSpeed = Math.abs(this.speed)
-        const steerAngle = (this.steerValue / Car.MAX_STEERING_VALUE) * (1 / Math.max(2, absSpeed * 0.5)) * 45 * grip * 2
+        const absSpeed = Math.abs(this.data.speed)
+        const steerAngle = (this.data.steerValue / Car.MAX_STEERING_VALUE) * (1 / Math.max(2, absSpeed * 0.5)) * 45 * grip * 2
         const targetForwardDir = Vector3.normalize(Vector3.rotate(forwardDir, Quaternion.fromEulerDegrees(0, steerAngle, 0)))
-        const velocity = Vector3.create(targetForwardDir.x * this.speed, targetForwardDir.y * this.speed * (this.isFreeFalling() ? 0.1 : 1), targetForwardDir.z * this.speed)
+        const velocity = Vector3.create(targetForwardDir.x * this.data.speed, targetForwardDir.y * this.data.speed * (this.isFreeFalling() ? 0.1 : 1), targetForwardDir.z * this.data.speed)
 
         // Grip Force
-        const gripCoef = this.speed * (-grip) * this.steerValue
+        const gripCoef = this.data.speed * (-grip) * this.data.steerValue
         const grippedVelocity = Vector3.create(sideDir.x * gripCoef, sideDir.y * gripCoef, sideDir.z * gripCoef)
         const totalVelocity = Vector3.add(Vector3.add(velocity, grippedVelocity), collisionCounterVelocity)
         //const totalVelocity = this.applyCollisions(Vector3.add(velocity, grippedVelocity), forwardDir)
 
         const deltaDistance = Vector3.create(totalVelocity.x * dt, totalVelocity.y * dt, totalVelocity.z * dt)
-        this.carBody.setPosition(Vector3.create(this.carBody.getPosition().x + deltaDistance.x, this.carBody.getPosition().y + deltaDistance.y, this.carBody.getPosition().z + deltaDistance.z))
+        this.data.carBody.setPosition(Vector3.create(this.data.carBody.getPosition().x + deltaDistance.x, this.data.carBody.getPosition().y + deltaDistance.y, this.data.carBody.getPosition().z + deltaDistance.z))
 
         if (absSpeed > 0.1) {
-            const deltaRot = Quaternion.create(0, steerAngle * dt * this.speed * 0.01, 0)
-            const oldRot = Quaternion.create(this.carBody.getRotation().x, this.carBody.getRotation().y, this.carBody.getRotation().z, this.carBody.getRotation().w)
+            const deltaRot = Quaternion.create(0, steerAngle * dt * this.data.speed * 0.01, 0)
+            const oldRot = Quaternion.create(this.data.carBody.getRotation().x, this.data.carBody.getRotation().y, this.data.carBody.getRotation().z, this.data.carBody.getRotation().w)
             const finalRot = Quaternion.multiply(oldRot, deltaRot)
 
-            this.carBody.setRotation(Quaternion.create(finalRot.x, finalRot.y, finalRot.z, finalRot.w))
+            this.data.carBody.setRotation(Quaternion.create(finalRot.x, finalRot.y, finalRot.z, finalRot.w))
         }
 
         // Copy from cannon
-        carTransform.position = Vector3.create(this.carBody.getPosition().x, this.carBody.getPosition().y + 0.4, this.carBody.getPosition().z)
-        this.carRot = Quaternion.create(this.carBody.getRotation().x, this.carBody.getRotation().y, this.carBody.getRotation().z, this.carBody.getRotation().w)
+        carTransform.position = Vector3.create(this.data.carBody.getPosition().x, this.data.carBody.getPosition().y + 0.4, this.data.carBody.getPosition().z)
+        this.data.carRot = Quaternion.create(this.data.carBody.getRotation().x, this.data.carBody.getRotation().y, this.data.carBody.getRotation().z, this.data.carBody.getRotation().w)
 
-        carTransform.rotation = Quaternion.create(this.carRot.x, this.carRot.y, this.carRot.z, this.carRot.w)
-        carTransform.rotation = Quaternion.multiply(carTransform.rotation, Quaternion.fromEulerDegrees(0, this.driftFactor * 50, 0))
+        carTransform.rotation = Quaternion.create(this.data.carRot.x, this.data.carRot.y, this.data.carRot.z, this.data.carRot.w)
+        carTransform.rotation = Quaternion.multiply(carTransform.rotation, Quaternion.fromEulerDegrees(0, this.data.driftFactor * 50, 0))
 
         // Update TrackManager car points
         TrackManager.carPoints.splice(0)
@@ -754,15 +714,15 @@ export class Car {
         TrackManager.carPoints.push(localToWorldPosition(Vector3.create(2, 0, 1), carTransform.position, carTransform.rotation))
 
         // Update wheels
-        if (this.wheelL1) this.updateWheel(this.wheelL1)
-        if (this.wheelL2) this.updateWheel(this.wheelL2)
-        if (this.wheelR1) this.updateWheel(this.wheelR1)
-        if (this.wheelR2) this.updateWheel(this.wheelR2)
+        if (this.data.wheelL1) this.updateWheel(this.data.wheelL1)
+        if (this.data.wheelL2) this.updateWheel(this.data.wheelL2)
+        if (this.data.wheelR1) this.updateWheel(this.data.wheelR1)
+        if (this.data.wheelR2) this.updateWheel(this.data.wheelR2)
 
         // Update dashboard
-        this.dashboard?.update(this.speed, this.carAttributes.minSpeed, this.carAttributes.maxSpeed)
+        this.data.dashboard?.update(this.data.speed, this.data.carAttributes?.minSpeed ?? 0, this.data.carAttributes?.maxSpeed ?? 0)
 
-        if (this.occupied) {
+        if (this.data.occupied) {
             const playerPos = Transform.get(engine.PlayerEntity).position
             const distToCar = Vector3.distance(playerPos, this.getCagePos())
             if (distToCar > 6) {
@@ -770,41 +730,43 @@ export class Car {
             }
         }
 
-        this.updatePlayerCage(dt)
+        if (this.data.occupied) {
+            this.updatePlayerCage(dt)
+        }
     }
 
     private updateWheel(wheel: Entity): void {
-        if (this.carEntity === undefined || this.carEntity === null) return
+        if (this.data.carEntity === undefined || this.data.carEntity === null) return
 
         const data = CarWheelComponent.getMutable(wheel)
 
         const wheelTransform = Transform.getMutable(wheel)
         const childTransform = Transform.getMutable(data.child as Entity)
 
-        const carTransform = Transform.get(this.carEntity)
+        const carTransform = Transform.get(this.data.carEntity)
 
-        wheelTransform.rotation = Quaternion.multiply(carTransform.rotation, Quaternion.fromEulerDegrees(0, -this.startRotY, 0))
-        if (data.isFrontWheel) wheelTransform.rotation = Quaternion.multiply(wheelTransform.rotation, Quaternion.fromEulerDegrees(0, this.steerValue * RAD2DEG * 0.5, 0))
+        wheelTransform.rotation = Quaternion.multiply(carTransform.rotation, Quaternion.fromEulerDegrees(0, -this.data.startRotY, 0))
+        if (data.isFrontWheel) wheelTransform.rotation = Quaternion.multiply(wheelTransform.rotation, Quaternion.fromEulerDegrees(0, this.data.steerValue * RAD2DEG * 0.5, 0))
 
         wheelTransform.position = localToWorldPosition(data.localPosition, carTransform.position, carTransform.rotation)
-        if (Math.abs(this.speed) > 0) {
-            childTransform.rotation = Quaternion.multiply(childTransform.rotation, Quaternion.fromEulerDegrees(0, (this.speed > 0 ? -1 : 1) * (Math.max(1, Math.abs(this.speed) * 2.5)), 0))
+        if (Math.abs(this.data.speed) > 0) {
+            childTransform.rotation = Quaternion.multiply(childTransform.rotation, Quaternion.fromEulerDegrees(0, (this.data.speed > 0 ? -1 : 1) * (Math.max(1, Math.abs(this.data.speed) * 2.5)), 0))
         }
     }
 
     private updatePlayerCage(dt: number): void {
-        if (!this.playerCageEntity || !Transform.getMutable(this.playerCageEntity)) return
+        if (!this.data.playerCageEntity || !Transform.getMutable(this.data.playerCageEntity)) return
 
-        const cageScale = Transform.getMutable(this.playerCageEntity).scale
+        const cageScale = Transform.getMutable(this.data.playerCageEntity).scale
         let currentScaleFactor = Vector3.create(1 / cageScale.x, 1 / cageScale.y, 1 / cageScale.z)
-        currentScaleFactor = Vector3.create(currentScaleFactor.x / this.carScale, currentScaleFactor.y / this.carScale, currentScaleFactor.z / this.carScale)
+        currentScaleFactor = Vector3.create(currentScaleFactor.x / this.data.carScale, currentScaleFactor.y / this.data.carScale, currentScaleFactor.z / this.data.carScale)
 
         const dif = Vector3.subtract(Car.TARGET_CAGE_SCALE_INV, Car.INITIAL_CAGE_SCALE_INV)
         const step = Vector3.create(dif.x * dt, dif.y * dt, dif.z * dt)
         currentScaleFactor = Vector3.add(currentScaleFactor, step)
         currentScaleFactor = Vector3.create(Math.min(currentScaleFactor.x, Car.TARGET_CAGE_SCALE_INV.x), Math.min(currentScaleFactor.y, Car.TARGET_CAGE_SCALE_INV.y), Math.min(currentScaleFactor.z, Car.TARGET_CAGE_SCALE_INV.z))
 
-        const newScale = Vector3.create(currentScaleFactor.x * this.carScale, currentScaleFactor.y * this.carScale, currentScaleFactor.z * this.carScale)
-        Transform.getMutable(this.playerCageEntity).scale = Vector3.create(1 / newScale.x, 1 / newScale.y, 1 / newScale.z)
+        const newScale = Vector3.create(currentScaleFactor.x * this.data.carScale, currentScaleFactor.y * this.data.carScale, currentScaleFactor.z * this.data.carScale)
+        Transform.getMutable(this.data.playerCageEntity).scale = Vector3.create(1 / newScale.x, 1 / newScale.y, 1 / newScale.z)
     }
 }
