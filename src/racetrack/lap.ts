@@ -37,11 +37,12 @@ export class Lap {
         if (Lap.lapsCompleted >= 0) Lap.timeElapsed += _dt
         const currentCheckpoint = Lap.findCheckpoint(Lap.checkpointIndex)
 
-        if(currentCheckpoint === null) return
+        if (currentCheckpoint === null) return
 
         const distance = pointToLineDistance(_carPos, currentCheckpoint.point1, currentCheckpoint.point2)
 
         if (distance < Lap.checkpointThresholdDistance) {
+            let end: boolean = false
             // crossed checkpoint
             if (Lap.checkpointIndex == 0) {
                 // completed a lap
@@ -49,6 +50,7 @@ export class Lap {
                 if (Lap.lapsCompleted >= Lap.totalLaps) {
                     TrackManager.ghostRecorder.completeRace()
                     GameManager.end()
+                    end = true
                 }
                 else {
                     TrackManager.onCheckpointEvent()
@@ -63,6 +65,9 @@ export class Lap {
             Lap.checkpointIndex++
             if (Lap.checkpointIndex >= Lap.checkpoints.length) {
                 Lap.checkpointIndex = 0
+            }
+            if (end) {
+                Lap.checkpointIndex = -1
             }
             Lap.findCheckpoint(Lap.checkpointIndex)?.show()
         }
