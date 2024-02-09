@@ -1,5 +1,5 @@
 import { Color4, Vector3 } from "@dcl/sdk/math"
-import ReactEcs, { Label, UiEntity } from "@dcl/sdk/react-ecs"
+import ReactEcs, { UiEntity } from "@dcl/sdk/react-ecs"
 import { Lap } from "../racetrack/lap";
 
 export type MinimapConfig = {
@@ -26,6 +26,7 @@ export class Minimap {
 
     private static readonly DOT_SIZE: number = 10
     private static readonly DOT_SIZE_ADD: number = 5
+    private static readonly LAP_IMAGES: string[] = ["images/ui/minimapUI/lap1.png", "images/ui/minimapUI/lap2.png"]
 
     private static posX: number = 0
     private static posZ: number = 0
@@ -66,21 +67,8 @@ export class Minimap {
                 }
             }}
         >
-            <UiEntity
-                uiTransform={{
-                    position: { right: '80px', top: '75px' },
-                    width: 100,
-                    height: 100,
-                    positionType: 'absolute',
-                    display: Lap.started ? 'flex' : 'none'
-                }}
-                uiBackground={{
-                    textureMode: 'stretch',
-                    texture: {
-                        src:Minimap.getLapImage()
-                    }
-                }}
-            >
+            <UiEntity>
+                {this.generateScoreImages()}
             </UiEntity>
             <UiEntity
                 uiTransform={{
@@ -190,11 +178,29 @@ export class Minimap {
         Minimap.checkpointPosZ = ((Minimap.paddingBottom + (ratioZ * srcHeight)) * Minimap.scale) - checkpointOffsetZ
     }
 
-    private static getLapImage(): string {
-        switch(Lap.lapsCompleted) {
-            case 0: return "images/ui/minimapUI/lap1.png"
-            case 1: return "images/ui/minimapUI/lap2.png"
-        }
-        return "images/ui/minimapUI/lap1.png"
+    private static generateScoreImages() {
+        return Minimap.LAP_IMAGES.map((image, index) =>
+            <UiEntity
+                key={"lap_image_" + index.toString()}
+                uiTransform={{
+                    position: { right: '-217px', top: '80px' },
+                    width: 100,
+                    height: 100,
+                    positionType: 'absolute',
+                    display: Lap.started && Minimap.getLapImageVisibility(index) ? 'flex' : 'none'
+                }}
+                uiBackground={{
+                    textureMode: 'stretch',
+                    texture: {
+                        src: image
+                    }
+                }}
+            >
+            </UiEntity>
+        )
+    }
+
+    private static getLapImageVisibility(_index: number): boolean {
+        return _index == Lap.lapsCompleted
     }
 }
