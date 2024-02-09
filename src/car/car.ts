@@ -1,4 +1,4 @@
-import { Animator, AudioSource, Entity, GltfContainer, Material, MeshRenderer, Transform, engine } from '@dcl/sdk/ecs'
+import { Animator, Entity, GltfContainer, Material, MeshRenderer, Transform, engine } from '@dcl/sdk/ecs'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
 import { CarConfig } from './carConfig'
 import { PhysicsManager, Body } from '../physics'
@@ -20,14 +20,14 @@ export class Car {
     static camFollow: boolean = false
     static activeCarEntity: Entity | null = null
 
-    data: CarData = new CarData()
-
     static audioManager: AudioManager
+
+    data: CarData = new CarData()
 
     constructor(_config: CarConfig, _position: Vector3, _rot: number) {
         this.data.carAttributes = new CarAttributes(_config)
 
-        if(Car.audioManager!=null){
+        if (Car.audioManager != null) {
             AudioManager.clearDown()
         }
 
