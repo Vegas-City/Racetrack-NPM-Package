@@ -196,7 +196,7 @@ export class Minimap {
                     width: 100,
                     height: 100,
                     positionType: 'absolute',
-                    display: Lap.started && Minimap.getLapImageVisibility(index) ? 'flex' : 'none'
+                    display: Minimap.getLapImageVisibility(index) ? 'flex' : 'none'
                 }}
                 uiBackground={{
                     textureMode: 'stretch',
@@ -209,15 +209,15 @@ export class Minimap {
         )
     }
 
-    private static getMinimapImageVisibility(_index: number): boolean {
-        return _index == TrackManager.trackID
+    private static getMinimapImageVisibility(_track: number): boolean {
+        return _track == TrackManager.trackID - 1
     }
 
     private static getCheckpointImageVisibility(_track: number, _index: number): boolean {
-        return _track == TrackManager.trackID && _index == Lap.checkpointIndex
+        return _track == TrackManager.trackID - 1 && _index == Lap.checkpointIndex
     }
 
     private static getLapImageVisibility(_index: number): boolean {
-        return _index == Lap.lapsCompleted
+        return !TrackManager.isPractice && Lap.started && _index == Lap.lapsCompleted
     }
 }

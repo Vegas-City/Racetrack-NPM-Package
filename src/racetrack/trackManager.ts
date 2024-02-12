@@ -7,7 +7,6 @@ import { HotspotActionManager } from "./hotspotActionManager"
 import { Lap } from "./lap"
 import { GhostCar, GhostRecorder } from "./../ghostCar"
 import { GameManager } from "./gameManager"
-import { AudioManager } from "../audio/audioManager"
 
 /**
  * Manages all track logic and setup.
@@ -15,6 +14,7 @@ import { AudioManager } from "../audio/audioManager"
 export class TrackManager {
     static debugMode: boolean = false
 
+    static isPractice: boolean = true
     static trackID: number = -1
     static track: Track
     static hotspots: Hotspot[] = []
