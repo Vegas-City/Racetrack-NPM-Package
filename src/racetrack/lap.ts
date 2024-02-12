@@ -46,15 +46,21 @@ export class Lap {
             // crossed checkpoint
             if (Lap.checkpointIndex == 0) {
                 // completed a lap
-                Lap.lapsCompleted++
-                if (Lap.lapsCompleted >= Lap.totalLaps) {
+                if(TrackManager.isPractice) {
                     TrackManager.ghostRecorder.completeRace()
-                    GameManager.end()
-                    end = true
+                    Lap.timeElapsed = 0
                 }
                 else {
-                    TrackManager.onCheckpointEvent()
-                    AudioManager.playCheckPointAudio()
+                    Lap.lapsCompleted++
+                    if (Lap.lapsCompleted >= Lap.totalLaps) {
+                        TrackManager.ghostRecorder.completeRace()
+                        GameManager.end()
+                        end = true
+                    }
+                    else {
+                        TrackManager.onCheckpointEvent()
+                        AudioManager.playCheckPointAudio()
+                    }
                 }
             }
             else {
