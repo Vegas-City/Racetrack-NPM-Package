@@ -33,13 +33,13 @@ export class TimeUI {
                 }}
             >
                 <Label
-                    value={TimeUI.formatTime()}
+                    value={TimeUI.formatTime(Lap.timeElapsed * 1000)}
                     color={Color4.White()}
                     fontSize={38}
                     font="sans-serif"
                     textAlign="top-center"
                     uiTransform={{
-                        position: { left: '270px', top: '6px' }
+                        position: { left: '240px', top: '6px' }
                     }}
                 />
                 <Label
@@ -69,13 +69,13 @@ export class TimeUI {
                 }}
             >
                 <Label
-                    value={TimeUI.formatPb()}
+                    value={TimeUI.formatTime(60000)}
                     color={Color4.White()}
                     fontSize={38}
                     font="sans-serif"
                     textAlign="top-center"
                     uiTransform={{
-                        position: { left: '260px', top: '6px' }
+                        position: { left: '230px', top: '6px' }
                     }}
                 />
                 <Label
@@ -106,19 +106,15 @@ export class TimeUI {
         TimeUI.visibility = false
     }
 
-    private static formatTime(): string {
-        let date = new Date(0)
-        date.setSeconds(Math.round(Lap.timeElapsed))
+    private static formatTime(_time: number): string {
+        // cap at 99:59
+        let roundedTime = Math.round(Math.min(_time / 1000, 5999))
+        let sec = roundedTime % 60
+        let min = (roundedTime - sec) / 60
 
-        let timeString = date.toISOString().substring(11, 19)
-        return timeString
-    }
-
-    private static formatPb(): string {
-        let date = new Date(0)
-        date.setSeconds(Math.round(60))
-
-        let timeString = date.toISOString().substring(11, 19)
-        return timeString
+        let secStr = (sec < 10 ? "0" : "") + sec.toString()
+        let minStr = (min < 10 ? "0" : "") + min.toString()
+        let timeStr = minStr + ":" + secStr
+        return timeStr
     }
 }
