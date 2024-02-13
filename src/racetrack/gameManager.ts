@@ -29,6 +29,7 @@ export class GameManager {
         Lap.lapsCompleted--
         Lap.started = false
         TrackManager.onEndEvent()
+        AudioManager.playEndRaceAudio()
 
         utils.timers.setTimeout(() => {
             GameManager.reset()

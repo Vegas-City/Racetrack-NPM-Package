@@ -17,7 +17,9 @@ export type CarConfig = {
     checkPointAudio: string
     countDownAudio: string
     startRaceAudio: string
-    
+    endRaceAudio: string
+    lapAudio: string
+
     carGLB: string
     carColliderGLB: string
     leftWheelGLB: string

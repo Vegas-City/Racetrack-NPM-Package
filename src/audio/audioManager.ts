@@ -1,4 +1,4 @@
-import { AudioSource, Entity, MeshRenderer, Transform, engine } from "@dcl/sdk/ecs";
+import { Transform, engine } from "@dcl/sdk/ecs";
 import { AudioEntity } from "./audioEntity";
 import { CarConfig } from "../car";
 
@@ -11,8 +11,10 @@ export class AudioManager {
   private static checkPointAudio: AudioEntity
   private static countDownAudio: AudioEntity
   private static startRaceAudio: AudioEntity
+  private static endRaceAudio: AudioEntity
+  private static lapAudio: AudioEntity
 
-  constructor(_config:CarConfig) {
+  constructor(_config: CarConfig) {
 
     // Building
     AudioManager.engineStartAudio = new AudioEntity(_config.engineStartAudio, 1, 1)
@@ -22,7 +24,8 @@ export class AudioManager {
     AudioManager.checkPointAudio = new AudioEntity(_config.checkPointAudio, 1, 1)
     AudioManager.countDownAudio = new AudioEntity(_config.countDownAudio, 1, 1)
     AudioManager.startRaceAudio = new AudioEntity(_config.startRaceAudio, 1, 1)
-
+    AudioManager.endRaceAudio = new AudioEntity(_config.endRaceAudio, 1, 1)
+    AudioManager.lapAudio = new AudioEntity(_config.lapAudio, 1, 1)
   }
 
   static playEngineStartAudio(): void {
@@ -53,7 +56,15 @@ export class AudioManager {
     AudioManager.startRaceAudio.playSound(Transform.get(engine.PlayerEntity).position)
   }
 
-  static clearDown(){
+  static playEndRaceAudio(): void {
+    AudioManager.endRaceAudio.playSound(Transform.get(engine.PlayerEntity).position)
+  }
+
+  static playLapAudio(): void {
+    AudioManager.lapAudio.playSound(Transform.get(engine.PlayerEntity).position)
+  }
+
+  static clearDown() {
     AudioManager.engineStartAudio.clearDown()
     AudioManager.brakeAudio.clearDown()
     AudioManager.skidAudio.clearDown()
@@ -62,6 +73,4 @@ export class AudioManager {
     AudioManager.countDownAudio.clearDown()
     AudioManager.startRaceAudio.clearDown()
   }
-
-
 } 
