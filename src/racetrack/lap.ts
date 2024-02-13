@@ -49,6 +49,7 @@ export class Lap {
                 if(TrackManager.isPractice) {
                     TrackManager.ghostRecorder.completeRace()
                     Lap.timeElapsed = 0
+                    TrackManager.onLapCompleteEvent()
                     AudioManager.playLapAudio()
                 }
                 else {
