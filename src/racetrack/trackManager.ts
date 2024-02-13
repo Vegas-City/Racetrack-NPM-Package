@@ -36,7 +36,7 @@ export class TrackManager {
     static onStartEvent: Function = () => { }
     static onEndEvent: Function = () => { }
     static onCheckpointEvent: Function = () => { }
-    static onLapCompletepointEvent: Function = () => { }
+    static onLapCompleteEvent: Function = () => { }
 
     /**
      * Creates a TrackManager instance.
@@ -70,7 +70,7 @@ export class TrackManager {
             if (_eventCallbacks.onStartEvent) TrackManager.onStartEvent = _eventCallbacks.onStartEvent
             if (_eventCallbacks.onEndEvent) TrackManager.onEndEvent = _eventCallbacks.onEndEvent
             if (_eventCallbacks.onCheckpointEvent) TrackManager.onCheckpointEvent = _eventCallbacks.onCheckpointEvent
-            if (_eventCallbacks.onLapCompletepointEvent) TrackManager.onLapCompletepointEvent = _eventCallbacks.onLapCompletepointEvent
+            if (_eventCallbacks.onLapCompleteEvent) TrackManager.onLapCompleteEvent = _eventCallbacks.onLapCompleteEvent
         }
 
         engine.addSystem(TrackManager.update)
