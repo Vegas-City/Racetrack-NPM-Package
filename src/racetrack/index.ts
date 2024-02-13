@@ -9,6 +9,7 @@ import { HotspotActionManager } from "./hotspotActionManager";
 import { LapCheckpoint } from "./lapCheckpoint";
 import { Lap } from "./lap";
 import { GameManager } from "./gameManager";
+import { RaceEventCallbacks } from "./raceEventCallbacks";
 
 export { HotspotType, ObstacleType }
 export { Hotspot }
@@ -20,3 +21,4 @@ export { HotspotActionManager }
 export { LapCheckpoint }
 export { Lap }
 export { GameManager }
+export { RaceEventCallbacks }
