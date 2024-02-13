@@ -59,7 +59,7 @@ export class Lap {
                         end = true
                     }
                     else {
-                        TrackManager.onLapCompletepointEvent()
+                        TrackManager.onLapCompleteEvent()
                         AudioManager.playLapAudio()
                     }
                 }
