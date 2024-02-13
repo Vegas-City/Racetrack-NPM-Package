@@ -72,5 +72,7 @@ export class AudioManager {
     AudioManager.checkPointAudio.clearDown()
     AudioManager.countDownAudio.clearDown()
     AudioManager.startRaceAudio.clearDown()
+    AudioManager.endRaceAudio.clearDown()
+    AudioManager.lapAudio.clearDown()
   }
 } 

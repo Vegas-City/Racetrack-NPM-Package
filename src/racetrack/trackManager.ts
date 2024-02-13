@@ -7,6 +7,7 @@ import { HotspotActionManager } from "./hotspotActionManager"
 import { Lap } from "./lap"
 import { GhostCar, GhostRecorder } from "./../ghostCar"
 import { GameManager } from "./gameManager"
+import { RaceEventCallbacks } from "./raceEventCallbacks"
 
 /**
  * Manages all track logic and setup.
@@ -32,9 +33,10 @@ export class TrackManager {
         scale: Vector3.One()
     }
 
-    static onStartEvent: Function = () => {}
-    static onEndEvent: Function = () => {}
-    static onCheckpointEvent: Function = () => {}
+    static onStartEvent: Function = () => { }
+    static onEndEvent: Function = () => { }
+    static onCheckpointEvent: Function = () => { }
+    static onLapCompletepointEvent: Function = () => { }
 
     /**
      * Creates a TrackManager instance.
@@ -45,7 +47,7 @@ export class TrackManager {
      * @param _debugMode a flag to toggle debug mode.
      *
      */
-    constructor(_position: Vector3, _rotation: Quaternion, _scale: Vector3, _debugMode: boolean = false, _onStartEvent?: Function, _onEndEvent?: Function, _onCheckpointEvent?: Function) {
+    constructor(_position: Vector3, _rotation: Quaternion, _scale: Vector3, _debugMode: boolean = false, _eventCallbacks?: RaceEventCallbacks) {
         TrackManager.debugMode = _debugMode
         TrackManager.trackTransform = {
             position: _position,
@@ -57,16 +59,19 @@ export class TrackManager {
         TrackManager.ghostCar = new GhostCar()
 
         TrackManager.trackCollider = engine.addEntity()
-        GltfContainer.create(TrackManager.trackCollider, {src: "models/trackCollider.glb"})
+        GltfContainer.create(TrackManager.trackCollider, { src: "models/trackCollider.glb" })
         Transform.create(TrackManager.trackCollider, {
             position: _position,
             rotation: _rotation,
             scale: _scale
         })
 
-        if(_onStartEvent) TrackManager.onStartEvent = _onStartEvent
-        if(_onEndEvent) TrackManager.onEndEvent = _onEndEvent
-        if(_onCheckpointEvent) TrackManager.onCheckpointEvent = _onCheckpointEvent
+        if (_eventCallbacks) {
+            if (_eventCallbacks.onStartEvent) TrackManager.onStartEvent = _eventCallbacks.onStartEvent
+            if (_eventCallbacks.onEndEvent) TrackManager.onEndEvent = _eventCallbacks.onEndEvent
+            if (_eventCallbacks.onCheckpointEvent) TrackManager.onCheckpointEvent = _eventCallbacks.onCheckpointEvent
+            if (_eventCallbacks.onLapCompletepointEvent) TrackManager.onLapCompletepointEvent = _eventCallbacks.onLapCompletepointEvent
+        }
 
         engine.addSystem(TrackManager.update)
     }
@@ -90,12 +95,12 @@ export class TrackManager {
      *
      */
     static Unload(): void {
-        if(TrackManager.trackEntity === undefined) return
+        if (TrackManager.trackEntity === undefined) return
 
         engine.removeEntity(TrackManager.trackEntity)
         TrackManager.trackEntity = undefined
 
-        if(TrackManager.track) {
+        if (TrackManager.track) {
             TrackManager.track.unload()
         }
 
@@ -110,14 +115,14 @@ export class TrackManager {
         Lap.unload()
     }
 
-    static showAvatarTrackCollider(){
-        if(TrackManager.trackCollider!=null){
+    static showAvatarTrackCollider() {
+        if (TrackManager.trackCollider != null) {
             Transform.getMutable(TrackManager.trackCollider).scale = TrackManager.trackTransform.scale
         }
     }
 
-    static hideAvatarTrackCollider(){
-        if(TrackManager.trackCollider!=null){
+    static hideAvatarTrackCollider() {
+        if (TrackManager.trackCollider != null) {
             Transform.getMutable(TrackManager.trackCollider).scale = Vector3.Zero()
         }
     }
@@ -188,7 +193,7 @@ export class TrackManager {
      * @param dt elapsed time between frames.
      */
     private static update(dt: number) {
-        if(TrackManager.trackEntity === undefined) return
+        if (TrackManager.trackEntity === undefined) return
 
         TrackManager.track.update(TrackManager.carPoints)
         TrackManager.hotspots.forEach(hotspot => {
