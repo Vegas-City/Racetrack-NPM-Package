@@ -65,7 +65,7 @@ export class GhostCar {
             return
         }
         
-        // If we are too close to the ghost car and in first person hide it. So we can see where we are going and so its not obvious we've raised the car
+        // If we are too close to the ghost car and in first person hide it. So we can see where we are going.
         if(!Car.instances[0].data.thirdPersonView){
             if(Car.instances[0].data.carEntity != null) {
                 if(Vector3.distance(Transform.get(Car.instances[0].data.carEntity).position, Transform.get(this.entity).position)<15){
