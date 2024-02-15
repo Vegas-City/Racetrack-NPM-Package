@@ -51,6 +51,8 @@ export class Lap {
                     Lap.timeElapsed = 0
                     TrackManager.onLapCompleteEvent()
                     AudioManager.playLapAudio()
+                    // Practice mode needs to start the ghost car again as it wont have another count down
+                    TrackManager.ghostCar.startGhost()
                 }
                 else {
                     Lap.lapsCompleted++
