@@ -1,6 +1,5 @@
 import { TrackManager } from "./trackManager"
-import { Countdown } from "../ui"
-import { InputManager } from "./inputManager"
+import { Countdown, ExitCarUI } from "../ui"
 import { Lap } from "./lap"
 import { Car } from "../car/car"
 import { Quaternion } from "@dcl/sdk/math"
@@ -25,31 +24,8 @@ export class GameManager {
         }
     }
 
-    static end(): void {
-        Lap.lapsCompleted--
-        Lap.started = false
-        TrackManager.onEndEvent()
-        AudioManager.playEndRaceAudio()
-
-        utils.timers.setTimeout(() => {
-            GameManager.reset()
-            utils.timers.setTimeout(() => {
-                if(Car.instances.length > 0) {
-                    CarPerspectives.exitCar(Car.instances[0].data)
-                }
-                Lap.timeElapsed = 0
-            }, 200)
-        }, 4000)
-    }
-
-    static update(_dt: number): void {
-        if (InputManager.isStartPressed && !Lap.triggeredStart) {
-            Lap.triggeredStart = true
-            GameManager.start()
-        }
-    }
-
-    private static start(): void {
+    static start(): void {
+        Lap.triggeredStart = true
         Countdown.Start(() => {
             Lap.started = true
             Lap.lapsCompleted = 0
@@ -58,7 +34,7 @@ export class GameManager {
             Lap.checkpoints[0].hide()
             Lap.findCheckpoint(Lap.checkpointIndex)?.show()
             // Do we have any data to show a ghost?
-            if(TrackManager.ghostRecorder.currentGhostData.points.length>0){
+            if (TrackManager.ghostRecorder.currentGhostData.points.length > 0) {
                 TrackManager.ghostCar.startGhost()
             }
             // Start recording
@@ -66,5 +42,31 @@ export class GameManager {
             TrackManager.onStartEvent()
             AudioManager.playStartRaceAudio()
         })
+    }
+
+    static end(_win: boolean = true): void {
+        Lap.lapsCompleted--
+        Lap.started = false
+        if (_win) {
+            TrackManager.onEndEvent()
+            AudioManager.playEndRaceAudio()
+
+            utils.timers.setTimeout(() => {
+                GameManager.reset()
+                utils.timers.setTimeout(() => {
+                    if (Car.instances.length > 0) {
+                        CarPerspectives.exitCar(Car.instances[0].data)
+                    }
+                    Lap.timeElapsed = 0
+                }, 200)
+            }, 4000)
+        }
+        else {
+            GameManager.reset()
+            if (Car.instances.length > 0) {
+                CarPerspectives.exitCar(Car.instances[0].data)
+            }
+            Lap.timeElapsed = 0
+        }
     }
 }

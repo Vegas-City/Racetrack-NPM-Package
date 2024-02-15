@@ -6,7 +6,7 @@ import { movePlayerTo } from "../../utils/setup"
 import { CarData } from "../carData"
 import { localToWorldPosition } from "../../utils/utils"
 import { Car } from "../car"
-import { TrackManager } from "../../racetrack"
+import { GameManager, TrackManager } from "../../racetrack"
 import { AudioManager } from "../../audio"
 import * as utils from '@dcl-sdk/utils'
 
@@ -69,7 +69,6 @@ export class CarPerspectives {
                         CarPerspectives.switchToCarPerspective(_data)
                         SpeedometerUI.Show()
                         TimeUI.Show()
-                        //CarChoiceUI.Show()
                         Minimap.Show()
 
                         if (_data.playerCageEntity) {
@@ -82,6 +81,7 @@ export class CarPerspectives {
                         }
 
                         _data.occupied = true
+                        GameManager.start()
                     }, 50)
 
                     Animator.playSingleAnimation(_data.carModelEntity, "CloseDoor")
@@ -105,9 +105,14 @@ export class CarPerspectives {
             Transform.getMutable(_data.carColliderEntity).scale = Vector3.One()
         }
 
-        const targetPos = localToWorldPosition(Vector3.create(-2.3, 1, -0.2), carTransform.position, _data.carRot)
-        const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carTransform.position, _data.carRot)
-        movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
+        if (TrackManager.respawnProvided) {
+            movePlayerTo({ newRelativePosition: TrackManager.respawnPosition, cameraTarget: TrackManager.respawnDirection })
+        }
+        else {
+            const targetPos = localToWorldPosition(Vector3.create(-2.3, 1, -0.2), carTransform.position, _data.carRot)
+            const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carTransform.position, _data.carRot)
+            movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
+        }
 
         CarPerspectives.attachPointerEvent(_data)
         SpeedometerUI.Hide()
@@ -119,6 +124,8 @@ export class CarPerspectives {
             CameraModeArea.deleteFrom(_data.playerCageEntity)
             Transform.getMutable(_data.playerCageEntity).scale = Vector3.Zero()
         }
+
+        Car.unload()
     }
 
     static attachPointerEvent(_data: CarData): void {

@@ -2,7 +2,7 @@ import { Quaternion, Vector3 } from "@dcl/sdk/math"
 import { Minimap, SpeedometerUI } from "../../ui"
 import { CarData } from "../carData"
 import { Car } from "../car"
-import { InputManager, TrackManager } from "../../racetrack"
+import { TrackManager } from "../../racetrack"
 import { Transform, engine } from "@dcl/sdk/ecs"
 import { localToWorldPosition } from "../../utils/utils"
 import { movePlayerTo } from "../../utils/setup"
@@ -25,10 +25,6 @@ export class CarUpdate {
         }
 
         const carTransform = Transform.getMutable(_data.carEntity)
-
-        if (_data.occupied && InputManager.isExitPressed) {
-            CarPerspectives.exitCar(_data)
-        }
 
         CarDrift.updateDriftFactor(_dt, _data)
         CarSpeed.updateSpeed(_dt, _data)
