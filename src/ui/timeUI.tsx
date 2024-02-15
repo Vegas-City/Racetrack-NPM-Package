@@ -1,11 +1,14 @@
 import { Color4 } from "@dcl/sdk/math"
 import { Lap } from "../racetrack"
-import ReactEcs, { Label, UiEntity } from "@dcl/sdk/react-ecs"
+import ReactEcs, { Label, PositionUnit, UiEntity } from "@dcl/sdk/react-ecs"
 
 export class TimeUI {
     private static readonly SCALE: number = 0.35
 
     static visibility: boolean = false
+    static pbOrQualValue: number = 0
+    static pbOrQualLabel: string = "Qualification"
+    static pBQualPos: PositionUnit
 
     private static component = () => (
         <UiEntity
@@ -69,7 +72,7 @@ export class TimeUI {
                 }}
             >
                 <Label
-                    value={TimeUI.formatTime(60000)}
+                    value={TimeUI.formatTime(TimeUI.pbOrQualValue)}
                     color={Color4.White()}
                     fontSize={38}
                     font="sans-serif"
@@ -79,13 +82,13 @@ export class TimeUI {
                     }}
                 />
                 <Label
-                    value={"personal best"}
+                    value={TimeUI.pbOrQualLabel}
                     color={Color4.White()}
                     fontSize={20}
                     font="sans-serif"
-                    textAlign="top-center"
+                    textAlign= "top-center"
                     uiTransform={{
-                        position: { left: '245px', top: '45px' }
+                        position: { left: TimeUI.pBQualPos, top: '45px' }
                     }}
                 />
             </UiEntity>
@@ -116,5 +119,11 @@ export class TimeUI {
         let minStr = (min < 10 ? "0" : "") + min.toString()
         let timeStr = minStr + ":" + secStr
         return timeStr
+    }
+
+    static showQualOrPbTime(text:string, value:number){
+        TimeUI.pbOrQualLabel = text
+        TimeUI.pbOrQualValue = value
+        TimeUI.pbOrQualLabel === "PB" ? TimeUI.pBQualPos = '200px' : TimeUI.pBQualPos = '245px'
     }
 }
