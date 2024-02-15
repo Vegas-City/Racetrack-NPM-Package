@@ -70,10 +70,10 @@ export class InputManager {
         }
 
         // Start
-        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_DOWN) && Car.instances[0].data.occupied) {
+        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_DOWN) && Car.instances.length > 0 && Car.instances[0].data.occupied) {
             InputManager.isStartPressed = true
         }
-        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_UP) && Car.instances[0].data.occupied) {
+        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_UP) && Car.instances.length > 0 && Car.instances[0].data.occupied) {
             InputManager.isStartPressed = false
         }
 

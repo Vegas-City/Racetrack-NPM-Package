@@ -107,4 +107,11 @@ export class CarWheels {
             localPosition: Vector3.create(-_data.wheelX_L, _data.wheelY, -_data.wheelZ_B)
         })
     }
+
+    static clearDown(_data: CarData) {
+        if(_data.wheelL1) engine.removeEntityWithChildren(_data.wheelL1)
+        if(_data.wheelL2) engine.removeEntityWithChildren(_data.wheelL2)
+        if(_data.wheelR1) engine.removeEntityWithChildren(_data.wheelR1)
+        if(_data.wheelR2) engine.removeEntityWithChildren(_data.wheelR2)
+    }
 }

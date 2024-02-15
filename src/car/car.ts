@@ -1,4 +1,4 @@
-import { Animator, Entity, GltfContainer, Material, MeshRenderer, Transform, engine } from '@dcl/sdk/ecs'
+import { Animator, GltfContainer, Material, MeshRenderer, Transform, engine, pointerEventsSystem } from '@dcl/sdk/ecs'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
 import { CarConfig } from './carConfig'
 import { PhysicsManager, Body } from '../physics'
@@ -18,9 +18,9 @@ export class Car {
     static stopSpeed: number = 0.2
     static debugMode: boolean = false
     static camFollow: boolean = false
-    static activeCarEntity: Entity | null = null
 
     static audioManager: AudioManager
+    static initialised: boolean = false
 
     data: CarData = new CarData()
 
@@ -114,8 +114,6 @@ export class Car {
         Transform.create(this.data.brakeLight, {
             parent: this.data.carModelEntity
         })
-
-
         this.data.steeringWheel = engine.addEntity()
         GltfContainer.create(this.data.steeringWheel, { src: _config.steeringWheelGLB })
         if (this.data.carModelEntity != null) {
@@ -129,15 +127,37 @@ export class Car {
 
         CarWheels.addWheels(_config.leftWheelGLB, _config.rightWheelGLB, this.data)
 
-        if (Car.instances.length < 1) {
+        if (!Car.initialised) {
             engine.addSystem(Car.update)
         }
 
+        Car.initialised = true
         Car.instances.push(this)
 
         this.data.carRot = Quaternion.fromEulerDegrees(0, _rot, 0)
 
         this.data.dashboard = new Dashboard(_config.dashboardPosition, _config.dashboardGLB, this.data.carModelEntity)
+    }
+
+    unload(): void {
+        this.data.dashboard?.cleardown()
+        CarWheels.clearDown(this.data)
+
+        if (this.data.steeringWheel) engine.removeEntity(this.data.steeringWheel)
+        if (this.data.brakeLight) engine.removeEntityWithChildren(this.data.brakeLight)
+        if (this.data.playerCageEntity) engine.removeEntityWithChildren(this.data.playerCageEntity)
+        if (this.data.carColliderEntity) engine.removeEntityWithChildren(this.data.carColliderEntity)
+        if (this.data.carModelEntity) engine.removeEntityWithChildren(this.data.carModelEntity)
+        if (this.data.carEntity) engine.removeEntityWithChildren(this.data.carEntity)
+
+        if (this.data.carBody) PhysicsManager.world.removeBody(this.data.carBody)
+    }
+
+    static unload(): void {
+        Car.instances.forEach(car => {
+            car.unload()
+        })
+        Car.instances.splice(0)
     }
 
     private initialiseCannon(_position: Vector3, _rot: Quaternion, _scale: Vector3): void {
