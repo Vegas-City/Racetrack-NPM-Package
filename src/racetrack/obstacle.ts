@@ -115,13 +115,18 @@ export class Obstacle {
         if(this.debugEntity) {
             engine.removeEntity(this.debugEntity)
         }
+        if(this.body) {
+            World.getInstance().removeBody(this.body)
+        }
+
         this.entity = undefined
         this.debugEntity = undefined
+        this.body = undefined
     }
 
     static getBounceFactor(_type: ObstacleType): number {
         switch (_type) {
-            case ObstacleType.none: return 0
+            case ObstacleType.none: return 3
             case ObstacleType.boundary: return 3
             case ObstacleType.tree: return 2
             case ObstacleType.barrel: return 0
