@@ -64,11 +64,11 @@ export class GhostCar {
         if (!this.ghostCarRunning) {
             return
         }
-
-        // If we are too close to the ghost car and in first person hide it. So we can see where we are going and so its not obvious we've raised the car
+        // If we are too close to the ghost car and in first person hide it. So we can see where we are going.
         if (Car.instances.length > 0 && !Car.instances[0].data.thirdPersonView) {
             if (Car.instances[0].data.carEntity != null) {
                 if (Vector3.distance(Transform.get(Car.instances[0].data.carEntity).position, Transform.get(this.entity).position) < 15) {
+
                     Transform.getMutable(this.entity).scale = Vector3.Zero()
                 } else {
                     Transform.getMutable(this.entity).scale = Vector3.One()
@@ -97,5 +97,7 @@ export class GhostCar {
         // Drive the course //
         Transform.getMutable(this.entity).position = Vector3.lerp(this.lastPoint.position, this.targetPoint.position, this.currentLerp / this.ghostData.frequecy)
         Transform.getMutable(this.entity).rotation = this.targetPoint.rotation
+        
+        Minimap.GhostUpdate(Transform.get(this.entity).position.x, Transform.get(this.entity).position.z)
     }
 }
