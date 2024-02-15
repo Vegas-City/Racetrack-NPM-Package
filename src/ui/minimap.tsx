@@ -37,6 +37,10 @@ export class Minimap {
     private static posX: number = 0
     private static posZ: number = 0
 
+    private static ghost_posX: number = 0
+    private static ghost_posZ: number = 0
+    private static showGhost: boolean = false
+
     private static imageWidth: number = 0
     private static imageHeight: number = 0
     private static parcelWidth: number = 0
@@ -79,6 +83,22 @@ export class Minimap {
                     textureMode: 'stretch',
                     texture: {
                         src: "images/ui/minimapUI/car_tracking.png"
+                    }
+                }}
+            >
+            </UiEntity>
+            <UiEntity
+                uiTransform={{
+                    position: { left: Minimap.ghost_posX - (Minimap.imageWidth * Minimap.scale), bottom: Minimap.ghost_posZ - (Minimap.imageHeight * Minimap.scale) },
+                    width: Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale),
+                    height: Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale),
+                    positionType: 'absolute',
+                    display: Minimap.showGhost ? 'flex' : 'none'
+                }}
+                uiBackground={{
+                    textureMode: 'stretch',
+                    texture: {
+                        src: "images/ui/minimapUI/car_tracking_ghost.png"
                     }
                 }}
             >
@@ -140,6 +160,30 @@ export class Minimap {
         Minimap.posX = ((Minimap.paddingLeft + (ratioX * srcWidth)) * Minimap.scale) - dotOffset
         Minimap.posZ = ((Minimap.paddingBottom + (ratioZ * srcHeight)) * Minimap.scale) - dotOffset
     }
+
+    static GhostUpdate(_x: number, _z: number) {
+        const width = (Minimap.parcelWidth * 16) - (2 * Minimap.offsetX)
+        const height = (Minimap.parcelHeight * 16) - (2 * Minimap.offsetZ)
+
+        const relX = _x - Minimap.bottomLeftX - Minimap.offsetX
+        const relZ = _z - Minimap.bottomLeftZ - Minimap.offsetZ
+
+        const ratioX = relX / width
+        const ratioZ = relZ / height
+
+        const srcWidth = Minimap.imageWidth - Minimap.paddingLeft - Minimap.paddingRight
+        const srcHeight = Minimap.imageHeight - Minimap.paddingBottom - Minimap.paddingTop
+
+        const dotOffset = (Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale)) * 0.5
+
+        Minimap.ghost_posX = ((Minimap.paddingLeft + (ratioX * srcWidth)) * Minimap.scale) - dotOffset
+        Minimap.ghost_posZ = ((Minimap.paddingBottom + (ratioZ * srcHeight)) * Minimap.scale) - dotOffset
+        Minimap.showGhost = true
+
+    }
+
+
+
 
     private static generateMinimapImages() {
         return Minimap.minimapImages.map((image, index) =>

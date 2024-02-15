@@ -3,6 +3,7 @@ import { GhostData } from "./ghostData";
 import { GhostPoint } from "./ghostPoint";
 import { Quaternion, Vector3 } from "@dcl/sdk/math";
 import { Car } from "../car";
+import { Minimap } from "../ui";
 
 export class GhostCar {
     entity: Entity
@@ -97,5 +98,6 @@ export class GhostCar {
         Transform.getMutable(this.entity).position = Vector3.lerp(this.lastPoint.position,this.targetPoint.position,this.currentLerp/this.ghostData.frequecy)
         Transform.getMutable(this.entity).rotation = this.targetPoint.rotation
         
+        Minimap.GhostUpdate(Transform.get(this.entity).position.x, Transform.get(this.entity).position.z)
     }
 }
