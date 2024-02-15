@@ -139,11 +139,18 @@ export class Car {
         this.data.dashboard = new Dashboard(_config.dashboardPosition, _config.dashboardGLB, this.data.carModelEntity)
     }
 
-    unload(): void {
+    static unload(): void {
+        Car.instances.forEach(car => {
+            car.unload()
+        })
+        Car.instances.splice(0)
+    }
+
+    private unload(): void {
         this.data.dashboard?.cleardown()
         CarWheels.clearDown(this.data)
 
-        if (this.data.steeringWheel) engine.removeEntity(this.data.steeringWheel)
+        if (this.data.steeringWheel) engine.removeEntityWithChildren(this.data.steeringWheel)
         if (this.data.brakeLight) engine.removeEntityWithChildren(this.data.brakeLight)
         if (this.data.playerCageEntity) engine.removeEntityWithChildren(this.data.playerCageEntity)
         if (this.data.carColliderEntity) engine.removeEntityWithChildren(this.data.carColliderEntity)
@@ -151,13 +158,6 @@ export class Car {
         if (this.data.carEntity) engine.removeEntityWithChildren(this.data.carEntity)
 
         if (this.data.carBody) PhysicsManager.world.removeBody(this.data.carBody)
-    }
-
-    static unload(): void {
-        Car.instances.forEach(car => {
-            car.unload()
-        })
-        Car.instances.splice(0)
     }
 
     private initialiseCannon(_position: Vector3, _rot: Quaternion, _scale: Vector3): void {
