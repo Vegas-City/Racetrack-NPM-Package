@@ -10,7 +10,7 @@ import * as utils from '@dcl-sdk/utils'
 
 export class GameManager {
     static reset(): void {
-        if (Car.instances.length <= 0) return
+        if (Car.instances.length < 1) return
 
         Car.instances[0].data.carBody?.setPosition(Car.instances[0].data.startPos)
         Car.instances[0].data.carBody?.setRotation(Quaternion.fromEulerDegrees(0, Car.instances[0].data.startRotY, 0))
@@ -34,7 +34,9 @@ export class GameManager {
         utils.timers.setTimeout(() => {
             GameManager.reset()
             utils.timers.setTimeout(() => {
-                CarPerspectives.exitCar(Car.instances[0].data)
+                if(Car.instances.length > 0) {
+                    CarPerspectives.exitCar(Car.instances[0].data)
+                }
                 Lap.timeElapsed = 0
             }, 200)
         }, 4000)

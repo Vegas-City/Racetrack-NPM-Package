@@ -82,7 +82,6 @@ export class CarPerspectives {
                         }
 
                         _data.occupied = true
-                        Car.activeCarEntity = _data.carEntity
                     }, 50)
 
                     Animator.playSingleAnimation(_data.carModelEntity, "CloseDoor")
@@ -99,7 +98,6 @@ export class CarPerspectives {
         if (_data.carEntity === undefined || _data.carEntity === null) return
 
         _data.occupied = false
-        Car.activeCarEntity = null
 
         const carTransform = Transform.getMutable(_data.carEntity)
 

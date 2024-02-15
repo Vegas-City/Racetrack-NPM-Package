@@ -102,4 +102,13 @@ export class Dashboard {
             })
         }
     }
+
+    cleardown(): void {
+        engine.removeEntityWithChildren(this.lapEntity)
+        engine.removeEntityWithChildren(this.stateEntity)
+        engine.removeEntityWithChildren(this.speedometerBarsEntity)
+        engine.removeEntityWithChildren(this.speedometerEntity)
+        engine.removeEntityWithChildren(this.containerEntity)
+        engine.removeEntityWithChildren(this.dashboardEntity)
+    }
 }
