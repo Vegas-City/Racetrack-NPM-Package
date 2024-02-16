@@ -62,6 +62,10 @@ export class GameManager {
             }, 4000)
         }
         else {
+            // Ghost car
+            TrackManager.ghostRecorder.stop() // Stop recording
+            TrackManager.ghostCar.endGhost() // Hide the ghost car if there is one
+
             GameManager.reset()
             if (Car.instances.length > 0) {
                 CarPerspectives.exitCar(Car.instances[0].data)
