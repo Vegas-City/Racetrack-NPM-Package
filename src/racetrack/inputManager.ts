@@ -1,13 +1,17 @@
 import { engine, InputAction, PointerEventType, inputSystem } from "@dcl/sdk/ecs"
 import { Car, CarPerspectives } from "../car"
+import { ExitCarUI } from "../ui"
+import { Lap } from "./lap"
 
 export class InputManager {
+    private static readonly INACTIVITY_THRESHOLD: number = 3
+    private static inactivityElapsed: number = 0
+
     static isForwardPressed: boolean = false
     static isBackwardPressed: boolean = false
     static isLeftPressed: boolean = false
     static isRightPressed: boolean = false
     static isExitPressed: boolean = false
-    static isStartPressed: boolean = false
     static isDriftPressed: boolean = false
     static mouseSteering: boolean = true
     static rightPressedDuration: number = 0
@@ -18,7 +22,6 @@ export class InputManager {
     private static readonly KEY_LEFT: InputAction = InputAction.IA_LEFT
     private static readonly KEY_RIGHT: InputAction = InputAction.IA_RIGHT
     private static readonly KEY_EXIT: InputAction = InputAction.IA_PRIMARY
-    private static readonly KEY_START: InputAction = InputAction.IA_SECONDARY
 
     constructor() {
         engine.addSystem(InputManager.update)
@@ -61,20 +64,25 @@ export class InputManager {
             InputManager.isRightPressed = false
         }
 
+        if (InputManager.isForwardPressed || InputManager.isBackwardPressed || InputManager.isLeftPressed || InputManager.isRightPressed) {
+            InputManager.inactivityElapsed = 0
+            ExitCarUI.hide()
+        }
+        else {
+            if (Car.instances.length > 0 && Car.instances[0].data?.occupied && Lap.started) {
+                InputManager.inactivityElapsed += dt
+                if (InputManager.inactivityElapsed > InputManager.INACTIVITY_THRESHOLD) {
+                    ExitCarUI.show()
+                }
+            }
+        }
+
         // Exit
         if (inputSystem.isTriggered(InputManager.KEY_EXIT, PointerEventType.PET_DOWN)) {
             InputManager.isExitPressed = true
         }
         if (inputSystem.isTriggered(InputManager.KEY_EXIT, PointerEventType.PET_UP)) {
             InputManager.isExitPressed = false
-        }
-
-        // Start
-        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_DOWN) && Car.instances.length > 0 && Car.instances[0].data.occupied) {
-            InputManager.isStartPressed = true
-        }
-        if (inputSystem.isTriggered(InputManager.KEY_START, PointerEventType.PET_UP) && Car.instances.length > 0 && Car.instances[0].data.occupied) {
-            InputManager.isStartPressed = false
         }
 
         if (InputManager.isRightPressed) {

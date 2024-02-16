@@ -6,7 +6,6 @@ import { Obstacle } from "./obstacle"
 import { HotspotActionManager } from "./hotspotActionManager"
 import { Lap } from "./lap"
 import { GhostCar, GhostRecorder } from "./../ghostCar"
-import { GameManager } from "./gameManager"
 import { RaceEventCallbacks } from "./raceEventCallbacks"
 
 /**
@@ -38,6 +37,10 @@ export class TrackManager {
     static onCheckpointEvent: Function = () => { }
     static onLapCompleteEvent: Function = () => { }
 
+    static respawnProvided: boolean = false
+    static respawnPosition: Vector3 = Vector3.Zero()
+    static respawnDirection: Vector3 = Vector3.Zero()
+
     /**
      * Creates a TrackManager instance.
      *
@@ -45,14 +48,23 @@ export class TrackManager {
      * @param _rotation the rotation of the entire track.
      * @param _scale the scale of the entire track.
      * @param _debugMode a flag to toggle debug mode.
+     * @param _eventCallbacks optional parameter that defines race event callbacks.
+     * @param _respawnPosition the position where the player respawns after ending a race. If this is not provided, the player respawns next to the car.
+     * @param _respawnDirection the direction the player is looking in when respawning. If this is not provided, the player respawns next to the car.
      *
      */
-    constructor(_position: Vector3, _rotation: Quaternion, _scale: Vector3, _debugMode: boolean = false, _eventCallbacks?: RaceEventCallbacks) {
+    constructor(_position: Vector3, _rotation: Quaternion, _scale: Vector3, _debugMode: boolean = false, _eventCallbacks?: RaceEventCallbacks, _respawnPosition?: Vector3, _respawnDirection?: Vector3) {
         TrackManager.debugMode = _debugMode
         TrackManager.trackTransform = {
             position: _position,
             rotation: _rotation,
             scale: _scale
+        }
+
+        if (_respawnPosition && _respawnDirection) {
+            TrackManager.respawnProvided = true
+            TrackManager.respawnPosition = _respawnPosition
+            TrackManager.respawnDirection = _respawnDirection
         }
 
         TrackManager.ghostRecorder = new GhostRecorder()
@@ -206,6 +218,5 @@ export class TrackManager {
             Lap.update(dt, TrackManager.carPoints[0])
         }
         HotspotActionManager.update(dt)
-        GameManager.update(dt)
     }
 }
