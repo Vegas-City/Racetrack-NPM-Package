@@ -80,7 +80,7 @@ export class GhostCar {
         this.currentLerp += _dt
 
         // Plot the course //
-        let newIndex: number = Math.floor((this.currentUpdateTime / this.ghostData.frequecy))
+        let newIndex: number = Math.floor((this.currentUpdateTime / this.ghostData.frequency))
 
         if (newIndex >= this.ghostData.points.length) {
             // We've reached the end
@@ -95,7 +95,7 @@ export class GhostCar {
         }
 
         // Drive the course //
-        Transform.getMutable(this.entity).position = Vector3.lerp(this.lastPoint.position, this.targetPoint.position, this.currentLerp / this.ghostData.frequecy)
+        Transform.getMutable(this.entity).position = Vector3.lerp(this.lastPoint.position, this.targetPoint.position, this.currentLerp / this.ghostData.frequency)
         Transform.getMutable(this.entity).rotation = this.targetPoint.rotation
         
         Minimap.GhostUpdate(Transform.get(this.entity).position.x, Transform.get(this.entity).position.z)

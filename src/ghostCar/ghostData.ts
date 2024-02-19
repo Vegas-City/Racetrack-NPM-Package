@@ -1,11 +1,11 @@
 import { GhostPoint } from "./ghostPoint" 
  
 export class GhostData { 
-    track:number = -1
+    track:string = ""
     car:number = 0 
     createDate:Date = new Date() 
     duration: number = 0 
-    frequecy:number = 0 
+    frequency:number = 0 
     points: GhostPoint[] = [] 
   
     getPointJSON():any{ 
