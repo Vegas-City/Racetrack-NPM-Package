@@ -80,6 +80,13 @@ export class CarPerspectives {
                             PlayerCage.expandCage(_data)
                         }
 
+                        if (TrackManager.trackEntityCollider) {
+                            let transform = Transform.getMutableOrNull(TrackManager.trackEntityCollider)
+                            if(transform) {
+                                transform.scale = Vector3.Zero()
+                            }
+                        }
+
                         _data.occupied = true
                         GameManager.start()
                     }, 50)
@@ -126,6 +133,13 @@ export class CarPerspectives {
         }
 
         Car.unload()
+
+        if (TrackManager.trackEntityCollider) {
+            let transform = Transform.getMutableOrNull(TrackManager.trackEntityCollider)
+            if(transform) {
+                transform.scale = TrackManager.trackTransform.scale
+            }
+        }
     }
 
     static attachPointerEvent(_data: CarData): void {
