@@ -25,6 +25,7 @@ export class TrackManager {
     static trackCollider: Entity
 
     static trackEntity: Entity | undefined
+    static trackEntityCollider: Entity | undefined
 
     static trackTransform: TransformType = {
         position: Vector3.Zero(),
@@ -107,10 +108,13 @@ export class TrackManager {
      *
      */
     static Unload(): void {
-        if (TrackManager.trackEntity === undefined) return
+        if (TrackManager.trackEntity === undefined || TrackManager.trackEntityCollider === undefined) return
 
         engine.removeEntity(TrackManager.trackEntity)
         TrackManager.trackEntity = undefined
+
+        engine.removeEntity(TrackManager.trackEntityCollider)
+        TrackManager.trackEntityCollider = undefined
 
         if (TrackManager.track) {
             TrackManager.track.unload()
@@ -150,6 +154,16 @@ export class TrackManager {
             src: _trackData.glb
         })
         Transform.create(TrackManager.trackEntity, {
+            position: TrackManager.trackTransform.position,
+            rotation: TrackManager.trackTransform.rotation,
+            scale: TrackManager.trackTransform.scale
+        })
+
+        TrackManager.trackEntityCollider = engine.addEntity()
+        GltfContainer.create(TrackManager.trackEntityCollider, {
+            src: _trackData.glb.substring(0, _trackData.glb.length - 4) + "_collider.glb"
+        })
+        Transform.create(TrackManager.trackEntityCollider, {
             position: TrackManager.trackTransform.position,
             rotation: TrackManager.trackTransform.rotation,
             scale: TrackManager.trackTransform.scale
@@ -205,8 +219,6 @@ export class TrackManager {
      * @param dt elapsed time between frames.
      */
     private static update(dt: number) {
-        if (TrackManager.trackEntity === undefined) return
-
         TrackManager.track.update(TrackManager.carPoints)
         TrackManager.hotspots.forEach(hotspot => {
             hotspot.update(TrackManager.carPoints)
