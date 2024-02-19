@@ -38,7 +38,6 @@ export class GameManager {
                 TrackManager.ghostCar.startGhost()
             }
             // Start recording
-            TrackManager.ghostRecorder.start()
             TrackManager.onStartEvent()
             AudioManager.playStartRaceAudio()
         })
