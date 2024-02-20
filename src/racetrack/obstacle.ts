@@ -42,7 +42,7 @@ export class Obstacle {
                 this.debugEntity = engine.addEntity()
                 MeshRenderer.setBox(this.debugEntity)
 
-                Transform.create(this.debugEntity, {
+                Transform.createOrReplace(this.debugEntity, {
                     position: boxShape.position,
                     rotation: boxShape.rotation,
                     scale: boxShape.scale
@@ -52,7 +52,7 @@ export class Obstacle {
             if (this.obstacleType == ObstacleType.barrel) {
                 this.entity = engine.addEntity()
 
-                Transform.create(this.entity, {
+                Transform.createOrReplace(this.entity, {
                     position: boxShape.position,
                     rotation: boxShape.rotation,
                     scale: Vector3.create(0.8, 0.8, 0.8)
@@ -63,7 +63,7 @@ export class Obstacle {
                     src: "models/barrel.glb"
                 })
 
-                Transform.create(child, {
+                Transform.createOrReplace(child, {
                     parent: this.entity,
                     position: Vector3.create(0, -0.4, 0)
                 })
