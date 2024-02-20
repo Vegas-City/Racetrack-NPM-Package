@@ -93,7 +93,7 @@ export class Minimap {
                     width: Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale),
                     height: Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale),
                     positionType: 'absolute',
-                    display: Minimap.showGhost ? 'flex' : 'none'
+                    display: Minimap.showGhost && TrackManager.ghostCar.pointIndex>0 && TrackManager.ghostCar.ghostData.points.length>0 ? 'flex' : 'none'
                 }}
                 uiBackground={{
                     textureMode: 'stretch',
