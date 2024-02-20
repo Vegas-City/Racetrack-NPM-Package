@@ -132,7 +132,7 @@ export class GhostRecorder {
             let ghostPoint: GhostPoint = {
                 checkPoint: point.cp,
                 position: Vector3.create(point.p.x,point.p.y,point.p.z),
-                rotation: Quaternion.create(point.r.w,point.r.x,point.r.y,point.r.z)
+                rotation: Quaternion.create(point.r.x,point.r.y,point.r.z,point.r.w)
             }
             ghostPoints.push(ghostPoint)
         });
