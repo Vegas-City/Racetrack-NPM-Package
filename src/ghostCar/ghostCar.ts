@@ -35,7 +35,9 @@ export class GhostCar {
     }
 
     show() {
-        Transform.getMutable(this.entity).scale = Vector3.One()
+        if(this.ghostData.points.length>0 && this.pointIndex>0 && this.ghostCarRunning){
+            Transform.getMutable(this.entity).scale = Vector3.One()
+        }
     }
 
     hide() {
@@ -68,12 +70,13 @@ export class GhostCar {
         if (Car.instances.length > 0 && !Car.instances[0].data.thirdPersonView) {
             if (Car.instances[0].data.carEntity != null) {
                 if (Vector3.distance(Transform.get(Car.instances[0].data.carEntity).position, Transform.get(this.entity).position) < 15) {
-
-                    Transform.getMutable(this.entity).scale = Vector3.Zero()
+                    this.hide()
                 } else {
-                    Transform.getMutable(this.entity).scale = Vector3.One()
+                    this.show()
                 }
             }
+        } else if (Car.instances.length > 0){
+            this.show()
         }
 
         this.currentUpdateTime += _dt

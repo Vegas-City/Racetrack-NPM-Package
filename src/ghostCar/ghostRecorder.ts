@@ -58,8 +58,10 @@ export class GhostRecorder {
         // Clone the data 
         this.copyData()
 
-        // Start recording again 
-        this.start(this.currentGhostData.track)
+        // Start recording again if practice
+        if(TrackManager.isPractice){
+            this.start(this.currentGhostData.track)
+        }
     }
 
     private copyData(){
@@ -110,13 +112,13 @@ export class GhostRecorder {
     }
 
     clearGhostData(){
-        this.recordedGhostData = new GhostData()
         TrackManager.ghostCar.ghostData = new GhostData()
-    }
+        TrackManager.ghostCar.endGhost()
+    } 
 
     setGhostDataFromServer(trackJs:any,_trackID:string): void {
         this.currentGhostData = new GhostData()
-        this.currentGhostData.frequency = trackJs.frequency
+        this.currentGhostData.frequency = trackJs.frequency 
         this.currentGhostData.createDate = trackJs.createDate
         this.currentGhostData.points = this.convertGhostPoints(trackJs.points)
         this.currentGhostData.track = _trackID
@@ -124,6 +126,7 @@ export class GhostRecorder {
 
         // Only copy if shorter than current ghost
         this.copyData()
+        TrackManager.ghostCar.startGhost()
     }
 
     convertGhostPoints(pointsJSON:any):GhostPoint[]{
