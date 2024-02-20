@@ -23,7 +23,7 @@ export class LapCheckpoint {
                 this.debugEntity1 = engine.addEntity()
                 MeshRenderer.setCylinder(this.debugEntity1)
 
-                Transform.create(this.debugEntity1, {
+                Transform.createOrReplace(this.debugEntity1, {
                     position: Vector3.create(this.point1.x, 2, this.point1.z),
                     scale: Vector3.create(1, 4, 1)
                 })
@@ -40,7 +40,7 @@ export class LapCheckpoint {
                 this.debugEntity2 = engine.addEntity()
                 MeshRenderer.setCylinder(this.debugEntity2)
 
-                Transform.create(this.debugEntity2, {
+                Transform.createOrReplace(this.debugEntity2, {
                     position: Vector3.create(this.point2.x, 2, this.point2.z),
                     scale: Vector3.create(1, 4, 1)
                 })
@@ -90,7 +90,7 @@ export class LapCheckpoint {
 
         const center = Vector3.lerp(this.point1, this.point2, 0.5)
         const angle = Math.atan2(this.point2.z - this.point1.z, this.point2.x - this.point1.x) * 180 / Math.PI
-        Transform.create(this.glowEntity, {
+        Transform.createOrReplace(this.glowEntity, {
             position: Vector3.create(center.x, TrackManager.trackTransform.position.y + 2, center.z),
             rotation: Quaternion.fromEulerDegrees(0, angle, 0),
             scale: Vector3.Zero()
