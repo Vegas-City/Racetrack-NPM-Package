@@ -7,6 +7,7 @@ import { AudioManager } from "../audio/audioManager"
 import { CarPerspectives } from "../car/helpers/carPerspectives"
 import * as utils from '@dcl-sdk/utils'
 
+
 export class GameManager {
     static reset(): void {
         if (Car.instances.length < 1) return
@@ -33,12 +34,8 @@ export class GameManager {
             Lap.checkpointIndex = 1
             Lap.checkpoints[0].hide()
             Lap.findCheckpoint(Lap.checkpointIndex)?.show()
-            // Do we have any data to show a ghost?
-            if (TrackManager.ghostRecorder.currentGhostData.points.length > 0) {
-                TrackManager.ghostCar.startGhost()
-            }
+
             // Start recording
-            TrackManager.ghostRecorder.start()
             TrackManager.onStartEvent()
             AudioManager.playStartRaceAudio()
         })

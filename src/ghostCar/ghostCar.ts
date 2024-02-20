@@ -35,7 +35,9 @@ export class GhostCar {
     }
 
     show() {
-        Transform.getMutable(this.entity).scale = Vector3.One()
+        if(this.ghostData.points.length>0 && this.pointIndex>0 && this.ghostCarRunning){
+            Transform.getMutable(this.entity).scale = Vector3.One()
+        }
     }
 
     hide() {
@@ -68,19 +70,20 @@ export class GhostCar {
         if (Car.instances.length > 0 && !Car.instances[0].data.thirdPersonView) {
             if (Car.instances[0].data.carEntity != null) {
                 if (Vector3.distance(Transform.get(Car.instances[0].data.carEntity).position, Transform.get(this.entity).position) < 15) {
-
-                    Transform.getMutable(this.entity).scale = Vector3.Zero()
+                    this.hide()
                 } else {
-                    Transform.getMutable(this.entity).scale = Vector3.One()
+                    this.show()
                 }
             }
+        } else if (Car.instances.length > 0){
+            this.show()
         }
 
         this.currentUpdateTime += _dt
         this.currentLerp += _dt
 
         // Plot the course //
-        let newIndex: number = Math.floor((this.currentUpdateTime / this.ghostData.frequecy))
+        let newIndex: number = Math.floor((this.currentUpdateTime / this.ghostData.frequency))
 
         if (newIndex >= this.ghostData.points.length) {
             // We've reached the end
@@ -95,7 +98,7 @@ export class GhostCar {
         }
 
         // Drive the course //
-        Transform.getMutable(this.entity).position = Vector3.lerp(this.lastPoint.position, this.targetPoint.position, this.currentLerp / this.ghostData.frequecy)
+        Transform.getMutable(this.entity).position = Vector3.lerp(this.lastPoint.position, this.targetPoint.position, this.currentLerp / this.ghostData.frequency)
         Transform.getMutable(this.entity).rotation = this.targetPoint.rotation
         
         Minimap.GhostUpdate(Transform.get(this.entity).position.x, Transform.get(this.entity).position.z)
