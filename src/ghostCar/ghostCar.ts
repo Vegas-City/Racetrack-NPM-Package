@@ -19,12 +19,12 @@ export class GhostCar {
 
     constructor() {
         this.entity = engine.addEntity()
-        Transform.create(this.entity, { position: Vector3.create(15.39, -20, 23.84) })
+        Transform.createOrReplace(this.entity, { position: Vector3.create(15.39, -20, 23.84) })
 
         this.entityModel = engine.addEntity()
-        Transform.create(this.entityModel, { parent: this.entity, position: Vector3.create(0, -0.8, 0), rotation: Quaternion.fromEulerDegrees(0, 0, 0), scale: Vector3.create(1, 1, 1) })
+        Transform.createOrReplace(this.entityModel, { parent: this.entity, position: Vector3.create(0, -0.8, 0), rotation: Quaternion.fromEulerDegrees(0, 0, 0), scale: Vector3.create(1, 1, 1) })
 
-        GltfContainer.create(this.entityModel, { src: "models/ghostCar.glb" })
+        GltfContainer.createOrReplace(this.entityModel, { src: "models/ghostCar.glb" })
 
         this.lastPoint = { checkPoint: 0, position: Vector3.create(15.39, 1, 23.84), rotation: Quaternion.fromEulerDegrees(0, 0, 0) }
 

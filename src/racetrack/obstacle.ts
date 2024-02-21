@@ -59,7 +59,7 @@ export class Obstacle {
                 })
 
                 const child = engine.addEntity()
-                GltfContainer.create(child, {
+                GltfContainer.createOrReplace(child, {
                     src: "models/barrel.glb"
                 })
 

@@ -31,19 +31,19 @@ export class CarWheels {
 
         // L1
         _data.wheelL1 = engine.addEntity()
-        Transform.create(_data.wheelL1)
+        Transform.createOrReplace(_data.wheelL1)
 
         const wheelL1Child = engine.addEntity()
-        GltfContainer.create(wheelL1Child, {
+        GltfContainer.createOrReplace(wheelL1Child, {
             src: _leftWheelGLB
         })
-        Transform.create(wheelL1Child, {
+        Transform.createOrReplace(wheelL1Child, {
             parent: _data.wheelL1,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
             scale: Vector3.create(_data.carScale, _data.carScale, _data.carScale)
         })
 
-        CarWheelComponent.create(_data.wheelL1, {
+        CarWheelComponent.createOrReplace(_data.wheelL1, {
             child: wheelL1Child,
             isFrontWheel: true,
             localPosition: Vector3.create(_data.wheelX_R, _data.wheelY, _data.wheelZ_F)
@@ -51,38 +51,38 @@ export class CarWheels {
 
         // L2
         _data.wheelL2 = engine.addEntity()
-        Transform.create(_data.wheelL2)
+        Transform.createOrReplace(_data.wheelL2)
 
         const wheelL2Child = engine.addEntity()
-        GltfContainer.create(wheelL2Child, {
+        GltfContainer.createOrReplace(wheelL2Child, {
             src: _leftWheelGLB
         })
-        Transform.create(wheelL2Child, {
+        Transform.createOrReplace(wheelL2Child, {
             parent: _data.wheelL2,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
             scale: Vector3.create(_data.carScale, _data.carScale, _data.carScale)
         })
 
-        CarWheelComponent.create(_data.wheelL2, {
+        CarWheelComponent.createOrReplace(_data.wheelL2, {
             child: wheelL2Child,
             localPosition: Vector3.create(_data.wheelX_R, _data.wheelY, -_data.wheelZ_B)
         })
 
         // R1
         _data.wheelR1 = engine.addEntity()
-        Transform.create(_data.wheelR1)
+        Transform.createOrReplace(_data.wheelR1)
 
         const wheelR1Child = engine.addEntity()
-        GltfContainer.create(wheelR1Child, {
+        GltfContainer.createOrReplace(wheelR1Child, {
             src: _rightWheelGLB
         })
-        Transform.create(wheelR1Child, {
+        Transform.createOrReplace(wheelR1Child, {
             parent: _data.wheelR1,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
             scale: Vector3.create(_data.carScale, _data.carScale, _data.carScale)
         })
 
-        CarWheelComponent.create(_data.wheelR1, {
+        CarWheelComponent.createOrReplace(_data.wheelR1, {
             child: wheelR1Child,
             isFrontWheel: true,
             localPosition: Vector3.create(-_data.wheelX_L, _data.wheelY, _data.wheelZ_F)
@@ -90,19 +90,19 @@ export class CarWheels {
 
         // R2
         _data.wheelR2 = engine.addEntity()
-        Transform.create(_data.wheelR2)
+        Transform.createOrReplace(_data.wheelR2)
 
         const wheelR2Child = engine.addEntity()
-        GltfContainer.create(wheelR2Child, {
+        GltfContainer.createOrReplace(wheelR2Child, {
             src: _rightWheelGLB
         })
-        Transform.create(wheelR2Child, {
+        Transform.createOrReplace(wheelR2Child, {
             parent: _data.wheelR2,
             rotation: Quaternion.fromEulerDegrees(90, Quaternion.toEulerAngles(carBodyTransform.rotation).y, 90),
             scale: Vector3.create(_data.carScale, _data.carScale, _data.carScale)
         })
 
-        CarWheelComponent.create(_data.wheelR2, {
+        CarWheelComponent.createOrReplace(_data.wheelR2, {
             child: wheelR2Child,
             localPosition: Vector3.create(-_data.wheelX_L, _data.wheelY, -_data.wheelZ_B)
         })

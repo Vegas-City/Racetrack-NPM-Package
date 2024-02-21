@@ -8,8 +8,8 @@ export class AudioEntity {
 
         for (let index = 0; index < _numberOfEntities; index++) {
             let entity = engine.addEntity()
-            Transform.create(entity, { position: Vector3.create(2, 2, 2), scale: Vector3.create(0.001, 0.001, 0.001) })
-            AudioSource.create(entity, {
+            Transform.createOrReplace(entity, { position: Vector3.create(2, 2, 2), scale: Vector3.create(0.001, 0.001, 0.001) })
+            AudioSource.createOrReplace(entity, {
                 audioClipUrl: _audioPath,
                 playing: false,
                 volume: _volume

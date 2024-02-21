@@ -81,7 +81,7 @@ export class LapCheckpoint {
 
     private addGlowEffect(): void {
         this.glowEntity = engine.addEntity()
-        GltfContainer.create(this.glowEntity, {
+        GltfContainer.createOrReplace(this.glowEntity, {
             src: "models/checkpointGlow.glb"
         })
 
