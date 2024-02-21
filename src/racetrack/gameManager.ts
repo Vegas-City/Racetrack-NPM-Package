@@ -1,5 +1,5 @@
 import { TrackManager } from "./trackManager"
-import { Countdown, ExitCarUI } from "../ui"
+import { Countdown } from "../ui"
 import { Lap } from "./lap"
 import { Car } from "../car/car"
 import { Quaternion } from "@dcl/sdk/math"
@@ -27,6 +27,11 @@ export class GameManager {
 
     static start(): void {
         Lap.triggeredStart = true
+        let startCheckpoint = Lap.findCheckpoint(0)
+        if(startCheckpoint) {
+            startCheckpoint.show()
+        }
+
         Countdown.Start(() => {
             Lap.started = true
             Lap.lapsCompleted = 0
@@ -49,13 +54,11 @@ export class GameManager {
             AudioManager.playEndRaceAudio()
 
             utils.timers.setTimeout(() => {
+                if (Car.instances.length > 0) {
+                    CarPerspectives.exitCar(Car.instances[0].data)
+                }
+                Lap.timeElapsed = 0
                 GameManager.reset()
-                utils.timers.setTimeout(() => {
-                    if (Car.instances.length > 0) {
-                        CarPerspectives.exitCar(Car.instances[0].data)
-                    }
-                    Lap.timeElapsed = 0
-                }, 200)
             }, 4000)
         }
         else {
