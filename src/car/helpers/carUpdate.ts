@@ -24,7 +24,8 @@ export class CarUpdate {
             _data.collisionCooldown = 0
         }
 
-        const carTransform = Transform.getMutable(_data.carEntity)
+        const carTransform = Transform.getMutableOrNull(_data.carEntity)
+        if (!carTransform) return
 
         CarDrift.updateDriftFactor(_dt, _data)
         CarSpeed.updateSpeed(_dt, _data)
@@ -98,7 +99,7 @@ export class CarUpdate {
         _data.dashboard?.update(_data.speed, _data.carAttributes?.minSpeed ?? 0, _data.carAttributes?.maxSpeed ?? 0)
 
         if (_data.occupied) {
-            const playerPos = Transform.get(engine.PlayerEntity).position
+            const playerPos = Transform.getMutableOrNull(engine.PlayerEntity)?.position ?? Vector3.Zero()
             const distToCar = Vector3.distance(playerPos, PlayerCage.getCagePos(_data))
             if (distToCar > 6) {
                 CarPerspectives.switchToCarPerspective(_data, deltaDistance)

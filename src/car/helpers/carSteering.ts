@@ -10,7 +10,7 @@ export class CarSteering {
         if (_data.carEntity === undefined || _data.carEntity === null) return
 
         if (InputManager.mouseSteering) {
-            const carRot = Quaternion.toEulerAngles(Quaternion.normalize(Transform.getMutable(_data.carEntity).rotation)).y
+            const carRot = Quaternion.toEulerAngles(Quaternion.normalize(Transform.getMutableOrNull(_data.carEntity)?.rotation ?? Quaternion.Identity())).y
             const cameraRot = Quaternion.toEulerAngles(Quaternion.normalize(Transform.get(engine.CameraEntity).rotation)).y
 
             let angleDif = cameraRot - carRot
@@ -70,9 +70,10 @@ export class CarSteering {
 
         // Update steering wheel based on steer value
         if (_data.steeringWheel != null) {
-            Transform.getMutable(_data.steeringWheel).rotation = Quaternion.fromEulerDegrees(_data.steerValue * -45, 0, 0)
+            let steeringWheelTransform = Transform.getMutableOrNull(_data.steeringWheel)
+            if (steeringWheelTransform) {
+                steeringWheelTransform.rotation = Quaternion.fromEulerDegrees(_data.steerValue * -45, 0, 0)
+            }
         }
-
-
     }
 }

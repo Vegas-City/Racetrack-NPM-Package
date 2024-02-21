@@ -35,13 +35,19 @@ export class GhostCar {
     }
 
     show() {
-        if(this.ghostData.points.length>0 && this.pointIndex>0 && this.ghostCarRunning){
-            Transform.getMutable(this.entity).scale = Vector3.One()
+        if (this.ghostData.points.length > 0 && this.pointIndex > 0 && this.ghostCarRunning) {
+            let transform = Transform.getMutableOrNull(this.entity)
+            if (transform) {
+                transform.scale = Vector3.One()
+            }
         }
     }
 
     hide() {
-        Transform.getMutable(this.entity).scale = Vector3.Zero()
+        let transform = Transform.getMutableOrNull(this.entity)
+        if (transform) {
+            transform.scale = Vector3.Zero()
+        }
     }
 
     startGhost() {
@@ -66,16 +72,23 @@ export class GhostCar {
         if (!this.ghostCarRunning) {
             return
         }
+
+        let transform = Transform.getMutableOrNull(this.entity)
+        if (!transform) return
+
         // If we are too close to the ghost car and in first person hide it. So we can see where we are going.
         if (Car.instances.length > 0 && !Car.instances[0].data.thirdPersonView) {
             if (Car.instances[0].data.carEntity != null) {
-                if (Vector3.distance(Transform.get(Car.instances[0].data.carEntity).position, Transform.get(this.entity).position) < 15) {
+                let carTransform = Transform.getMutableOrNull(Car.instances[0].data.carEntity)
+                if (!carTransform) return
+
+                if (Vector3.distance(carTransform.position, transform.position) < 15) {
                     this.hide()
                 } else {
                     this.show()
                 }
             }
-        } else if (Car.instances.length > 0){
+        } else if (Car.instances.length > 0) {
             this.show()
         }
 
@@ -98,9 +111,9 @@ export class GhostCar {
         }
 
         // Drive the course //
-        Transform.getMutable(this.entity).position = Vector3.lerp(this.lastPoint.position, this.targetPoint.position, this.currentLerp / this.ghostData.frequency)
-        Transform.getMutable(this.entity).rotation = this.targetPoint.rotation
-        
-        Minimap.GhostUpdate(Transform.get(this.entity).position.x, Transform.get(this.entity).position.z)
+        transform.position = Vector3.lerp(this.lastPoint.position, this.targetPoint.position, this.currentLerp / this.ghostData.frequency)
+        transform.rotation = this.targetPoint.rotation
+
+        Minimap.GhostUpdate(transform.position.x, transform.position.z)
     }
 }

@@ -14,8 +14,8 @@ export class CarDrift {
             // drifting ended
             _data.isDrifting = false
             if (_data.carEntity) {
-                const carTransform = Transform.getMutable(_data.carEntity)
-                _data.carBody?.setRotation(carTransform.rotation)
+                const carTransform = Transform.getMutableOrNull(_data.carEntity)
+                if (carTransform) _data.carBody?.setRotation(carTransform.rotation)
                 _data.driftElapsed = 0
                 _data.driftFactor = 0
             }

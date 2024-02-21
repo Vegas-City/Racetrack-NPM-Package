@@ -14,8 +14,6 @@ export class CarPerspectives {
     static switchToCarPerspective(_data: CarData, _deltaDistance: Vector3 = Vector3.Zero()): void {
         if (_data.carEntity === undefined || _data.carEntity === null || _data.playerCageEntity === undefined || _data.playerCageEntity === null || _data.carModelEntity === undefined || _data.carModelEntity === null) return
 
-        const carEntityTransform = Transform.getMutable(_data.carEntity)
-
         //Update cage and car transform
         if (_data.thirdPersonView) {
             CarPerspectives.thirdPersonCar(_data)
@@ -27,25 +25,39 @@ export class CarPerspectives {
 
         PlayerCage.expandCage(_data)
 
-        const forwardDir = Vector3.add(PlayerCage.getCagePos(_data), Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
-        movePlayerTo({ newRelativePosition: Vector3.add(PlayerCage.getCagePos(_data), _deltaDistance), cameraTarget: forwardDir })
+        const carEntityTransform = Transform.getMutableOrNull(_data.carEntity)
+        if (carEntityTransform) {
+            const forwardDir = Vector3.add(PlayerCage.getCagePos(_data), Vector3.rotate(Vector3.scale(Vector3.Forward(), 10), carEntityTransform.rotation))
+            movePlayerTo({ newRelativePosition: Vector3.add(PlayerCage.getCagePos(_data), _deltaDistance), cameraTarget: forwardDir })
+        }
     }
 
     static thirdPersonCar(_data: CarData) {
         if (_data.playerCageEntity === undefined || _data.playerCageEntity === null) return
-        Transform.getMutable(_data.playerCageEntity).position = Vector3.create(_data.thirdPersonCagePosition.x, _data.thirdPersonCagePosition.y, _data.thirdPersonCagePosition.z)
+
+        let transform = Transform.getMutableOrNull(_data.playerCageEntity)
+        if (transform) {
+            transform.position = Vector3.create(_data.thirdPersonCagePosition.x, _data.thirdPersonCagePosition.y, _data.thirdPersonCagePosition.z)
+        }
     }
 
     static firstPersonCar(_data: CarData) {
         if (_data.playerCageEntity === undefined || _data.playerCageEntity === null) return
-        Transform.getMutable(_data.playerCageEntity).position = _data.firstPersonCagePosition
+
+        let transform = Transform.getMutableOrNull(_data.playerCageEntity)
+        if (transform) {
+            transform.position = _data.firstPersonCagePosition
+        }
     }
 
     static enterCar(_data: CarData): void {
         if (_data.carEntity === undefined || _data.carEntity === null || _data.carModelEntity === undefined || _data.carModelEntity === null) return
 
         pointerEventsSystem.removeOnPointerDown(_data.carModelEntity)
-        const carEntityTransform = Transform.getMutable(_data.carEntity)
+        const carEntityTransform = Transform.getMutableOrNull(_data.carEntity)
+
+        if (!carEntityTransform) return
+
         const targetPos = localToWorldPosition(Vector3.create(-2.3, -2, -0.2), carEntityTransform.position, carEntityTransform.rotation)
         const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carEntityTransform.position, carEntityTransform.rotation)
         movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
@@ -62,7 +74,10 @@ export class CarPerspectives {
                     utils.timers.setTimeout(function () {
 
                         if (_data.carColliderEntity !== undefined && _data.carColliderEntity !== null) {
-                            Transform.getMutable(_data.carColliderEntity).scale = Vector3.Zero()
+                            let carColliderEntityTransform = Transform.getMutableOrNull(_data.carColliderEntity)
+                            if (carColliderEntityTransform) {
+                                carColliderEntityTransform.scale = Vector3.Zero()
+                            }
                         }
 
                         TrackManager.hideAvatarTrackCollider()
@@ -81,9 +96,9 @@ export class CarPerspectives {
                         }
 
                         if (TrackManager.trackEntityCollider) {
-                            let transform = Transform.getMutableOrNull(TrackManager.trackEntityCollider)
-                            if(transform) {
-                                transform.scale = Vector3.Zero()
+                            let trackEntityColliderTransform = Transform.getMutableOrNull(TrackManager.trackEntityCollider)
+                            if (trackEntityColliderTransform) {
+                                trackEntityColliderTransform.scale = Vector3.Zero()
                             }
                         }
 
@@ -106,10 +121,15 @@ export class CarPerspectives {
 
         _data.occupied = false
 
-        const carTransform = Transform.getMutable(_data.carEntity)
+        const carTransform = Transform.getMutableOrNull(_data.carEntity)
+
+        if (!carTransform) return
 
         if (_data.carColliderEntity !== undefined && _data.carColliderEntity !== null) {
-            Transform.getMutable(_data.carColliderEntity).scale = Vector3.One()
+            let carColliderEntityTransform = Transform.getMutableOrNull(_data.carColliderEntity)
+            if (carColliderEntityTransform) {
+                carColliderEntityTransform.scale = Vector3.One()
+            }
         }
 
         if (TrackManager.respawnProvided) {
@@ -129,15 +149,18 @@ export class CarPerspectives {
 
         if (_data.playerCageEntity) {
             CameraModeArea.deleteFrom(_data.playerCageEntity)
-            Transform.getMutable(_data.playerCageEntity).scale = Vector3.Zero()
+            let playerCageEntityTransform = Transform.getMutableOrNull(_data.playerCageEntity)
+            if (playerCageEntityTransform) {
+                playerCageEntityTransform.scale = Vector3.Zero()
+            }
         }
 
         Car.unload()
 
         if (TrackManager.trackEntityCollider) {
-            let transform = Transform.getMutableOrNull(TrackManager.trackEntityCollider)
-            if(transform) {
-                transform.scale = TrackManager.trackTransform.scale
+            let trackEntityColliderTransform = Transform.getMutableOrNull(TrackManager.trackEntityCollider)
+            if (trackEntityColliderTransform) {
+                trackEntityColliderTransform.scale = TrackManager.trackTransform.scale
             }
         }
     }
