@@ -18,21 +18,26 @@ export class AudioEntity {
             this.entities.push(entity)
         }
     }
- 
-    playSound(_position:Vector3) {
-        Transform.getMutable(this.entities[this.currentEntity]).position = _position
-        AudioSource.getMutable(this.entities[this.currentEntity]).playing = true
+
+    playSound(_position: Vector3) {
+        let transform = Transform.getMutableOrNull(this.entities[this.currentEntity])
+        let audioSource = AudioSource.getMutableOrNull(this.entities[this.currentEntity])
+
+        if (!transform || !audioSource) return
+
+        transform.position = _position
+        audioSource.playing = true
         this.incrementEntity()
     }
 
-    incrementEntity(){
-        this.currentEntity = this.currentEntity+1
-        if(this.currentEntity>this.entities.length-1){
+    incrementEntity() {
+        this.currentEntity = this.currentEntity + 1
+        if (this.currentEntity > this.entities.length - 1) {
             this.currentEntity = 0
         }
     }
 
-    clearDown(){
+    clearDown() {
         this.entities.forEach(entity => {
             MeshRenderer.deleteFrom(entity)
             AudioSource.deleteFrom(entity)

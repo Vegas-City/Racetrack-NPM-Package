@@ -133,13 +133,21 @@ export class TrackManager {
 
     static showAvatarTrackCollider() {
         if (TrackManager.trackCollider != null) {
-            Transform.getMutable(TrackManager.trackCollider).scale = TrackManager.trackTransform.scale
+
+            let trackColliderTransform = Transform.getMutableOrNull(TrackManager.trackCollider)
+            if (trackColliderTransform) {
+                trackColliderTransform.scale = TrackManager.trackTransform.scale
+            }
         }
     }
 
     static hideAvatarTrackCollider() {
         if (TrackManager.trackCollider != null) {
-            Transform.getMutable(TrackManager.trackCollider).scale = Vector3.Zero()
+
+            let trackColliderTransform = Transform.getMutableOrNull(TrackManager.trackCollider)
+            if (trackColliderTransform) {
+                trackColliderTransform.scale = Vector3.Zero()
+            }
         }
     }
 

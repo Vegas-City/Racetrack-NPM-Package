@@ -8,12 +8,18 @@ export class CarWheels {
     static updateWheel(_wheel: Entity, _data: CarData): void {
         if (_data.carEntity === undefined || _data.carEntity === null) return
 
-        const data = CarWheelComponent.getMutable(_wheel)
+        const data = CarWheelComponent.getMutableOrNull(_wheel)
 
-        const wheelTransform = Transform.getMutable(_wheel)
-        const childTransform = Transform.getMutable(data.child as Entity)
+        if (!data) return
 
-        const carTransform = Transform.get(_data.carEntity)
+        const wheelTransform = Transform.getMutableOrNull(_wheel)
+        const childTransform = Transform.getMutableOrNull(data.child as Entity)
+
+        if (!wheelTransform || !childTransform) return
+
+        const carTransform = Transform.getMutableOrNull(_data.carEntity)
+
+        if (!carTransform) return
 
         wheelTransform.rotation = Quaternion.multiply(carTransform.rotation, Quaternion.fromEulerDegrees(0, -_data.startRotY, 0))
         if (data.isFrontWheel) wheelTransform.rotation = Quaternion.multiply(wheelTransform.rotation, Quaternion.fromEulerDegrees(0, _data.steerValue * RAD2DEG * 0.5, 0))
@@ -27,7 +33,9 @@ export class CarWheels {
     static addWheels(_leftWheelGLB: string, _rightWheelGLB: string, _data: CarData): void {
         if (_data.carEntity === undefined || _data.carEntity === null) return
 
-        const carBodyTransform = Transform.getMutable(_data.carEntity)
+        const carBodyTransform = Transform.getMutableOrNull(_data.carEntity)
+
+        if (!carBodyTransform) return
 
         // L1
         _data.wheelL1 = engine.addEntity()
@@ -109,9 +117,9 @@ export class CarWheels {
     }
 
     static clearDown(_data: CarData) {
-        if(_data.wheelL1) engine.removeEntityWithChildren(_data.wheelL1)
-        if(_data.wheelL2) engine.removeEntityWithChildren(_data.wheelL2)
-        if(_data.wheelR1) engine.removeEntityWithChildren(_data.wheelR1)
-        if(_data.wheelR2) engine.removeEntityWithChildren(_data.wheelR2)
+        if (_data.wheelL1) engine.removeEntityWithChildren(_data.wheelL1)
+        if (_data.wheelL2) engine.removeEntityWithChildren(_data.wheelL2)
+        if (_data.wheelR1) engine.removeEntityWithChildren(_data.wheelR1)
+        if (_data.wheelR2) engine.removeEntityWithChildren(_data.wheelR2)
     }
 }

@@ -1,6 +1,7 @@
 import { Transform, engine } from "@dcl/sdk/ecs";
 import { AudioEntity } from "./audioEntity";
 import { CarConfig } from "../car";
+import { Vector3 } from "@dcl/ecs-math";
 
 export class AudioManager {
 
@@ -29,39 +30,39 @@ export class AudioManager {
   }
 
   static playEngineStartAudio(): void {
-    AudioManager.engineStartAudio.playSound(Transform.get(engine.PlayerEntity).position)
+    AudioManager.engineStartAudio.playSound(AudioManager.getPlayerPosition())
   }
 
   static playBrakeAudio(): void {
-    AudioManager.brakeAudio.playSound(Transform.get(engine.PlayerEntity).position)
+    AudioManager.brakeAudio.playSound(AudioManager.getPlayerPosition())
   }
 
   static playSkidAudio(): void {
-    AudioManager.skidAudio.playSound(Transform.get(engine.PlayerEntity).position)
+    AudioManager.skidAudio.playSound(AudioManager.getPlayerPosition())
   }
 
   static playCrashAudio(): void {
-    AudioManager.crashAudio.playSound(Transform.get(engine.PlayerEntity).position)
+    AudioManager.crashAudio.playSound(AudioManager.getPlayerPosition())
   }
 
   static playCheckPointAudio(): void {
-    AudioManager.checkPointAudio.playSound(Transform.get(engine.PlayerEntity).position)
+    AudioManager.checkPointAudio.playSound(AudioManager.getPlayerPosition())
   }
 
   static playCountDown(): void {
-    AudioManager.countDownAudio.playSound(Transform.get(engine.PlayerEntity).position)
+    AudioManager.countDownAudio.playSound(AudioManager.getPlayerPosition())
   }
 
   static playStartRaceAudio(): void {
-    AudioManager.startRaceAudio.playSound(Transform.get(engine.PlayerEntity).position)
+    AudioManager.startRaceAudio.playSound(AudioManager.getPlayerPosition())
   }
 
   static playEndRaceAudio(): void {
-    AudioManager.endRaceAudio.playSound(Transform.get(engine.PlayerEntity).position)
+    AudioManager.endRaceAudio.playSound(AudioManager.getPlayerPosition())
   }
 
   static playLapAudio(): void {
-    AudioManager.lapAudio.playSound(Transform.get(engine.PlayerEntity).position)
+    AudioManager.lapAudio.playSound(AudioManager.getPlayerPosition())
   }
 
   static clearDown() {
@@ -74,5 +75,9 @@ export class AudioManager {
     AudioManager.startRaceAudio.clearDown()
     AudioManager.endRaceAudio.clearDown()
     AudioManager.lapAudio.clearDown()
+  }
+
+  private static getPlayerPosition(): Vector3 {
+    return Transform.getMutableOrNull(engine.PlayerEntity)?.position ?? Vector3.Zero()
   }
 } 

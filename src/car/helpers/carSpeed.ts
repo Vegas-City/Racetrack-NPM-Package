@@ -59,17 +59,23 @@ export class CarSpeed {
 
         // Show break light
         if (_data.brakeLight != null) {
-            if (braking) {
-                Transform.getMutable(_data.brakeLight).scale = Vector3.One()
-            } else {
-                Transform.getMutable(_data.brakeLight).scale = Vector3.Zero()
+            let brakeLightTransform = Transform.getMutableOrNull(_data.brakeLight)
+            if (brakeLightTransform) {
+                if (braking) {
+                    brakeLightTransform.scale = Vector3.One()
+                } else {
+                    brakeLightTransform.scale = Vector3.Zero()
+                }
             }
         }
 
         // Move player cage based on max speed
         if (_data.playerCageEntity != null) {
             if (_data.thirdPersonView && _data.speed > 0) {
-                Transform.getMutable(_data.playerCageEntity).position.z = _data.thirdPersonCagePosition.z - (_data.speed / _data.carAttributes.maxSpeed) / 3
+                let playerCageEntityTransform = Transform.getMutableOrNull(_data.playerCageEntity)
+                if (playerCageEntityTransform) {
+                    playerCageEntityTransform.position.z = _data.thirdPersonCagePosition.z - (_data.speed / _data.carAttributes.maxSpeed) / 3
+                }
             }
         }
     }

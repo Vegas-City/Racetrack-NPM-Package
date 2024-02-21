@@ -58,13 +58,20 @@ export class LapCheckpoint {
         if (this.glowEntity === undefined) return
 
         const distance = Vector3.distance(this.point1, this.point2)
-        Transform.getMutable(this.glowEntity).scale = Vector3.create(distance / 2, 2, 1)
+
+        let transform = Transform.getMutableOrNull(this.glowEntity)
+        if (transform) {
+            transform.scale = Vector3.create(distance / 2, 2, 1)
+        }
     }
 
     hide(): void {
         if (this.glowEntity === undefined) return
 
-        Transform.getMutable(this.glowEntity).scale = Vector3.Zero()
+        let transform = Transform.getMutableOrNull(this.glowEntity)
+        if (transform) {
+            transform.scale = Vector3.Zero()
+        }
     }
 
     unload(): void {

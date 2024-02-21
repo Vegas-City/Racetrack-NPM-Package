@@ -22,7 +22,7 @@ export class GhostRecorder {
         engine.addSystem(this.update.bind(this))
     }
 
-    start(_trackID:string) {
+    start(_trackID: string) {
         this.currentGhostData.frequency = this.recordFrequncy
         this.currentGhostData.createDate = new Date()
         this.currentGhostData.points = []
@@ -59,12 +59,12 @@ export class GhostRecorder {
         this.copyData()
 
         // Start recording again if practice
-        if(TrackManager.isPractice){
+        if (TrackManager.isPractice) {
             this.start(this.currentGhostData.track)
         }
     }
 
-    private copyData(){
+    private copyData() {
         if (TrackManager.ghostCar.ghostData.points.length == 0) {
             // No previous data so copy over 
             Object.assign(TrackManager.ghostCar.ghostData, this.currentGhostData)
@@ -88,7 +88,9 @@ export class GhostRecorder {
 
         // Don't save the data to a high dp as we may need to transfer the positions over the network 
         let recordAccuracy: number = 3
-        let carTransform = Transform.get(car.data.carEntity)
+        let carTransform = Transform.getMutableOrNull(car.data.carEntity)
+
+        if (!carTransform) return
 
         let position: Vector3 = Vector3.create(Number.parseFloat(carTransform.position.x.toFixed(recordAccuracy)),
             Number.parseFloat(carTransform.position.y.toFixed(recordAccuracy)),
@@ -111,14 +113,14 @@ export class GhostRecorder {
         return this.recordedGhostData
     }
 
-    clearGhostData(){
+    clearGhostData() {
         TrackManager.ghostCar.ghostData = new GhostData()
         TrackManager.ghostCar.endGhost()
-    } 
+    }
 
-    setGhostDataFromServer(trackJs:any,_trackID:string): void {
+    setGhostDataFromServer(trackJs: any, _trackID: string): void {
         this.currentGhostData = new GhostData()
-        this.currentGhostData.frequency = trackJs.frequency 
+        this.currentGhostData.frequency = trackJs.frequency
         this.currentGhostData.createDate = trackJs.createDate
         this.currentGhostData.points = this.convertGhostPoints(trackJs.points)
         this.currentGhostData.track = _trackID
@@ -129,13 +131,13 @@ export class GhostRecorder {
         TrackManager.ghostCar.startGhost()
     }
 
-    convertGhostPoints(pointsJSON:any):GhostPoint[]{
-        let ghostPoints:GhostPoint[] = []
+    convertGhostPoints(pointsJSON: any): GhostPoint[] {
+        let ghostPoints: GhostPoint[] = []
         pointsJSON.forEach((point: { cp: any; p: { x: number | undefined; y: number | undefined; z: number | undefined }; r: { w: number | undefined; x: number | undefined; y: number | undefined; z: number | undefined } }) => {
             let ghostPoint: GhostPoint = {
                 checkPoint: point.cp,
-                position: Vector3.create(point.p.x,point.p.y,point.p.z),
-                rotation: Quaternion.create(point.r.x,point.r.y,point.r.z,point.r.w)
+                position: Vector3.create(point.p.x, point.p.y, point.p.z),
+                rotation: Quaternion.create(point.r.x, point.r.y, point.r.z, point.r.w)
             }
             ghostPoints.push(ghostPoint)
         });

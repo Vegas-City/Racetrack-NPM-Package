@@ -85,16 +85,22 @@ export class Obstacle {
         if (!this.body) return
 
         if (this.entity) {
-            let transform = Transform.getMutable(this.entity)
-            transform.position = Vector3.add(this.body.getPosition(), Vector3.create(0, 0, 0))
-            transform.rotation = this.body.getRotation()
+            let transform = Transform.getMutableOrNull(this.entity)
+
+            if (transform) {
+                transform.position = Vector3.add(this.body.getPosition(), Vector3.create(0, 0, 0))
+                transform.rotation = this.body.getRotation()
+            }
         }
 
         if (this.debugEntity) {
-            let debugTransform = Transform.getMutable(this.debugEntity)
-            debugTransform.position = this.body.getPosition()
-            debugTransform.rotation = this.body.getRotation()
-            debugTransform.scale = this.body.getScale()
+            let debugTransform = Transform.getMutableOrNull(this.debugEntity)
+
+            if (debugTransform) {
+                debugTransform.position = this.body.getPosition()
+                debugTransform.rotation = this.body.getRotation()
+                debugTransform.scale = this.body.getScale()
+            }
         }
     }
 
@@ -109,13 +115,13 @@ export class Obstacle {
     }
 
     unload(): void {
-        if(this.entity) {
+        if (this.entity) {
             engine.removeEntity(this.entity)
         }
-        if(this.debugEntity) {
+        if (this.debugEntity) {
             engine.removeEntity(this.debugEntity)
         }
-        if(this.body) {
+        if (this.body) {
             World.getInstance().removeBody(this.body)
         }
 

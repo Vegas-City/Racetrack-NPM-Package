@@ -73,20 +73,27 @@ export class Dashboard {
     }
 
     update(_speed: number, _minSpeed: number, _maxSpeed: number) {
-        TextShape.getMutable(this.lapEntity).text = "Lap " + (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
-        TextShape.getMutable(this.stateEntity).text = _speed > 0 ? "D" : (_speed < 0 ? "R" : "N")
-        TextShape.getMutable(this.stateEntity).textColor = _speed > 0 ? Color4.Green() : (_speed < 0 ? Color4.Red() : Color4.White())
-        TextShape.getMutable(this.speedometerEntity).text = (Math.round(Math.abs(_speed) * 4 * 100) / 100).toFixed(0).toString()
+        let lapEntityTextShape = TextShape.getMutableOrNull(this.lapEntity)
+        let stateEntityTextShape = TextShape.getMutableOrNull(this.stateEntity)
+        let speedometerEntityTextShape = TextShape.getMutableOrNull(this.speedometerEntity)
+        let speedometerBarsEntityTransform = Transform.getMutableOrNull(this.speedometerBarsEntity)
+
+        if (!lapEntityTextShape || !stateEntityTextShape || !speedometerEntityTextShape || !speedometerBarsEntityTransform) return
+
+        lapEntityTextShape.text = "Lap " + (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
+        stateEntityTextShape.text = _speed > 0 ? "D" : (_speed < 0 ? "R" : "N")
+        stateEntityTextShape.textColor = _speed > 0 ? Color4.Green() : (_speed < 0 ? Color4.Red() : Color4.White())
+        speedometerEntityTextShape.text = (Math.round(Math.abs(_speed) * 4 * 100) / 100).toFixed(0).toString()
 
         if (_speed == 0) {
-            Transform.getMutable(this.speedometerBarsEntity).scale = Vector3.Zero()
+            speedometerBarsEntityTransform.scale = Vector3.Zero()
         }
         else {
             const trueMaxSpeed = Math.max(Math.abs(_minSpeed), _maxSpeed)
             const speedFactor = _speed < 0 ? Math.abs(_speed) / trueMaxSpeed : Math.abs(_speed) / trueMaxSpeed
             const index = Math.min(Math.ceil(speedFactor * 5), 5)
 
-            Transform.getMutable(this.speedometerBarsEntity).scale = Vector3.create(0.7, 0.7, 0.7)
+            speedometerBarsEntityTransform.scale = Vector3.create(0.7, 0.7, 0.7)
             Material.setPbrMaterial(this.speedometerBarsEntity, {
                 texture: Material.Texture.Common({
                     src: 'images/ui/speedometerUI/speedometerBar' + index.toString() + '.png',
