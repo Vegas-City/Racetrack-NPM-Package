@@ -56,7 +56,7 @@ export class Car {
                 albedoColor: Color4.create(0, 0, 0, 0.5)
             })
         }
-        Transform.create(this.data.carEntity, {
+        Transform.createOrReplace(this.data.carEntity, {
             position: _position,
             rotation: Quaternion.fromEulerDegrees(0, _rot, 0),
             scale: scale
@@ -65,16 +65,16 @@ export class Car {
         this.data.startRotY = _rot
 
         this.data.carModelEntity = engine.addEntity()
-        Transform.create(this.data.carModelEntity, {
+        Transform.createOrReplace(this.data.carModelEntity, {
             parent: this.data.carEntity,
             position: Vector3.create(0, 0, -0.02),
             rotation: Quaternion.fromEulerDegrees(0, -90, 0),
             scale: Vector3.create(1 / scale.z * this.data.carScale, 1 / scale.y * this.data.carScale, 1 / scale.x * this.data.carScale)
         })
-        GltfContainer.create(this.data.carModelEntity, {
+        GltfContainer.createOrReplace(this.data.carModelEntity, {
             src: _config.carGLB
         })
-        Animator.create(this.data.carModelEntity, {
+        Animator.createOrReplace(this.data.carModelEntity, {
             states: [
                 {
                     clip: "OpenDoor",
@@ -92,32 +92,32 @@ export class Car {
         })
 
         this.data.carColliderEntity = engine.addEntity()
-        Transform.create(this.data.carColliderEntity, {
+        Transform.createOrReplace(this.data.carColliderEntity, {
             parent: this.data.carModelEntity
         })
-        GltfContainer.create(this.data.carColliderEntity, {
+        GltfContainer.createOrReplace(this.data.carColliderEntity, {
             src: _config.carColliderGLB
         })
 
         this.data.playerCageEntity = engine.addEntity()
-        Transform.create(this.data.playerCageEntity, {
+        Transform.createOrReplace(this.data.playerCageEntity, {
             parent: this.data.carEntity,
             position: Vector3.create(0, 2, -1.5),
             scale: Vector3.Zero()
         })
-        GltfContainer.create(this.data.playerCageEntity, {
+        GltfContainer.createOrReplace(this.data.playerCageEntity, {
             src: 'models/playerLocker.glb'
         })
 
         this.data.brakeLight = engine.addEntity()
-        GltfContainer.create(this.data.brakeLight, { src: _config.brakeLightsGLB })
-        Transform.create(this.data.brakeLight, {
+        GltfContainer.createOrReplace(this.data.brakeLight, { src: _config.brakeLightsGLB })
+        Transform.createOrReplace(this.data.brakeLight, {
             parent: this.data.carModelEntity
         })
         this.data.steeringWheel = engine.addEntity()
-        GltfContainer.create(this.data.steeringWheel, { src: _config.steeringWheelGLB })
+        GltfContainer.createOrReplace(this.data.steeringWheel, { src: _config.steeringWheelGLB })
         if (this.data.carModelEntity != null) {
-            Transform.create(this.data.steeringWheel, {
+            Transform.createOrReplace(this.data.steeringWheel, {
                 parent: this.data.carModelEntity,
                 position: _config.steeringWheelPosition
             })

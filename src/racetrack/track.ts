@@ -18,7 +18,7 @@ export class Track {
                     const entity = engine.addEntity()
                     MeshRenderer.setSphere(entity)
 
-                    Transform.create(entity, {
+                    Transform.createOrReplace(entity, {
                         position: transformedPoint,
                         scale: Vector3.create(0.3, 0.3, 0.3)
                     })

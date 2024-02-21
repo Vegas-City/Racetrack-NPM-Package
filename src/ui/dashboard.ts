@@ -12,15 +12,15 @@ export class Dashboard {
 
     constructor(_pos: Vector3, _glb: string, _parent: Entity) {
         this.dashboardEntity = engine.addEntity()
-        Transform.create(this.dashboardEntity, {
+        Transform.createOrReplace(this.dashboardEntity, {
             parent: _parent
         })
-        GltfContainer.create(this.dashboardEntity, {
+        GltfContainer.createOrReplace(this.dashboardEntity, {
             src: _glb
         })
 
         this.containerEntity = engine.addEntity()
-        Transform.create(this.containerEntity, {
+        Transform.createOrReplace(this.containerEntity, {
             parent: this.dashboardEntity,
             position: _pos,
             rotation: Quaternion.fromEulerDegrees(30, 90, 0),
@@ -28,19 +28,19 @@ export class Dashboard {
         })
 
         this.speedometerEntity = engine.addEntity()
-        Transform.create(this.speedometerEntity, {
+        Transform.createOrReplace(this.speedometerEntity, {
             parent: this.containerEntity,
             position: Vector3.create(-5.95, -0.97, -3.7),
             rotation: Quaternion.fromEulerDegrees(-20, 0, 0)
         })
-        TextShape.create(this.speedometerEntity, {
+        TextShape.createOrReplace(this.speedometerEntity, {
             text: "",
             fontSize: 4,
             textAlign: TextAlignMode.TAM_MIDDLE_LEFT
         })
 
         this.speedometerBarsEntity = engine.addEntity()
-        Transform.create(this.speedometerBarsEntity, {
+        Transform.createOrReplace(this.speedometerBarsEntity, {
             parent: this.containerEntity,
             position: Vector3.create(-4.85, -0.87, -3.7),
             rotation: Quaternion.fromEulerDegrees(-20, 0, 0),
@@ -49,23 +49,23 @@ export class Dashboard {
         MeshRenderer.setPlane(this.speedometerBarsEntity)
 
         this.stateEntity = engine.addEntity()
-        Transform.create(this.stateEntity, {
+        Transform.createOrReplace(this.stateEntity, {
             parent: this.containerEntity,
             position: Vector3.create(-4.25, -0.97, -3.7),
             rotation: Quaternion.fromEulerDegrees(-20, 0, 0)
         })
-        TextShape.create(this.stateEntity, {
+        TextShape.createOrReplace(this.stateEntity, {
             text: "",
             fontSize: 4,
             textColor: Color4.White()
         })
 
         this.lapEntity = engine.addEntity()
-        Transform.create(this.lapEntity, {
+        Transform.createOrReplace(this.lapEntity, {
             parent: this.containerEntity,
             position: Vector3.create(0.5, 0, 0)
         })
-        TextShape.create(this.lapEntity, {
+        TextShape.createOrReplace(this.lapEntity, {
             text: "",
             fontSize: 4,
             textColor: Color4.White()

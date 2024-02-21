@@ -72,8 +72,8 @@ export class TrackManager {
         TrackManager.ghostCar = new GhostCar()
 
         TrackManager.trackCollider = engine.addEntity()
-        GltfContainer.create(TrackManager.trackCollider, { src: "models/trackCollider.glb" })
-        Transform.create(TrackManager.trackCollider, {
+        GltfContainer.createOrReplace(TrackManager.trackCollider, { src: "models/trackCollider.glb" })
+        Transform.createOrReplace(TrackManager.trackCollider, {
             position: _position,
             rotation: _rotation,
             scale: _scale
@@ -150,20 +150,20 @@ export class TrackManager {
      */
     private static loadTrack(_trackData: any): void {
         TrackManager.trackEntity = engine.addEntity()
-        GltfContainer.create(TrackManager.trackEntity, {
+        GltfContainer.createOrReplace(TrackManager.trackEntity, {
             src: _trackData.glb
         })
-        Transform.create(TrackManager.trackEntity, {
+        Transform.createOrReplace(TrackManager.trackEntity, {
             position: TrackManager.trackTransform.position,
             rotation: TrackManager.trackTransform.rotation,
             scale: TrackManager.trackTransform.scale
         })
 
         TrackManager.trackEntityCollider = engine.addEntity()
-        GltfContainer.create(TrackManager.trackEntityCollider, {
+        GltfContainer.createOrReplace(TrackManager.trackEntityCollider, {
             src: _trackData.glb.substring(0, _trackData.glb.length - 4) + "_collider.glb"
         })
-        Transform.create(TrackManager.trackEntityCollider, {
+        Transform.createOrReplace(TrackManager.trackEntityCollider, {
             position: TrackManager.trackTransform.position,
             rotation: TrackManager.trackTransform.rotation,
             scale: TrackManager.trackTransform.scale
