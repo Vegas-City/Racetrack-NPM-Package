@@ -1,7 +1,7 @@
 import { Vector3, Quaternion } from "@dcl/sdk/math";
 import { ObstacleType } from "./enums";
 import { TrackManager } from "./trackManager";
-import { Entity, GltfContainer, MeshRenderer, Transform, engine } from "@dcl/sdk/ecs";
+import { Entity, GltfContainer, MeshRenderer, Transform, TransformType, engine } from "@dcl/sdk/ecs";
 import { applyTransformToPoint } from "../utils";
 import { BoxShapeDefinition } from "../physics/shapes";
 import { Body, World } from "../physics";
@@ -11,9 +11,12 @@ export class Obstacle {
     body: Body | undefined
     entity: Entity | undefined
     debugEntity: Entity | undefined
+
+    position: Vector3 = Vector3.Zero()
+    rotation: Vector3 = Vector3.Zero()
     scale: Vector3 = Vector3.Zero()
 
-    constructor(_type: string, _shape: string, _position: Vector3, _rotation: Vector3, _scale: Vector3, _vertices: Vector3[], _indices: Vector3[]) {
+    constructor(_type: string, _shape: string, _position: Vector3, _rotation: Vector3, _scale: Vector3) {
         switch (_type) {
             case "none": this.obstacleType = ObstacleType.none
                 break
@@ -25,29 +28,21 @@ export class Obstacle {
                 break
         }
 
+        this.position = _position
+        this.rotation = _rotation
         this.scale = _scale
-        const mass = this.getBodyMass()
 
         if (_shape == "box") {
             const transformedPoint = applyTransformToPoint(_position, { position: TrackManager.trackTransform.position, rotation: TrackManager.trackTransform.rotation, scale: TrackManager.trackTransform.scale })
-
-            const boxShape = new BoxShapeDefinition({
-                position: Vector3.create(transformedPoint.x, (_position.y + TrackManager.trackTransform.position.y) * TrackManager.trackTransform.scale.y, transformedPoint.z),
-                rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(_rotation.x, _rotation.y, _rotation.z)),
-                scale: Vector3.Zero(),
-                mass: mass
-            })
-            this.body = new Body(boxShape)
-            World.getInstance().addBody(this.body)
 
             if (TrackManager.debugMode) {
                 this.debugEntity = engine.addEntity()
                 MeshRenderer.setBox(this.debugEntity)
 
                 Transform.createOrReplace(this.debugEntity, {
-                    position: boxShape.position,
-                    rotation: boxShape.rotation,
-                    scale: boxShape.scale
+                    position: Vector3.create(transformedPoint.x, (_position.y + TrackManager.trackTransform.position.y) * TrackManager.trackTransform.scale.y, transformedPoint.z),
+                    rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(_rotation.x, _rotation.y, _rotation.z)),
+                    scale: Vector3.Zero()
                 })
             }
 
@@ -55,8 +50,8 @@ export class Obstacle {
                 this.entity = engine.addEntity()
 
                 Transform.createOrReplace(this.entity, {
-                    position: boxShape.position,
-                    rotation: boxShape.rotation,
+                    position: Vector3.create(transformedPoint.x, (_position.y + TrackManager.trackTransform.position.y) * TrackManager.trackTransform.scale.y, transformedPoint.z),
+                    rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(_rotation.x, _rotation.y, _rotation.z)),
                     scale: Vector3.Zero()
                 })
 
@@ -90,7 +85,7 @@ export class Obstacle {
             let transform = Transform.getMutableOrNull(this.entity)
 
             if (transform) {
-                transform.position = Vector3.add(this.body.getPosition(), Vector3.create(0, 0, 0))
+                transform.position = this.body.getPosition()
                 transform.rotation = this.body.getRotation()
             }
         }
@@ -131,9 +126,15 @@ export class Obstacle {
             }
         }
 
-        if (this.body) {
-            this.body.setScale(Vector3.multiply(this.scale, TrackManager.trackTransform.scale))
-        }
+        const transformedPoint = applyTransformToPoint(this.position, { position: TrackManager.trackTransform.position, rotation: TrackManager.trackTransform.rotation, scale: TrackManager.trackTransform.scale })
+        const boxShape = new BoxShapeDefinition({
+            position: Vector3.create(transformedPoint.x, (this.position.y + TrackManager.trackTransform.position.y) * TrackManager.trackTransform.scale.y, transformedPoint.z),
+            rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(this.rotation.x, this.rotation.y, this.rotation.z)),
+            scale: Vector3.multiply(this.scale, TrackManager.trackTransform.scale),
+            mass: this.getBodyMass()
+        })
+        this.body = new Body(boxShape)
+        World.getInstance().addBody(this.body)
     }
 
     unload(): void {
@@ -151,8 +152,8 @@ export class Obstacle {
             }
         }
 
-        if (this.body) {
-            this.body.setScale(Vector3.Zero())
+        if(this.body) {
+            World.getInstance().removeBody(this.body)
         }
     }
 

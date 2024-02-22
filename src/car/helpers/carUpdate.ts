@@ -63,12 +63,27 @@ export class CarUpdate {
         //const totalVelocity = this.applyCollisions(Vector3.add(velocity, grippedVelocity), forwardDir)
 
         const deltaDistance = Vector3.create(totalVelocity.x * _dt, totalVelocity.y * _dt, totalVelocity.z * _dt)
-        _data.carBody.setPosition(Vector3.create(_data.carBody.getPosition().x + deltaDistance.x, _data.carBody.getPosition().y + deltaDistance.y, _data.carBody.getPosition().z + deltaDistance.z))
+
+        // Don't allow vertical movement
+        let yPos = _data.carBody.getPosition().y + deltaDistance.y
+        if (yPos > _data.startPos.y + 0.5) {
+            yPos = _data.startPos.y
+        }
+
+        _data.carBody.setPosition(Vector3.create(_data.carBody.getPosition().x + deltaDistance.x, yPos, _data.carBody.getPosition().z + deltaDistance.z))
 
         if (absSpeed > 0.1) {
             const deltaRot = Quaternion.create(0, steerAngle * _dt * _data.speed * 0.01, 0)
             const oldRot = Quaternion.create(_data.carBody.getRotation().x, _data.carBody.getRotation().y, _data.carBody.getRotation().z, _data.carBody.getRotation().w)
-            const finalRot = Quaternion.multiply(oldRot, deltaRot)
+            let finalRot = Quaternion.multiply(oldRot, deltaRot)
+
+            // Don't allow x/z rotations
+            if (Math.abs(finalRot.x) > 0.01) {
+                finalRot.x = 0
+            }
+            if (Math.abs(finalRot.z) > 0.01) {
+                finalRot.z = 0
+            }
 
             _data.carBody.setRotation(Quaternion.create(finalRot.x, finalRot.y, finalRot.z, finalRot.w))
         }

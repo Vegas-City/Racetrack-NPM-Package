@@ -257,7 +257,7 @@ export class Minimap {
         if (!TrackManager.trackIndices.has(TrackManager.currentTrackGuid)) return false
 
         const trackIndex = TrackManager.trackIndices.get(TrackManager.currentTrackGuid)
-        if (!trackIndex) return false
+        if (trackIndex === undefined || trackIndex === null) return false
 
         return _track == trackIndex
     }
@@ -266,7 +266,7 @@ export class Minimap {
         if (!TrackManager.trackIndices.has(TrackManager.currentTrackGuid)) return false
 
         const trackIndex = TrackManager.trackIndices.get(TrackManager.currentTrackGuid)
-        if (!trackIndex) return false
+        if (trackIndex === undefined || trackIndex === null) return false
 
         let lap = TrackManager.GetLap()
         if (!lap) return false

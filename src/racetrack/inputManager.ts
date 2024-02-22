@@ -65,7 +65,7 @@ export class InputManager {
             InputManager.isRightPressed = false
         }
 
-        if (InputManager.isForwardPressed || InputManager.isBackwardPressed || InputManager.isLeftPressed || InputManager.isRightPressed) {
+        if (InputManager.isForwardPressed || InputManager.isBackwardPressed) {
             InputManager.inactivityElapsed = 0
             ExitCarUI.hide()
         }

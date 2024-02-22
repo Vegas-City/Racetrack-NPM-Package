@@ -22,10 +22,6 @@ export class GameManager {
         lap.started = false
         lap.lapsCompleted = -1
         lap.checkpointIndex = 0
-        if (lap.checkpoints.length > 1) {
-            lap.checkpoints[1].hide()
-            lap.checkpoints[0].show()
-        }
     }
 
     static start(): void {
@@ -58,6 +54,7 @@ export class GameManager {
         let lap = TrackManager.GetLap()
         if (!lap) return
 
+        lap.checkpointIndex = -1
         lap.lapsCompleted--
         lap.started = false
         if (_win) {

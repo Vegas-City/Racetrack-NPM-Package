@@ -109,6 +109,8 @@ export class TrackManager {
      * @param _guid the track guid.
      */
     static Load(_guid: string): void {
+        if (_guid === TrackManager.currentTrackGuid) return
+
         if (_guid.length > 0) {
             TrackManager.unloadTrack()
             TrackManager.unloadHotspots()
@@ -237,6 +239,7 @@ export class TrackManager {
                 rotation: TrackManager.trackTransform.rotation,
                 scale: Vector3.Zero()
             })
+            TrackManager.trackColliderEntities.set(_guid, trackColliderEntity)
         }
 
         if (!TrackManager.tracks.has(_guid)) {
@@ -264,7 +267,7 @@ export class TrackManager {
         if (!TrackManager.obstacles.has(_guid)) {
             let obstacles: Obstacle[] = []
             for (let obstacle of _data.obstacles) {
-                obstacles.push(new Obstacle(obstacle.obstacleType, obstacle.shape, obstacle.position, obstacle.rotation, obstacle.scale, obstacle.vertices, obstacle.indices))
+                obstacles.push(new Obstacle(obstacle.obstacleType, obstacle.shape, obstacle.position, obstacle.rotation, obstacle.scale))
             }
             TrackManager.obstacles.set(_guid, obstacles)
         }

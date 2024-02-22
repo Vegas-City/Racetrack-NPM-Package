@@ -24,7 +24,7 @@ export class World {
         switch (Config.physicsImplementation) {
 
             case PhysicsImplementation.CANNON: {
-                this.__implementation = new implementations.CANNON.World()
+                this.__implementation = implementations.CANNON.World.getInstance()
             } break
 
             case PhysicsImplementation.Custom:
