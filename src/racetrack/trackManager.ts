@@ -142,7 +142,7 @@ export class TrackManager {
      * Unloads the collider for the entire track area. This is typically the ground collider.
      *
      */
-    static UnloadsAvatarTrackCollider() {
+    static UnloadAvatarTrackCollider() {
         if (TrackManager.trackCollider != null) {
 
             let trackColliderTransform = Transform.getMutableOrNull(TrackManager.trackCollider)

@@ -80,7 +80,7 @@ export class CarPerspectives {
                             }
                         }
 
-                        TrackManager.UnloadsAvatarTrackCollider()
+                        TrackManager.UnloadAvatarTrackCollider()
                         CarPerspectives.switchToCarPerspective(_data)
                         SpeedometerUI.Show()
                         TimeUI.Show()
