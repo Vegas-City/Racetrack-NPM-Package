@@ -1,5 +1,5 @@
 import { Color4 } from "@dcl/sdk/math"
-import { Lap } from "../racetrack"
+import { TrackManager } from "../racetrack"
 import ReactEcs, { Label, PositionUnit, UiEntity } from "@dcl/sdk/react-ecs"
 
 export class TimeUI {
@@ -36,7 +36,7 @@ export class TimeUI {
                 }}
             >
                 <Label
-                    value={TimeUI.formatTime(Lap.timeElapsed * 1000)}
+                    value={TimeUI.formatTime((TrackManager.GetLap()?.timeElapsed ?? 0) * 1000)}
                     color={Color4.White()}
                     fontSize={38}
                     font="sans-serif"
@@ -86,7 +86,7 @@ export class TimeUI {
                     color={Color4.White()}
                     fontSize={20}
                     font="sans-serif"
-                    textAlign= "top-center"
+                    textAlign="top-center"
                     uiTransform={{
                         position: { left: TimeUI.pBQualPos, top: '45px' }
                     }}
@@ -121,7 +121,7 @@ export class TimeUI {
         return timeStr
     }
 
-    static showQualOrPbTime(text:string, value:number){
+    static showQualOrPbTime(text: string, value: number) {
         TimeUI.pbOrQualLabel = text
         TimeUI.pbOrQualValue = value
         TimeUI.pbOrQualLabel === "PB" ? TimeUI.pBQualPos = '200px' : TimeUI.pBQualPos = '245px'

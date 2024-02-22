@@ -80,7 +80,7 @@ export class CarPerspectives {
                             }
                         }
 
-                        TrackManager.hideAvatarTrackCollider()
+                        TrackManager.UnloadAvatarTrackCollider()
                         CarPerspectives.switchToCarPerspective(_data)
                         SpeedometerUI.Show()
                         TimeUI.Show()
@@ -95,10 +95,11 @@ export class CarPerspectives {
                             PlayerCage.expandCage(_data)
                         }
 
-                        if (TrackManager.trackEntityCollider) {
-                            let trackEntityColliderTransform = Transform.getMutableOrNull(TrackManager.trackEntityCollider)
-                            if (trackEntityColliderTransform) {
-                                trackEntityColliderTransform.scale = Vector3.Zero()
+                        let trackColliderEntity = TrackManager.GetTrackColliderEntity()
+                        if (trackColliderEntity) {
+                            let trackColliderTransform = Transform.getMutableOrNull(trackColliderEntity)
+                            if (trackColliderTransform) {
+                                trackColliderTransform.scale = Vector3.Zero()
                             }
                         }
 
@@ -115,7 +116,7 @@ export class CarPerspectives {
 
     static exitCar(_data: CarData): void {
 
-        TrackManager.showAvatarTrackCollider()
+        TrackManager.LoadAvatarTrackCollider()
 
         if (_data.carEntity === undefined || _data.carEntity === null) return
 
@@ -157,10 +158,11 @@ export class CarPerspectives {
 
         Car.unload()
 
-        if (TrackManager.trackEntityCollider) {
-            let trackEntityColliderTransform = Transform.getMutableOrNull(TrackManager.trackEntityCollider)
-            if (trackEntityColliderTransform) {
-                trackEntityColliderTransform.scale = TrackManager.trackTransform.scale
+        let trackColliderEntity = TrackManager.GetTrackColliderEntity()
+        if (trackColliderEntity) {
+            let trackColliderTransform = Transform.getMutableOrNull(trackColliderEntity)
+            if (trackColliderTransform) {
+                trackColliderTransform.scale = TrackManager.trackTransform.scale
             }
         }
     }

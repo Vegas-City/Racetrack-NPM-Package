@@ -8,34 +8,36 @@ import { AudioManager } from "../audio/audioManager";
 export class Lap {
     static readonly checkpointThresholdDistance: number = 2
 
-    static checkpoints: LapCheckpoint[] = []
-    static checkpointIndex: number = 0
-    static lapsCompleted: number = -1
-    static timeElapsed: number = 0
-    static totalLaps: number = 2 // make the default 2
-    static triggeredStart: boolean = false
-    static started: boolean = false
+    checkpoints: LapCheckpoint[] = []
+    checkpointIndex: number = 0
+    lapsCompleted: number = -1
+    timeElapsed: number = 0
+    totalLaps: number = 2 // make the default 2
+    triggeredStart: boolean = false
+    started: boolean = false
 
-    static addCheckpoint(_index: number, _pos: Vector3): void {
-        let checkpoint = Lap.findCheckpoint(_index)
+    constructor(_data: any) {
+        for (let checkpoint of _data.lapCheckpoints) {
+            this.addCheckpoint(checkpoint.index, checkpoint.position)
+        }
+    }
+
+    private addCheckpoint(_index: number, _pos: Vector3): void {
+        let checkpoint = this.findCheckpoint(_index)
         if (checkpoint === null) {
             checkpoint = new LapCheckpoint(_index)
-            Lap.checkpoints.push(checkpoint)
+            this.checkpoints.push(checkpoint)
         }
         checkpoint.addPoint(_pos)
     }
 
-    static setTotalLaps(_laps: number): void {
-        Lap.totalLaps = _laps
-    }
+    update(_dt: number, _carPos: Vector3): void {
+        if (this.checkpoints.length < 1) return
 
-    static update(_dt: number, _carPos: Vector3): void {
-        if (Lap.checkpoints.length < 1) return
+        if (!this.started) return
 
-        if (!Lap.started) return
-
-        if (Lap.lapsCompleted >= 0) Lap.timeElapsed += _dt
-        const currentCheckpoint = Lap.findCheckpoint(Lap.checkpointIndex)
+        if (this.lapsCompleted >= 0) this.timeElapsed += _dt
+        const currentCheckpoint = this.findCheckpoint(this.checkpointIndex)
 
         if (currentCheckpoint === null) return
 
@@ -44,19 +46,19 @@ export class Lap {
         if (distance < Lap.checkpointThresholdDistance) {
             let end: boolean = false
             // crossed checkpoint
-            if (Lap.checkpointIndex == 0) {
+            if (this.checkpointIndex == 0) {
                 // completed a lap
                 if(TrackManager.isPractice) {
                     TrackManager.ghostRecorder.completeRace()
-                    Lap.timeElapsed = 0
+                    this.timeElapsed = 0
                     TrackManager.onLapCompleteEvent()
                     AudioManager.playLapAudio()
                     // Practice mode needs to start the ghost car again as it wont have another count down
                     TrackManager.ghostCar.startGhost()
                 }
                 else {
-                    Lap.lapsCompleted++
-                    if (Lap.lapsCompleted >= Lap.totalLaps) {
+                    this.lapsCompleted++
+                    if (this.lapsCompleted >= this.totalLaps) {
                         TrackManager.ghostRecorder.completeRace()
                         GameManager.end()
                         end = true
@@ -72,26 +74,31 @@ export class Lap {
                 AudioManager.playCheckPointAudio()
             }
             currentCheckpoint.hide()
-            Lap.checkpointIndex++
-            if (Lap.checkpointIndex >= Lap.checkpoints.length) {
-                Lap.checkpointIndex = 0
+            this.checkpointIndex++
+            if (this.checkpointIndex >= this.checkpoints.length) {
+                this.checkpointIndex = 0
             }
             if (end) {
-                Lap.checkpointIndex = -1
+                this.checkpointIndex = -1
             }
-            Lap.findCheckpoint(Lap.checkpointIndex)?.show()
+            this.findCheckpoint(this.checkpointIndex)?.show()
         }
     }
 
-    static unload(): void {
-        Lap.checkpoints.forEach(checkpoint => {
-            checkpoint.unload()
+    load(): void {
+        this.checkpoints.forEach(checkpoint => {
+            checkpoint.load()
         })
-        Lap.checkpoints.splice(0)
     }
 
-    static findCheckpoint(_index: number): LapCheckpoint | null {
-        for (let checkpoint of Lap.checkpoints) {
+    unload(): void {
+        this.checkpoints.forEach(checkpoint => {
+            checkpoint.unload()
+        })
+    }
+
+    findCheckpoint(_index: number): LapCheckpoint | null {
+        for (let checkpoint of this.checkpoints) {
             if (checkpoint.index == _index) {
                 return checkpoint
             }

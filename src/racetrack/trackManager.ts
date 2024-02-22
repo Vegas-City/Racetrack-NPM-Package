@@ -1,12 +1,27 @@
 import { Entity, GltfContainer, Transform, TransformType, engine } from "@dcl/sdk/ecs"
 import { Quaternion, Vector3 } from "@dcl/sdk/math"
+import { Lap } from "./lap"
 import { Track } from "./track"
 import { Hotspot } from "./hotspot"
 import { Obstacle } from "./obstacle"
 import { HotspotActionManager } from "./hotspotActionManager"
-import { Lap } from "./lap"
 import { GhostCar, GhostRecorder } from "./../ghostCar"
 import { RaceEventCallbacks } from "./raceEventCallbacks"
+
+export type TrackManagerConfig = {
+    position: Vector3,
+    rotation?: Quaternion,
+    scale?: Vector3
+    debugMode?: boolean,
+    eventCallbacks?: RaceEventCallbacks,
+    respawnPosition?: Vector3,
+    respawnDirection?: Vector3,
+    trackConfigs: {
+        index: number,
+        guid: string,
+        data: any
+    }[]
+}
 
 /**
  * Manages all track logic and setup.
@@ -15,17 +30,20 @@ export class TrackManager {
     static debugMode: boolean = false
 
     static isPractice: boolean = true
-    static trackID: number = -1
-    static track: Track
-    static hotspots: Hotspot[] = []
-    static obstacles: Obstacle[] = []
+    static currentTrackGuid: string = ""
+
     static carPoints: Vector3[] = []
     static ghostRecorder: GhostRecorder
     static ghostCar: GhostCar
     static trackCollider: Entity
 
-    static trackEntity: Entity | undefined
-    static trackEntityCollider: Entity | undefined
+    static trackIndices: Map<string, number> = new Map<string, number>()
+    static trackEntities: Map<string, Entity> = new Map<string, Entity>()
+    static trackColliderEntities: Map<string, Entity> = new Map<string, Entity>()
+    static tracks: Map<string, Track> = new Map<string, Track>()
+    static hotspots: Map<string, Hotspot[]> = new Map<string, Hotspot[]>()
+    static obstacles: Map<string, Obstacle[]> = new Map<string, Obstacle[]>()
+    static laps: Map<string, Lap> = new Map<string, Lap>()
 
     static trackTransform: TransformType = {
         position: Vector3.Zero(),
@@ -43,29 +61,23 @@ export class TrackManager {
     static respawnDirection: Vector3 = Vector3.Zero()
 
     /**
-     * Creates a TrackManager instance.
+     * Creates a TrackManager instance and initialises all track data.
      *
-     * @param _position the position of the entire track.
-     * @param _rotation the rotation of the entire track.
-     * @param _scale the scale of the entire track.
-     * @param _debugMode a flag to toggle debug mode.
-     * @param _eventCallbacks optional parameter that defines race event callbacks.
-     * @param _respawnPosition the position where the player respawns after ending a race. If this is not provided, the player respawns next to the car.
-     * @param _respawnDirection the direction the player is looking in when respawning. If this is not provided, the player respawns next to the car.
+     * @param _config the track manager config.
      *
      */
-    constructor(_position: Vector3, _rotation: Quaternion, _scale: Vector3, _debugMode: boolean = false, _eventCallbacks?: RaceEventCallbacks, _respawnPosition?: Vector3, _respawnDirection?: Vector3) {
-        TrackManager.debugMode = _debugMode
+    constructor(_config: TrackManagerConfig) {
+        TrackManager.debugMode = _config.debugMode ?? false
         TrackManager.trackTransform = {
-            position: _position,
-            rotation: _rotation,
-            scale: _scale
+            position: _config.position,
+            rotation: _config.rotation ?? Quaternion.Identity(),
+            scale: _config.scale ?? Vector3.One()
         }
 
-        if (_respawnPosition && _respawnDirection) {
+        if (_config.respawnPosition && _config.respawnDirection) {
             TrackManager.respawnProvided = true
-            TrackManager.respawnPosition = _respawnPosition
-            TrackManager.respawnDirection = _respawnDirection
+            TrackManager.respawnPosition = _config.respawnPosition
+            TrackManager.respawnDirection = _config.respawnDirection
         }
 
         TrackManager.ghostRecorder = new GhostRecorder()
@@ -74,64 +86,49 @@ export class TrackManager {
         TrackManager.trackCollider = engine.addEntity()
         GltfContainer.createOrReplace(TrackManager.trackCollider, { src: "models/trackCollider.glb" })
         Transform.createOrReplace(TrackManager.trackCollider, {
-            position: _position,
-            rotation: _rotation,
-            scale: _scale
+            position: _config.position,
+            rotation: _config.rotation ?? Quaternion.Identity(),
+            scale: _config.scale ?? Vector3.One()
         })
 
-        if (_eventCallbacks) {
-            if (_eventCallbacks.onStartEvent) TrackManager.onStartEvent = _eventCallbacks.onStartEvent
-            if (_eventCallbacks.onEndEvent) TrackManager.onEndEvent = _eventCallbacks.onEndEvent
-            if (_eventCallbacks.onCheckpointEvent) TrackManager.onCheckpointEvent = _eventCallbacks.onCheckpointEvent
-            if (_eventCallbacks.onLapCompleteEvent) TrackManager.onLapCompleteEvent = _eventCallbacks.onLapCompleteEvent
+        if (_config.eventCallbacks) {
+            if (_config.eventCallbacks.onStartEvent) TrackManager.onStartEvent = _config.eventCallbacks.onStartEvent
+            if (_config.eventCallbacks.onEndEvent) TrackManager.onEndEvent = _config.eventCallbacks.onEndEvent
+            if (_config.eventCallbacks.onCheckpointEvent) TrackManager.onCheckpointEvent = _config.eventCallbacks.onCheckpointEvent
+            if (_config.eventCallbacks.onLapCompleteEvent) TrackManager.onLapCompleteEvent = _config.eventCallbacks.onLapCompleteEvent
         }
+
+        TrackManager.InitialiseTracks(_config.trackConfigs)
 
         engine.addSystem(TrackManager.update)
     }
 
     /**
-     * Loads a track with the provided config (json file).
+     * Loads a track by providing the track guid
      *
-     * @param _config the config (json file) that represents the track and all of its components like track points, hotspots, obstacles, and lap checkpoints.
+     * @param _guid the track guid.
      */
-    static Load(_config: any): void {
-        TrackManager.Unload()
+    static Load(_guid: string): void {
+        if (_guid.length > 0) {
+            TrackManager.unloadTrack()
+            TrackManager.unloadHotspots()
+            TrackManager.unloadObstacles()
+            TrackManager.unloadLap()
+        }
 
-        TrackManager.loadTrack(_config)
-        TrackManager.loadHotspots(_config)
-        TrackManager.loadObstacles(_config)
-        TrackManager.loadLapCheckpoints(_config)
+        TrackManager.currentTrackGuid = _guid
+
+        TrackManager.loadTrack()
+        TrackManager.loadHotspots()
+        TrackManager.loadObstacles()
+        TrackManager.loadLap()
     }
 
     /**
-     * Unloads a track and removes all of its components from the engine.
+     * Loads the collider for the entire track area. This is typically the ground collider.
      *
      */
-    static Unload(): void {
-        if (TrackManager.trackEntity === undefined || TrackManager.trackEntityCollider === undefined) return
-
-        engine.removeEntity(TrackManager.trackEntity)
-        TrackManager.trackEntity = undefined
-
-        engine.removeEntity(TrackManager.trackEntityCollider)
-        TrackManager.trackEntityCollider = undefined
-
-        if (TrackManager.track) {
-            TrackManager.track.unload()
-        }
-
-        TrackManager.hotspots.forEach(hotspot => {
-            hotspot.unload()
-        })
-
-        TrackManager.obstacles.forEach(obstacle => {
-            obstacle.unload()
-        })
-
-        Lap.unload()
-    }
-
-    static showAvatarTrackCollider() {
+    static LoadAvatarTrackCollider() {
         if (TrackManager.trackCollider != null) {
 
             let trackColliderTransform = Transform.getMutableOrNull(TrackManager.trackCollider)
@@ -141,7 +138,11 @@ export class TrackManager {
         }
     }
 
-    static hideAvatarTrackCollider() {
+    /**
+     * Unloads the collider for the entire track area. This is typically the ground collider.
+     *
+     */
+    static UnloadAvatarTrackCollider() {
         if (TrackManager.trackCollider != null) {
 
             let trackColliderTransform = Transform.getMutableOrNull(TrackManager.trackCollider)
@@ -152,91 +153,283 @@ export class TrackManager {
     }
 
     /**
-     * Loads the track data (the roads).
+     * Returns the collider entity the current track.
      *
-     * @param _trackData the track json config.
+     * @returns The collider entity of the current track, or undefined if it doesn't exist.
      */
-    private static loadTrack(_trackData: any): void {
-        TrackManager.trackEntity = engine.addEntity()
-        GltfContainer.createOrReplace(TrackManager.trackEntity, {
-            src: _trackData.glb
-        })
-        Transform.createOrReplace(TrackManager.trackEntity, {
-            position: TrackManager.trackTransform.position,
-            rotation: TrackManager.trackTransform.rotation,
-            scale: TrackManager.trackTransform.scale
-        })
+    static GetTrackColliderEntity(): Entity | undefined {
+        if (!TrackManager.trackColliderEntities.has(TrackManager.currentTrackGuid)) return undefined
 
-        TrackManager.trackEntityCollider = engine.addEntity()
-        GltfContainer.createOrReplace(TrackManager.trackEntityCollider, {
-            src: _trackData.glb.substring(0, _trackData.glb.length - 4) + "_collider.glb"
-        })
-        Transform.createOrReplace(TrackManager.trackEntityCollider, {
-            position: TrackManager.trackTransform.position,
-            rotation: TrackManager.trackTransform.rotation,
-            scale: TrackManager.trackTransform.scale
-        })
-
-        let trackPolygons: Vector3[][] = []
-        for (let trackPart of _trackData.track) {
-            const poly: Vector3[] = trackPart.polygon
-            trackPolygons.push(poly)
-        }
-
-        TrackManager.track = new Track(trackPolygons)
+        return TrackManager.trackColliderEntities.get(TrackManager.currentTrackGuid)
     }
 
     /**
-     * Loads all hotspots.
+     * Returns the current track.
      *
-     * @param _trackData the track json config.
+     * @returns The current track, or undefined if it doesn't exist.
      */
-    private static loadHotspots(_trackData: any): void {
-        TrackManager.hotspots.splice(0)
-        for (let hotspot of _trackData.hotspots) {
-            TrackManager.hotspots.push(new Hotspot(hotspot.hotspotType, hotspot.polygon))
-        }
+    static GetTrack(): Track | undefined {
+        if (!TrackManager.tracks.has(TrackManager.currentTrackGuid)) return undefined
+
+        return TrackManager.tracks.get(TrackManager.currentTrackGuid)
     }
 
     /**
-     * Loads all obstacles.
+     * Returns the list of hotspots for the current track.
      *
-     * @param _trackData the track json config.
+     * @returns The list of hotspots for the current track.
      */
-    private static loadObstacles(_trackData: any): void {
-        TrackManager.obstacles.splice(0)
-        for (let obstacle of _trackData.obstacles) {
-            TrackManager.obstacles.push(new Obstacle(obstacle.obstacleType, obstacle.shape, obstacle.position, obstacle.rotation, obstacle.scale, obstacle.vertices, obstacle.indices))
-        }
+    static GetHotspots(): Hotspot[] {
+        if (!TrackManager.hotspots.has(TrackManager.currentTrackGuid)) return []
+
+        let hotspots = TrackManager.hotspots.get(TrackManager.currentTrackGuid)
+
+        if (!hotspots) return []
+
+        return hotspots
     }
 
     /**
-     * Loads all lap checkpoints.
+     * Returns the lap of the current track.
      *
-     * @param _trackData the track json config.
+     * @returns The lap of the current track, or undefined if it doesn't exist.
      */
-    private static loadLapCheckpoints(_trackData: any): void {
-        for (let checkpoint of _trackData.lapCheckpoints) {
-            Lap.addCheckpoint(checkpoint.index, checkpoint.position)
+    static GetLap(): Lap | undefined {
+        if (!TrackManager.laps.has(TrackManager.currentTrackGuid)) return undefined
+
+        return TrackManager.laps.get(TrackManager.currentTrackGuid)
+    }
+
+    private static InitialiseTracks(_trackConfigs: { index: number, guid: string, data: any }[]): void {
+        for (let trackConfig of _trackConfigs) {
+            TrackManager.InitialiseTrack(trackConfig.index, trackConfig.guid, trackConfig.data)
+            TrackManager.InitialiseHotspots(trackConfig.guid, trackConfig.data)
+            TrackManager.InitialiseObstacles(trackConfig.guid, trackConfig.data)
+            TrackManager.InitialiseLaps(trackConfig.guid, trackConfig.data)
         }
     }
 
-    /**
-     * Update method that is called every frame.
-     *
-     * @param dt elapsed time between frames.
-     */
-    private static update(dt: number) {
-        TrackManager.track.update(TrackManager.carPoints)
-        TrackManager.hotspots.forEach(hotspot => {
-            hotspot.update(TrackManager.carPoints)
-        })
-        TrackManager.obstacles.forEach(obstacle => {
-            obstacle.update()
-        })
+    private static InitialiseTrack(_index: number, _guid: string, _data: any): void {
+        if (!TrackManager.trackIndices.has(_guid)) {
+            TrackManager.trackIndices.set(_guid, _index)
+        }
+
+        if (!TrackManager.trackEntities.has(_guid)) {
+            let trackEntity = engine.addEntity()
+            GltfContainer.createOrReplace(trackEntity, {
+                src: _data.glb
+            })
+            Transform.createOrReplace(trackEntity, {
+                position: TrackManager.trackTransform.position,
+                rotation: TrackManager.trackTransform.rotation,
+                scale: Vector3.Zero()
+            })
+            TrackManager.trackEntities.set(_guid, trackEntity)
+        }
+
+        if (!TrackManager.trackColliderEntities.has(_guid)) {
+            let trackColliderEntity = engine.addEntity()
+            GltfContainer.createOrReplace(trackColliderEntity, {
+                src: _data.glb.substring(0, _data.glb.length - 4) + "_collider.glb"
+            })
+            Transform.createOrReplace(trackColliderEntity, {
+                position: TrackManager.trackTransform.position,
+                rotation: TrackManager.trackTransform.rotation,
+                scale: Vector3.Zero()
+            })
+        }
+
+        if (!TrackManager.tracks.has(_guid)) {
+            let trackPolygons: Vector3[][] = []
+            for (let trackPart of _data.track) {
+                const poly: Vector3[] = trackPart.polygon
+                trackPolygons.push(poly)
+            }
+
+            TrackManager.tracks.set(_guid, new Track(trackPolygons))
+        }
+    }
+
+    private static InitialiseHotspots(_guid: string, _data: any): void {
+        if (!TrackManager.hotspots.has(_guid)) {
+            let hotspots: Hotspot[] = []
+            for (let hotspot of _data.hotspots) {
+                hotspots.push(new Hotspot(hotspot.hotspotType, hotspot.polygon))
+            }
+            TrackManager.hotspots.set(_guid, hotspots)
+        }
+    }
+
+    private static InitialiseObstacles(_guid: string, _data: any): void {
+        if (!TrackManager.obstacles.has(_guid)) {
+            let obstacles: Obstacle[] = []
+            for (let obstacle of _data.obstacles) {
+                obstacles.push(new Obstacle(obstacle.obstacleType, obstacle.shape, obstacle.position, obstacle.rotation, obstacle.scale, obstacle.vertices, obstacle.indices))
+            }
+            TrackManager.obstacles.set(_guid, obstacles)
+        }
+    }
+
+    private static InitialiseLaps(_guid: string, _data: any): void {
+        if (!TrackManager.laps.has(_guid)) {
+            TrackManager.laps.set(_guid, new Lap(_data.lapCheckpoints))
+        }
+    }
+
+    private static loadTrack(): void {
+        if (TrackManager.trackEntities.has(TrackManager.currentTrackGuid)) {
+            let trackEntity = TrackManager.trackEntities.get(TrackManager.currentTrackGuid)
+            if (trackEntity) {
+                let transform = Transform.getMutableOrNull(trackEntity)
+                if (transform) {
+                    transform.scale = TrackManager.trackTransform.scale
+                }
+            }
+        }
+
+        if (TrackManager.trackColliderEntities.has(TrackManager.currentTrackGuid)) {
+            let trackColliderEntity = TrackManager.trackColliderEntities.get(TrackManager.currentTrackGuid)
+            if (trackColliderEntity) {
+                let transform = Transform.getMutableOrNull(trackColliderEntity)
+                if (transform) {
+                    transform.scale = TrackManager.trackTransform.scale
+                }
+            }
+        }
+
+        if (TrackManager.tracks.has(TrackManager.currentTrackGuid)) {
+            let track = TrackManager.tracks.get(TrackManager.currentTrackGuid)
+            if (track) {
+                track.load()
+            }
+        }
+    }
+
+    private static loadHotspots(): void {
+        if (TrackManager.hotspots.has(TrackManager.currentTrackGuid)) {
+            let hotspots = TrackManager.hotspots.get(TrackManager.currentTrackGuid)
+            if (hotspots) {
+                hotspots.forEach(hotspot => {
+                    hotspot.load()
+                })
+            }
+        }
+    }
+
+    private static loadObstacles(): void {
+        if (TrackManager.obstacles.has(TrackManager.currentTrackGuid)) {
+            let obstacles = TrackManager.obstacles.get(TrackManager.currentTrackGuid)
+            if (obstacles) {
+                obstacles.forEach(obstacle => {
+                    obstacle.load()
+                })
+            }
+        }
+    }
+
+    private static loadLap(): void {
+        if (TrackManager.laps.has(TrackManager.currentTrackGuid)) {
+            let lap = TrackManager.laps.get(TrackManager.currentTrackGuid)
+            if (lap) {
+                lap.load()
+            }
+        }
+    }
+
+    private static unloadTrack(): void {
+        if (TrackManager.trackEntities.has(TrackManager.currentTrackGuid)) {
+            let trackEntity = TrackManager.trackEntities.get(TrackManager.currentTrackGuid)
+            if (trackEntity) {
+                let transform = Transform.getMutableOrNull(trackEntity)
+                if (transform) {
+                    transform.scale = Vector3.Zero()
+                }
+            }
+        }
+
+        if (TrackManager.trackColliderEntities.has(TrackManager.currentTrackGuid)) {
+            let trackColliderEntity = TrackManager.trackColliderEntities.get(TrackManager.currentTrackGuid)
+            if (trackColliderEntity) {
+                let transform = Transform.getMutableOrNull(trackColliderEntity)
+                if (transform) {
+                    transform.scale = Vector3.Zero()
+                }
+            }
+        }
+
+        if (TrackManager.tracks.has(TrackManager.currentTrackGuid)) {
+            let track = TrackManager.tracks.get(TrackManager.currentTrackGuid)
+            if (track) {
+                track.unload()
+            }
+        }
+    }
+
+    private static unloadHotspots(): void {
+        if (TrackManager.hotspots.has(TrackManager.currentTrackGuid)) {
+            let hotspots = TrackManager.hotspots.get(TrackManager.currentTrackGuid)
+            if (hotspots) {
+                hotspots.forEach(hotspot => {
+                    hotspot.unload()
+                })
+            }
+        }
+    }
+
+    private static unloadObstacles(): void {
+        if (TrackManager.obstacles.has(TrackManager.currentTrackGuid)) {
+            let obstacles = TrackManager.obstacles.get(TrackManager.currentTrackGuid)
+            if (obstacles) {
+                obstacles.forEach(obstacle => {
+                    obstacle.unload()
+                })
+            }
+        }
+    }
+
+    private static unloadLap(): void {
+        if (TrackManager.laps.has(TrackManager.currentTrackGuid)) {
+            let lap = TrackManager.laps.get(TrackManager.currentTrackGuid)
+            if (lap) {
+                lap.unload()
+            }
+        }
+    }
+
+    private static update(_dt: number) {
+        if (TrackManager.tracks.has(TrackManager.currentTrackGuid)) {
+            let track = TrackManager.tracks.get(TrackManager.currentTrackGuid)
+            if (track) {
+                track.update(TrackManager.carPoints)
+            }
+        }
+
+        if (TrackManager.hotspots.has(TrackManager.currentTrackGuid)) {
+            let hotspots = TrackManager.hotspots.get(TrackManager.currentTrackGuid)
+            if (hotspots) {
+                hotspots.forEach(hotspot => {
+                    hotspot.update(TrackManager.carPoints)
+                })
+            }
+        }
+
+        if (TrackManager.obstacles.has(TrackManager.currentTrackGuid)) {
+            let obstacles = TrackManager.obstacles.get(TrackManager.currentTrackGuid)
+            if (obstacles) {
+                obstacles.forEach(obstacle => {
+                    obstacle.update()
+                })
+            }
+        }
+
         if (TrackManager.carPoints.length > 0) {
-            Lap.update(dt, TrackManager.carPoints[0])
+            if (TrackManager.laps.has(TrackManager.currentTrackGuid)) {
+                let lap = TrackManager.laps.get(TrackManager.currentTrackGuid)
+                if (lap) {
+                    lap.update(_dt, TrackManager.carPoints[0])
+                }
+            }
         }
-        HotspotActionManager.update(dt)
+        HotspotActionManager.update(_dt)
     }
 }
