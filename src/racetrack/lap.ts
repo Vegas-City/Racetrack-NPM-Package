@@ -16,8 +16,8 @@ export class Lap {
     triggeredStart: boolean = false
     started: boolean = false
 
-    constructor(_data: any) {
-        for (let checkpoint of _data.lapCheckpoints) {
+    constructor(_checkpoints: any[]) {
+        for (let checkpoint of _checkpoints) {
             this.addCheckpoint(checkpoint.index, checkpoint.position)
         }
     }

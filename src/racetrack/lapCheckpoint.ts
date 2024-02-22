@@ -75,8 +75,6 @@ export class LapCheckpoint {
     }
 
     load(): void {
-        this.show()
-
         if (!TrackManager.debugMode) return
 
         if (this.debugEntity1) {
