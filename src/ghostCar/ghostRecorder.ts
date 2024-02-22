@@ -100,8 +100,11 @@ export class GhostRecorder {
             Number.parseFloat(carTransform.rotation.z.toFixed(recordAccuracy)),
             Number.parseFloat(carTransform.rotation.w.toFixed(recordAccuracy)))
 
+        let lap = TrackManager.GetLap()
+        if (!lap) return
+
         let ghostPoint: GhostPoint = {
-            checkPoint: Lap.checkpointIndex,
+            checkPoint: lap.checkpointIndex,
             position: position,
             rotation: rotation
         }

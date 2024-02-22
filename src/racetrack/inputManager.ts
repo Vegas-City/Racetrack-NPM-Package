@@ -2,6 +2,7 @@ import { engine, InputAction, PointerEventType, inputSystem } from "@dcl/sdk/ecs
 import { Car, CarPerspectives } from "../car"
 import { ExitCarUI } from "../ui"
 import { Lap } from "./lap"
+import { TrackManager } from "."
 
 export class InputManager {
     private static readonly INACTIVITY_THRESHOLD: number = 3
@@ -69,7 +70,7 @@ export class InputManager {
             ExitCarUI.hide()
         }
         else {
-            if (Car.instances.length > 0 && Car.instances[0].data?.occupied && Lap.started) {
+            if (Car.instances.length > 0 && Car.instances[0].data?.occupied && TrackManager.GetLap()?.started) {
                 InputManager.inactivityElapsed += dt
                 if (InputManager.inactivityElapsed > InputManager.INACTIVITY_THRESHOLD) {
                     ExitCarUI.show()

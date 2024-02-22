@@ -25,7 +25,7 @@ export class LapCheckpoint {
 
                 Transform.createOrReplace(this.debugEntity1, {
                     position: Vector3.create(this.point1.x, 2, this.point1.z),
-                    scale: Vector3.create(1, 4, 1)
+                    scale: Vector3.Zero()
                 })
 
                 Material.setPbrMaterial(this.debugEntity1, {
@@ -42,7 +42,7 @@ export class LapCheckpoint {
 
                 Transform.createOrReplace(this.debugEntity2, {
                     position: Vector3.create(this.point2.x, 2, this.point2.z),
-                    scale: Vector3.create(1, 4, 1)
+                    scale: Vector3.Zero()
                 })
 
                 Material.setPbrMaterial(this.debugEntity2, {
@@ -74,15 +74,41 @@ export class LapCheckpoint {
         }
     }
 
-    unload(): void {
-        if (this.glowEntity) {
-            engine.removeEntity(this.glowEntity)
-        }
+    load(): void {
+        this.show()
+
+        if (!TrackManager.debugMode) return
+
         if (this.debugEntity1) {
-            engine.removeEntity(this.debugEntity1)
+            let transform = Transform.getMutableOrNull(this.debugEntity1)
+            if (transform) {
+                transform.scale = Vector3.create(1, 4, 1)
+            }
         }
         if (this.debugEntity2) {
-            engine.removeEntity(this.debugEntity2)
+            let transform = Transform.getMutableOrNull(this.debugEntity2)
+            if (transform) {
+                transform.scale = Vector3.create(1, 4, 1)
+            }
+        }
+    }
+
+    unload(): void {
+        this.hide()
+        
+        if (!TrackManager.debugMode) return
+
+        if (this.debugEntity1) {
+            let transform = Transform.getMutableOrNull(this.debugEntity1)
+            if (transform) {
+                transform.scale = Vector3.Zero()
+            }
+        }
+        if (this.debugEntity2) {
+            let transform = Transform.getMutableOrNull(this.debugEntity2)
+            if (transform) {
+                transform.scale = Vector3.Zero()
+            }
         }
     }
 

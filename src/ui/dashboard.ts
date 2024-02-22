@@ -1,6 +1,6 @@
 import { Entity, GltfContainer, Material, MeshRenderer, TextAlignMode, TextShape, Transform, engine } from "@dcl/sdk/ecs";
 import { Color3, Color4, Quaternion, Vector3 } from "@dcl/sdk/math";
-import { Lap } from "../racetrack";
+import { Lap, TrackManager } from "../racetrack";
 
 export class Dashboard {
     dashboardEntity: Entity
@@ -72,7 +72,7 @@ export class Dashboard {
         })
     }
 
-    update(_speed: number, _minSpeed: number, _maxSpeed: number) {
+    update(_speed: number, _minSpeed: number, _maxSpeed: number): void {
         let lapEntityTextShape = TextShape.getMutableOrNull(this.lapEntity)
         let stateEntityTextShape = TextShape.getMutableOrNull(this.stateEntity)
         let speedometerEntityTextShape = TextShape.getMutableOrNull(this.speedometerEntity)
@@ -80,7 +80,10 @@ export class Dashboard {
 
         if (!lapEntityTextShape || !stateEntityTextShape || !speedometerEntityTextShape || !speedometerBarsEntityTransform) return
 
-        lapEntityTextShape.text = "Lap " + (Lap.lapsCompleted + 1).toString() + "/" + Lap.totalLaps
+        let lap = TrackManager.GetLap()
+        if (!lap) return
+
+        lapEntityTextShape.text = "Lap " + (lap.lapsCompleted + 1).toString() + "/" + lap.totalLaps
         stateEntityTextShape.text = _speed > 0 ? "D" : (_speed < 0 ? "R" : "N")
         stateEntityTextShape.textColor = _speed > 0 ? Color4.Green() : (_speed < 0 ? Color4.Red() : Color4.White())
         speedometerEntityTextShape.text = (Math.round(Math.abs(_speed) * 4 * 100) / 100).toFixed(0).toString()

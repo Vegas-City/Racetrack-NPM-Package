@@ -93,7 +93,7 @@ export class Minimap {
                     width: Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale),
                     height: Minimap.DOT_SIZE_ADD + (Minimap.DOT_SIZE * Minimap.scale),
                     positionType: 'absolute',
-                    display: Minimap.showGhost && TrackManager.ghostCar.pointIndex>0 && TrackManager.ghostCar.ghostData.points.length>0 ? 'flex' : 'none'
+                    display: Minimap.showGhost && TrackManager.ghostCar.pointIndex > 0 && TrackManager.ghostCar.ghostData.points.length > 0 ? 'flex' : 'none'
                 }}
                 uiBackground={{
                     textureMode: 'stretch',
@@ -254,14 +254,30 @@ export class Minimap {
     }
 
     private static getMinimapImageVisibility(_track: number): boolean {
-        return _track == TrackManager.trackID - 1
+        if (!TrackManager.trackIndices.has(TrackManager.currentTrackGuid)) return false
+
+        const trackIndex = TrackManager.trackIndices.get(TrackManager.currentTrackGuid)
+        if (!trackIndex) return false
+
+        return _track == trackIndex
     }
 
     private static getCheckpointImageVisibility(_track: number, _index: number): boolean {
-        return _track == TrackManager.trackID - 1 && _index == Lap.checkpointIndex
+        if (!TrackManager.trackIndices.has(TrackManager.currentTrackGuid)) return false
+
+        const trackIndex = TrackManager.trackIndices.get(TrackManager.currentTrackGuid)
+        if (!trackIndex) return false
+
+        let lap = TrackManager.GetLap()
+        if (!lap) return false
+
+        return _track == trackIndex && _index == lap.checkpointIndex
     }
 
     private static getLapImageVisibility(_index: number): boolean {
-        return !TrackManager.isPractice && Lap.started && _index == Lap.lapsCompleted
+        let lap = TrackManager.GetLap()
+        if (!lap) return false
+
+        return !TrackManager.isPractice && lap.started && _index == lap.lapsCompleted
     }
 }

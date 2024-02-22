@@ -25,7 +25,7 @@ export class Hotspot {
 
                 Transform.createOrReplace(entity, {
                     position: transformedPoint,
-                    scale: Vector3.create(0.3, 0.3, 0.3)
+                    scale: Vector3.Zero()
                 })
                 this.debugEntities.push(entity)
             }
@@ -46,9 +46,25 @@ export class Hotspot {
         this.inside = isInside
     }
 
-    unload(): void {
+    load(): void {
+        if (!TrackManager.debugMode) return
+
         this.debugEntities.forEach(entity => {
-            engine.removeEntity(entity)
+            let transform = Transform.getMutableOrNull(entity)
+            if (transform) {
+                transform.scale = Vector3.create(0.3, 0.3, 0.3)
+            }
+        })
+    }
+
+    unload(): void {
+        if (!TrackManager.debugMode) return
+
+        this.debugEntities.forEach(entity => {
+            let transform = Transform.getMutableOrNull(entity)
+            if (transform) {
+                transform.scale = Vector3.Zero()
+            }
         })
     }
 }
