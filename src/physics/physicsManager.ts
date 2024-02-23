@@ -28,6 +28,7 @@ export class PhysicsManager {
     private static update(dt: number) {
         if (!PhysicsManager.world) return
 
+        dt = 1 / 30 //fixed dt for physics update
         PhysicsManager.world.update(dt)
     }
 }

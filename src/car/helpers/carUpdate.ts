@@ -19,6 +19,7 @@ export class CarUpdate {
         if (_data.carEntity === undefined || _data.carEntity === null
             || _data.carBody === undefined || _data.carBody === null) return
 
+        _dt = 1 / 30 // fixed for car updates
         _data.collisionCooldown -= _dt
         if (_data.collisionCooldown <= 0) {
             _data.collisionCooldown = 0

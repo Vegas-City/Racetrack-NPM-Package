@@ -124,6 +124,6 @@ export class TimeUI {
     static showQualOrPbTime(text: string, value: number) {
         TimeUI.pbOrQualLabel = text
         TimeUI.pbOrQualValue = value
-        TimeUI.pbOrQualLabel === "PB" ? TimeUI.pBQualPos = '200px' : TimeUI.pBQualPos = '245px'
+        TimeUI.pbOrQualLabel === "PB" ? TimeUI.pBQualPos = '193px' : TimeUI.pBQualPos = '240px'
     }
 }
