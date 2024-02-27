@@ -111,7 +111,7 @@ export class TimeUI {
 
     private static formatTime(_time: number): string {
         // cap at 99:59
-        let roundedTime = Math.round(Math.min(_time / 1000, 5999))
+        let roundedTime = Math.floor(Math.min(_time / 1000, 5999))
         let sec = roundedTime % 60
         let min = (roundedTime - sec) / 60
 
