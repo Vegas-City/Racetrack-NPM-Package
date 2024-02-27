@@ -31,7 +31,7 @@ export class Lap {
         checkpoint.addPoint(_pos)
     }
 
-    update(_dt: number, _carPos: Vector3): void {
+    update(_dt: number, _carPoints: Vector3[]): void {
         if (this.checkpoints.length < 1) return
 
         if (!this.started) return
@@ -41,14 +41,20 @@ export class Lap {
 
         if (currentCheckpoint === null) return
 
-        const distance = pointToLineDistance(_carPos, currentCheckpoint.point1, currentCheckpoint.point2)
+        let closeToCheckpoint: boolean = false
+        for (let carPoint of _carPoints) {
+            if (pointToLineDistance(carPoint, currentCheckpoint.point1, currentCheckpoint.point2) < Lap.checkpointThresholdDistance) {
+                closeToCheckpoint = true
+                break
+            }
+        }
 
-        if (distance < Lap.checkpointThresholdDistance) {
+        if (closeToCheckpoint) {
             let end: boolean = false
             // crossed checkpoint
             if (this.checkpointIndex == 0) {
                 // completed a lap
-                if(TrackManager.isPractice) {
+                if (TrackManager.isPractice) {
                     TrackManager.ghostRecorder.completeRace()
                     TrackManager.onLapCompleteEvent()
                     AudioManager.playLapAudio()
