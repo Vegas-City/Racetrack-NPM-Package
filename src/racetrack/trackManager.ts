@@ -429,7 +429,7 @@ export class TrackManager {
             if (TrackManager.laps.has(TrackManager.currentTrackGuid)) {
                 let lap = TrackManager.laps.get(TrackManager.currentTrackGuid)
                 if (lap) {
-                    lap.update(_dt, TrackManager.carPoints[0])
+                    lap.update(_dt, TrackManager.carPoints)
                 }
             }
         }
