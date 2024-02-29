@@ -5,7 +5,7 @@ import { localToWorldPosition } from "../../utils/utils"
 
 export class PlayerCage {
     static readonly INITIAL_CAGE_SCALE_INV: Vector3 = Vector3.create(0.5, 1, 1)
-    static readonly TARGET_CAGE_SCALE_INV: Vector3 = Vector3.create(5, 1, 10)
+    static readonly TARGET_CAGE_SCALE_INV: Vector3 = Vector3.create(5, 1, 12)
 
     static getCagePos(_data: CarData): Vector3 {
         if (_data.carEntity === undefined || _data.carEntity === null) {
