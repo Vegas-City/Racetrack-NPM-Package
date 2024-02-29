@@ -11,6 +11,7 @@ import { CarSteering } from "./helpers/carSteering";
 import { CarUpdate } from "./helpers/carUpdate";
 import { CarWheels } from "./helpers/carWheels";
 import { PlayerCage } from "./helpers/playerCage";
+import { PlayerCageEntity } from "./playerCageEntity";
 import { CarWheelComponent } from "./carWheelComponent";
 
 export { CarConfig }
@@ -26,4 +27,5 @@ export { CarSteering }
 export { CarUpdate }
 export { CarWheels }
 export { PlayerCage }
+export { PlayerCageEntity }
 export { CarWheelComponent }

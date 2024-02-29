@@ -3,6 +3,7 @@ import { Body } from '../physics'
 import { CarAttributes } from './carAttributes'
 import { Dashboard } from '../ui'
 import { Entity } from '@dcl/ecs'
+import { PlayerCageEntity } from './playerCageEntity'
 
 export class CarData {
     thirdPersonView: boolean = true
@@ -10,7 +11,7 @@ export class CarData {
     carEntity: Entity | null = null
     carModelEntity: Entity | null = null
     carColliderEntity: Entity | null = null
-    playerCageEntity: Entity | null = null
+    playerCageEntity: PlayerCageEntity | null = null
     carBody: Body | null = null
     steeringWheel: Entity | null = null
     brakeLight: Entity | null = null

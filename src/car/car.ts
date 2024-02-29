@@ -11,6 +11,7 @@ import { CarData } from './carData'
 import { CarPerspectives } from './helpers/carPerspectives'
 import { CarWheels } from './helpers/carWheels'
 import { CarUpdate } from './helpers/carUpdate'
+import { PlayerCageEntity } from './playerCageEntity'
 
 export class Car {
     static instances: Car[] = []
@@ -99,15 +100,7 @@ export class Car {
             src: _config.carColliderGLB
         })
 
-        this.data.playerCageEntity = engine.addEntity()
-        Transform.createOrReplace(this.data.playerCageEntity, {
-            parent: this.data.carEntity,
-            position: Vector3.create(0, 2, -1.5),
-            scale: Vector3.Zero()
-        })
-        GltfContainer.createOrReplace(this.data.playerCageEntity, {
-            src: 'models/playerLocker.glb'
-        })
+        this.data.playerCageEntity = new PlayerCageEntity(this.data.carEntity)
 
         this.data.brakeLight = engine.addEntity()
         GltfContainer.createOrReplace(this.data.brakeLight, { src: _config.brakeLightsGLB })
@@ -150,9 +143,9 @@ export class Car {
         this.data.dashboard?.cleardown()
         CarWheels.clearDown(this.data)
 
+        if (this.data.playerCageEntity) this.data.playerCageEntity.unload()
         if (this.data.steeringWheel) engine.removeEntityWithChildren(this.data.steeringWheel)
         if (this.data.brakeLight) engine.removeEntityWithChildren(this.data.brakeLight)
-        if (this.data.playerCageEntity) engine.removeEntityWithChildren(this.data.playerCageEntity)
         if (this.data.carColliderEntity) engine.removeEntityWithChildren(this.data.carColliderEntity)
         if (this.data.carModelEntity) engine.removeEntityWithChildren(this.data.carModelEntity)
         if (this.data.carEntity) engine.removeEntityWithChildren(this.data.carEntity)

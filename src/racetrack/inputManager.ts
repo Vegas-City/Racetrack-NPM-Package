@@ -1,7 +1,6 @@
 import { engine, InputAction, PointerEventType, inputSystem } from "@dcl/sdk/ecs"
 import { Car, CarPerspectives } from "../car"
 import { ExitCarUI } from "../ui"
-import { Lap } from "./lap"
 import { TrackManager } from "."
 
 export class InputManager {
@@ -66,8 +65,10 @@ export class InputManager {
         }
 
         if (InputManager.isForwardPressed || InputManager.isBackwardPressed) {
-            InputManager.inactivityElapsed = 0
-            ExitCarUI.hide()
+            if(InputManager.inactivityElapsed > 0) {
+                InputManager.inactivityElapsed = 0
+                ExitCarUI.hide()
+            }
         }
         else {
             if (Car.instances.length > 0 && Car.instances[0].data?.occupied && TrackManager.GetLap()?.started) {

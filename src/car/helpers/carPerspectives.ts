@@ -1,4 +1,4 @@
-import { Animator, AudioSource, CameraModeArea, CameraType, InputAction, Transform, pointerEventsSystem } from "@dcl/sdk/ecs"
+import { Animator, CameraModeArea, CameraType, InputAction, Transform, pointerEventsSystem } from "@dcl/sdk/ecs"
 import { Vector3 } from "@dcl/sdk/math"
 import { CarChoiceUI, Minimap, SpeedometerUI, TimeUI } from "../../ui"
 import { PlayerCage } from "./playerCage"
@@ -35,7 +35,7 @@ export class CarPerspectives {
     static thirdPersonCar(_data: CarData) {
         if (_data.playerCageEntity === undefined || _data.playerCageEntity === null) return
 
-        let transform = Transform.getMutableOrNull(_data.playerCageEntity)
+        let transform = Transform.getMutableOrNull(_data.playerCageEntity.parent)
         if (transform) {
             transform.position = Vector3.create(_data.thirdPersonCagePosition.x, _data.thirdPersonCagePosition.y, _data.thirdPersonCagePosition.z)
         }
@@ -44,7 +44,7 @@ export class CarPerspectives {
     static firstPersonCar(_data: CarData) {
         if (_data.playerCageEntity === undefined || _data.playerCageEntity === null) return
 
-        let transform = Transform.getMutableOrNull(_data.playerCageEntity)
+        let transform = Transform.getMutableOrNull(_data.playerCageEntity.parent)
         if (transform) {
             transform.position = _data.firstPersonCagePosition
         }
@@ -87,7 +87,7 @@ export class CarPerspectives {
                         Minimap.Show()
 
                         if (_data.playerCageEntity) {
-                            CameraModeArea.createOrReplace(_data.playerCageEntity, {
+                            CameraModeArea.createOrReplace(_data.playerCageEntity.parent, {
                                 area: Vector3.create(3, 2, 7),
                                 mode: CameraType.CT_FIRST_PERSON,
                             })
@@ -149,8 +149,8 @@ export class CarPerspectives {
         Minimap.Hide()
 
         if (_data.playerCageEntity) {
-            CameraModeArea.deleteFrom(_data.playerCageEntity)
-            let playerCageEntityTransform = Transform.getMutableOrNull(_data.playerCageEntity)
+            CameraModeArea.deleteFrom(_data.playerCageEntity.parent)
+            let playerCageEntityTransform = Transform.getMutableOrNull(_data.playerCageEntity.parent)
             if (playerCageEntityTransform) {
                 playerCageEntityTransform.scale = Vector3.Zero()
             }
