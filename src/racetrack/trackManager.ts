@@ -7,6 +7,7 @@ import { Obstacle } from "./obstacle"
 import { HotspotActionManager } from "./hotspotActionManager"
 import { GhostCar, GhostRecorder } from "./../ghostCar"
 import { RaceEventCallbacks } from "./raceEventCallbacks"
+import { PhysicsManager } from "../physics"
 
 export type TrackManagerConfig = {
     position: Vector3,
@@ -28,6 +29,7 @@ export type TrackManagerConfig = {
  */
 export class TrackManager {
     static debugMode: boolean = false
+    static experimentalMode: boolean = false
 
     static isPractice: boolean = true
     static currentTrackGuid: string = ""
@@ -101,6 +103,8 @@ export class TrackManager {
         TrackManager.InitialiseTracks(_config.trackConfigs)
 
         engine.addSystem(TrackManager.update)
+
+        new PhysicsManager()
     }
 
     /**
