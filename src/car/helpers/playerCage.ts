@@ -17,7 +17,7 @@ export class PlayerCage {
         }
 
         const carEntityTransform = Transform.getMutableOrNull(_data.carEntity)
-        const playerCageTransform = Transform.getMutableOrNull(_data.playerCageEntity)
+        const playerCageTransform = Transform.getMutableOrNull(_data.playerCageEntity.parent)
 
         if (!carEntityTransform || !playerCageTransform) return Vector3.Zero()
 
@@ -27,7 +27,7 @@ export class PlayerCage {
     static updatePlayerCage(_dt: number, _data: CarData): void {
         if (!_data.playerCageEntity) return
 
-        let playerCageTransform = Transform.getMutableOrNull(_data.playerCageEntity)
+        let playerCageTransform = Transform.getMutableOrNull(_data.playerCageEntity.parent)
         if (!playerCageTransform) return
 
         const cageScale = playerCageTransform.scale
@@ -46,7 +46,7 @@ export class PlayerCage {
     static expandCage(_data: CarData): void {
         if (!_data.playerCageEntity) return
 
-        let playerCageTransform = Transform.getMutableOrNull(_data.playerCageEntity)
+        let playerCageTransform = Transform.getMutableOrNull(_data.playerCageEntity.parent)
         if (!playerCageTransform) return
 
         const scale = Vector3.create(PlayerCage.INITIAL_CAGE_SCALE_INV.x * _data.carScale, PlayerCage.INITIAL_CAGE_SCALE_INV.y * _data.carScale, PlayerCage.INITIAL_CAGE_SCALE_INV.z * _data.carScale)

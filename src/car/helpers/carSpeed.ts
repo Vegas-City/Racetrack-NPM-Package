@@ -75,7 +75,7 @@ export class CarSpeed {
         // Move player cage based on max speed
         if (_data.playerCageEntity != null) {
             if (_data.thirdPersonView && _data.speed > 0) {
-                let playerCageEntityTransform = Transform.getMutableOrNull(_data.playerCageEntity)
+                let playerCageEntityTransform = Transform.getMutableOrNull(_data.playerCageEntity.parent)
                 if (playerCageEntityTransform) {
                     playerCageEntityTransform.position.z = _data.thirdPersonCagePosition.z - (_data.speed / _data.carAttributes.maxSpeed) / 3
                 }

@@ -117,7 +117,7 @@ export class CarUpdate {
         if (_data.occupied) {
             const playerPos = Transform.getMutableOrNull(engine.PlayerEntity)?.position ?? Vector3.Zero()
             const distToCar = Vector3.distance(playerPos, PlayerCage.getCagePos(_data))
-            if (distToCar > 6) {
+            if (distToCar > 2) {
                 CarPerspectives.switchToCarPerspective(_data, deltaDistance)
             }
         }
