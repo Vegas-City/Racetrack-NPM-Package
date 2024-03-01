@@ -9,6 +9,9 @@ import { GhostCar, GhostRecorder } from "./../ghostCar"
 import { RaceEventCallbacks } from "./raceEventCallbacks"
 import { PhysicsManager } from "../physics"
 
+/**
+ * Config for creating a Track Manager.
+ */
 export type TrackManagerConfig = {
     position: Vector3,
     rotation?: Quaternion,

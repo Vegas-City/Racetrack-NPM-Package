@@ -1,6 +1,9 @@
 import { Entity, MeshCollider, Transform, engine } from "@dcl/sdk/ecs"
 import { Quaternion, Vector3 } from "@dcl/sdk/math"
 
+/**
+ * Defines the player cage entity which is an invisible collider that holds while racing.
+ */
 export class PlayerCageEntity {
     parent: Entity
 
@@ -72,6 +75,10 @@ export class PlayerCageEntity {
         MeshCollider.setBox(this.front)
     }
 
+    /**
+     * Unloads the player cage entity by deleting all of its associated entities.
+     *
+     */
     unload(): void {
         engine.removeEntityWithChildren(this.parent)
     }
