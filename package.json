@@ -1,6 +1,6 @@
 {
   "name": "@vegascity/racetrack",
-  "version": "1.0.35",
+  "version": "1.0.101",
   "description": "DCL RaceTrack Library",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -11,7 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "@dcl-sdk/utils": "^1.1.2",
-    "@dcl/sdk": "^7.3.36",
+    "@dcl/sdk": "^7.4.2",
     "@types/text-encoding": "^0.0.38",
     "typedoc": "^0.25.3",
     "typescript": "^5.1.6"
@@ -24,7 +24,8 @@
     "src/racetrack",
     "src/ui",
     "src/utils",
-    "src/ghostCar"
+    "src/ghostCar",
+    "src/audio"
   ],
   "dependencies": {
     "@dcl-sdk/utils": "^1.1.3",

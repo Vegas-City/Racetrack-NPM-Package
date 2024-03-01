@@ -9,7 +9,9 @@ export class HotspotActionManager {
     private static oilSpillSwayLeft: boolean = false
 
     private static isOnOilSpill(): boolean {
-        for (let hotspot of TrackManager.hotspots) {
+        let hotspots = TrackManager.GetHotspots()
+
+        for (let hotspot of hotspots) {
             if (hotspot.hotspotType == HotspotType.oilSpill && hotspot.inside) {
                 return true
             }
@@ -17,12 +19,12 @@ export class HotspotActionManager {
         return false
     }
 
-    private static checkOilSpill(dt: number): void {
+    private static checkOilSpill(_dt: number): void {
         if (HotspotActionManager.isOnOilSpill()) {
             HotspotActionManager.oilSpillTimer = 3
         }
         else {
-            HotspotActionManager.oilSpillTimer -= dt
+            HotspotActionManager.oilSpillTimer -= _dt
             if (HotspotActionManager.oilSpillTimer <= 0) {
                 HotspotActionManager.oilSpillTimer = 0
             }
@@ -32,30 +34,30 @@ export class HotspotActionManager {
             const car = Car.instances[0]
 
             if (HotspotActionManager.oilSpillSwayLeft) {
-                HotspotActionManager.oilSpillSwayElapsed -= (dt * 4)
+                HotspotActionManager.oilSpillSwayElapsed -= (_dt * 4)
 
                 if (HotspotActionManager.oilSpillSwayElapsed < -1) {
                     HotspotActionManager.oilSpillSwayLeft = false
                 }
             }
             else {
-                HotspotActionManager.oilSpillSwayElapsed += (dt * 4)
+                HotspotActionManager.oilSpillSwayElapsed += (_dt * 4)
 
                 if (HotspotActionManager.oilSpillSwayElapsed > 1) {
                     HotspotActionManager.oilSpillSwayLeft = true
                 }
             }
 
-            if (car.carBody) {
-                const newRot = Quaternion.multiply(car.carBody.getRotation(), Quaternion.fromEulerDegrees(0, this.oilSpillSwayElapsed * car.speed * 0.2, 0))
-                car.carBody.setRotation(newRot)
+            if (car.data.carBody) {
+                const newRot = Quaternion.multiply(car.data.carBody.getRotation(), Quaternion.fromEulerDegrees(0, this.oilSpillSwayElapsed * car.data.speed * 0.2, 0))
+                car.data.carBody.setRotation(newRot)
             }
 
         }
     }
 
-    static update(dt: number) {
+    static update(_dt: number) {
         // Check oil spill
-        HotspotActionManager.checkOilSpill(dt)
+        HotspotActionManager.checkOilSpill(_dt)
     }
 }

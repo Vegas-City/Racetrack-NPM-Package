@@ -16,7 +16,7 @@ export class PhysicsManager {
         PhysicsManager.world = World.getInstance()
 
         const groundShape = new PlaneShapeDefinition({
-            position: Vector3.create(0,  TrackManager.trackTransform.position.y, 0),
+            position: Vector3.create(0, TrackManager.trackTransform.position.y, 0),
             rotation: Quaternion.fromEulerDegrees(-90, 0, 0)
         })
         PhysicsManager.groundBody = new Body(groundShape)
@@ -28,6 +28,7 @@ export class PhysicsManager {
     private static update(dt: number) {
         if (!PhysicsManager.world) return
 
+        if(!TrackManager.experimentalMode) dt = 1 / 30 //fixed dt for physics update
         PhysicsManager.world.update(dt)
     }
 }

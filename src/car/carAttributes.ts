@@ -1,4 +1,5 @@
 import { TrackManager } from "../racetrack"
+import { InputManager } from "../racetrack"
 import { CarConfig } from "./carConfig"
 import { HotspotActionManager } from "../racetrack/hotspotActionManager";
 
@@ -30,19 +31,19 @@ export class CarAttributes {
     }
 
     public calculateDeceleration(): number {
-        return this.deceleration * (TrackManager.track.inside ? 1 : 3)
+        return this.deceleration * (TrackManager.GetTrack()?.inside ? 1 : 3) * (InputManager.mouseSteering ? 1 : 4)
     }
 
     public calculateMinSpeed(): number {
-        return this.minSpeed * (TrackManager.track.inside ? 1 : 0.5)
+        return this.minSpeed * (TrackManager.GetTrack()?.inside ? 1 : 0.5)
     }
 
     public calculateMaxSpeed(): number {
-        return this.maxSpeed * (TrackManager.track.inside ? 1 : 0.5)
+        return this.maxSpeed * (TrackManager.GetTrack()?.inside ? 1 : 0.5) * (InputManager.mouseSteering ? 1 : 0.5)
     }
 
     public calculateSteerSpeed(): number {
-        return this.steerSpeed * (HotspotActionManager.oilSpillTimer > 0 ? 0.35 : 1)
+        return this.steerSpeed * (HotspotActionManager.oilSpillTimer > 0 ? 0.35 : 1) * (InputManager.mouseSteering ? 1 : 0.5)
     }
 
     public calculateGrip(): number {

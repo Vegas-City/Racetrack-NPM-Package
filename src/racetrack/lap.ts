@@ -3,69 +3,108 @@ import { LapCheckpoint } from "./lapCheckpoint";
 import { pointToLineDistance } from "../utils/utils";
 import { TrackManager } from "./trackManager";
 import { GameManager } from "./gameManager";
+import { AudioManager } from "../audio/audioManager";
 
 export class Lap {
     static readonly checkpointThresholdDistance: number = 2
 
-    static checkpoints: LapCheckpoint[] = []
-    static checkpointIndex: number = 0
-    static lapsCompleted: number = -1
-    static lapElapsed: number = 0
-    static totalLaps: number = 1 // make the default 1
-    static triggeredStart: boolean = false
-    static started: boolean = false
+    checkpoints: LapCheckpoint[] = []
+    checkpointIndex: number = 0
+    lapsCompleted: number = -1
+    timeElapsed: number = 0
+    totalLaps: number = 2 // make the default 2
+    triggeredStart: boolean = false
+    started: boolean = false
 
-    static addCheckpoint(_index: number, _pos: Vector3): void {
-        let checkpoint = Lap.findCheckpoint(_index)
+    constructor(_checkpoints: any[]) {
+        for (let checkpoint of _checkpoints) {
+            this.addCheckpoint(checkpoint.index, checkpoint.position)
+        }
+    }
+
+    private addCheckpoint(_index: number, _pos: Vector3): void {
+        let checkpoint = this.findCheckpoint(_index)
         if (checkpoint === null) {
             checkpoint = new LapCheckpoint(_index)
-            Lap.checkpoints.push(checkpoint)
+            this.checkpoints.push(checkpoint)
         }
         checkpoint.addPoint(_pos)
     }
 
-    static setTotalLaps(_laps: number): void {
-        Lap.totalLaps = _laps
-    }
+    update(_dt: number, _carPoints: Vector3[]): void {
+        if (this.checkpoints.length < 1) return
 
-    static update(_dt: number, _carPos: Vector3): void {
-        if (Lap.checkpoints.length < 1) return
+        if (!this.started) return
 
-        if (!Lap.started) return
+        if (this.lapsCompleted >= 0) this.timeElapsed += _dt
+        const currentCheckpoint = this.findCheckpoint(this.checkpointIndex)
 
-        if (Lap.lapsCompleted >= 0) Lap.lapElapsed += _dt
-        const currentCheckpoint = Lap.checkpoints[Lap.checkpointIndex]
-        const distance = pointToLineDistance(_carPos, currentCheckpoint.point1, currentCheckpoint.point2)
+        if (currentCheckpoint === null) return
 
-        if (distance < Lap.checkpointThresholdDistance) {
+        let closeToCheckpoint: boolean = false
+        for (let carPoint of _carPoints) {
+            if (pointToLineDistance(carPoint, currentCheckpoint.point1, currentCheckpoint.point2) < Lap.checkpointThresholdDistance) {
+                closeToCheckpoint = true
+                break
+            }
+        }
+
+        if (closeToCheckpoint) {
+            let end: boolean = false
             // crossed checkpoint
-            if (Lap.checkpointIndex == 0) {
+            if (this.checkpointIndex == 0) {
                 // completed a lap
-                Lap.lapsCompleted++
-                Lap.lapElapsed = 0
-                TrackManager.ghostRecorder.completeLap()
-                if (Lap.lapsCompleted >= Lap.totalLaps) {
-                    GameManager.end()
+                if (TrackManager.isPractice) {
+                    TrackManager.ghostRecorder.completeRace()
+                    TrackManager.onLapCompleteEvent()
+                    AudioManager.playLapAudio()
+                    this.timeElapsed = 0
+                    // Practice mode needs to start the ghost car again as it wont have another count down
+                    TrackManager.ghostCar.startGhost()
+                }
+                else {
+                    this.lapsCompleted++
+                    if (this.lapsCompleted >= this.totalLaps) {
+                        TrackManager.ghostRecorder.completeRace()
+                        GameManager.end()
+                        end = true
+                    }
+                    else {
+                        TrackManager.onLapCompleteEvent()
+                        AudioManager.playLapAudio()
+                    }
                 }
             }
-            currentCheckpoint.hide()
-            Lap.checkpointIndex++
-            if (Lap.checkpointIndex >= Lap.checkpoints.length) {
-                Lap.checkpointIndex = 0
+            else {
+                TrackManager.onCheckpointEvent()
+                AudioManager.playCheckPointAudio()
             }
-            Lap.checkpoints[Lap.checkpointIndex].show()
+            currentCheckpoint.hide()
+            this.checkpointIndex++
+            if (this.checkpointIndex >= this.checkpoints.length) {
+                this.checkpointIndex = 0
+            }
+            if (end) {
+                this.checkpointIndex = -1
+            }
+            this.findCheckpoint(this.checkpointIndex)?.show()
         }
     }
 
-    static unload(): void {
-        Lap.checkpoints.forEach(checkpoint => {
-            checkpoint.unload()
+    load(): void {
+        this.checkpoints.forEach(checkpoint => {
+            checkpoint.load()
         })
-        Lap.checkpoints.splice(0)
     }
 
-    private static findCheckpoint(_index: number): LapCheckpoint | null {
-        for (let checkpoint of Lap.checkpoints) {
+    unload(): void {
+        this.checkpoints.forEach(checkpoint => {
+            checkpoint.unload()
+        })
+    }
+
+    findCheckpoint(_index: number): LapCheckpoint | null {
+        for (let checkpoint of this.checkpoints) {
             if (checkpoint.index == _index) {
                 return checkpoint
             }

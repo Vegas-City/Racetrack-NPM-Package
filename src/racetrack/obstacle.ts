@@ -1,7 +1,7 @@
 import { Vector3, Quaternion } from "@dcl/sdk/math";
 import { ObstacleType } from "./enums";
 import { TrackManager } from "./trackManager";
-import { Entity, GltfContainer, MeshRenderer, Transform, engine } from "@dcl/sdk/ecs";
+import { Entity, GltfContainer, MeshRenderer, Transform, TransformType, engine } from "@dcl/sdk/ecs";
 import { applyTransformToPoint } from "../utils";
 import { BoxShapeDefinition } from "../physics/shapes";
 import { Body, World } from "../physics";
@@ -12,7 +12,11 @@ export class Obstacle {
     entity: Entity | undefined
     debugEntity: Entity | undefined
 
-    constructor(_type: string, _shape: string, _position: Vector3, _rotation: Vector3, _scale: Vector3, _vertices: Vector3[], _indices: Vector3[]) {
+    position: Vector3 = Vector3.Zero()
+    rotation: Vector3 = Vector3.Zero()
+    scale: Vector3 = Vector3.Zero()
+
+    constructor(_type: string, _shape: string, _position: Vector3, _rotation: Vector3, _scale: Vector3) {
         switch (_type) {
             case "none": this.obstacleType = ObstacleType.none
                 break
@@ -24,46 +28,39 @@ export class Obstacle {
                 break
         }
 
-        const mass = this.getBodyMass()
+        this.position = _position
+        this.rotation = _rotation
+        this.scale = _scale
 
         if (_shape == "box") {
             const transformedPoint = applyTransformToPoint(_position, { position: TrackManager.trackTransform.position, rotation: TrackManager.trackTransform.rotation, scale: TrackManager.trackTransform.scale })
-
-            const boxShape = new BoxShapeDefinition({
-                position: Vector3.create(transformedPoint.x, (_position.y + TrackManager.trackTransform.position.y) * TrackManager.trackTransform.scale.y, transformedPoint.z),
-                rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(_rotation.x, _rotation.y, _rotation.z)),
-                scale: Vector3.multiply(_scale, TrackManager.trackTransform.scale),
-                mass: mass
-            })
-            this.body = new Body(boxShape)
-            World.getInstance().addBody(this.body)
 
             if (TrackManager.debugMode) {
                 this.debugEntity = engine.addEntity()
                 MeshRenderer.setBox(this.debugEntity)
 
-                Transform.create(this.debugEntity, {
-                    position: boxShape.position,
-                    rotation: boxShape.rotation,
-                    scale: boxShape.scale
+                Transform.createOrReplace(this.debugEntity, {
+                    position: Vector3.create(transformedPoint.x, (_position.y + TrackManager.trackTransform.position.y) * TrackManager.trackTransform.scale.y, transformedPoint.z),
+                    rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(_rotation.x, _rotation.y, _rotation.z)),
+                    scale: Vector3.Zero()
                 })
             }
 
             if (this.obstacleType == ObstacleType.barrel) {
                 this.entity = engine.addEntity()
 
-                Transform.create(this.entity, {
-                    position: boxShape.position,
-                    rotation: boxShape.rotation,
-                    scale: Vector3.create(0.8, 0.8, 0.8)
+                Transform.createOrReplace(this.entity, {
+                    position: Vector3.create(transformedPoint.x, (_position.y + TrackManager.trackTransform.position.y) * TrackManager.trackTransform.scale.y, transformedPoint.z),
+                    rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(_rotation.x, _rotation.y, _rotation.z)),
+                    scale: Vector3.Zero()
                 })
 
                 const child = engine.addEntity()
-                GltfContainer.create(child, {
+                GltfContainer.createOrReplace(child, {
                     src: "models/barrel.glb"
                 })
 
-                Transform.create(child, {
+                Transform.createOrReplace(child, {
                     parent: this.entity,
                     position: Vector3.create(0, -0.4, 0)
                 })
@@ -85,16 +82,22 @@ export class Obstacle {
         if (!this.body) return
 
         if (this.entity) {
-            let transform = Transform.getMutable(this.entity)
-            transform.position = Vector3.add(this.body.getPosition(), Vector3.create(0, 0, 0))
-            transform.rotation = this.body.getRotation()
+            let transform = Transform.getMutableOrNull(this.entity)
+
+            if (transform) {
+                transform.position = this.body.getPosition()
+                transform.rotation = this.body.getRotation()
+            }
         }
 
-        if (this.debugEntity) {
-            let debugTransform = Transform.getMutable(this.debugEntity)
-            debugTransform.position = this.body.getPosition()
-            debugTransform.rotation = this.body.getRotation()
-            debugTransform.scale = this.body.getScale()
+        if (TrackManager.debugMode && this.debugEntity) {
+            let debugTransform = Transform.getMutableOrNull(this.debugEntity)
+
+            if (debugTransform) {
+                debugTransform.position = this.body.getPosition()
+                debugTransform.rotation = this.body.getRotation()
+                debugTransform.scale = this.body.getScale()
+            }
         }
     }
 
@@ -108,20 +111,55 @@ export class Obstacle {
         }
     }
 
+    load(): void {
+        if (this.entity && this.obstacleType == ObstacleType.barrel) {
+            let transform = Transform.getMutableOrNull(this.entity)
+            if (transform) {
+                transform.scale = Vector3.create(0.8, 0.8, 0.8)
+            }
+        }
+
+        if (TrackManager.debugMode && this.debugEntity) {
+            let transform = Transform.getMutableOrNull(this.debugEntity)
+            if (transform) {
+                transform.scale = Vector3.multiply(this.scale, TrackManager.trackTransform.scale)
+            }
+        }
+
+        const transformedPoint = applyTransformToPoint(this.position, { position: TrackManager.trackTransform.position, rotation: TrackManager.trackTransform.rotation, scale: TrackManager.trackTransform.scale })
+        const boxShape = new BoxShapeDefinition({
+            position: Vector3.create(transformedPoint.x, (this.position.y + TrackManager.trackTransform.position.y) * TrackManager.trackTransform.scale.y, transformedPoint.z),
+            rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(this.rotation.x, this.rotation.y, this.rotation.z)),
+            scale: Vector3.multiply(this.scale, TrackManager.trackTransform.scale),
+            mass: this.getBodyMass()
+        })
+        this.body = new Body(boxShape)
+        World.getInstance().addBody(this.body)
+    }
+
     unload(): void {
-        if(this.entity) {
-            engine.removeEntity(this.entity)
+        if (this.entity && this.obstacleType == ObstacleType.barrel) {
+            let transform = Transform.getMutableOrNull(this.entity)
+            if (transform) {
+                transform.scale = Vector3.Zero()
+            }
         }
-        if(this.debugEntity) {
-            engine.removeEntity(this.debugEntity)
+
+        if (TrackManager.debugMode && this.debugEntity) {
+            let transform = Transform.getMutableOrNull(this.debugEntity)
+            if (transform) {
+                transform.scale = Vector3.Zero()
+            }
         }
-        this.entity = undefined
-        this.debugEntity = undefined
+
+        if(this.body) {
+            World.getInstance().removeBody(this.body)
+        }
     }
 
     static getBounceFactor(_type: ObstacleType): number {
         switch (_type) {
-            case ObstacleType.none: return 0
+            case ObstacleType.none: return 3
             case ObstacleType.boundary: return 3
             case ObstacleType.tree: return 2
             case ObstacleType.barrel: return 0
@@ -129,7 +167,12 @@ export class Obstacle {
     }
 
     static getObstacleTypeFromId(_id: number): ObstacleType {
-        for (let obstacle of TrackManager.obstacles) {
+        if (!TrackManager.obstacles.has(TrackManager.currentTrackGuid)) return ObstacleType.none
+
+        const obstacles = TrackManager.obstacles.get(TrackManager.currentTrackGuid)
+        if (!obstacles) return ObstacleType.none
+
+        for (let obstacle of obstacles) {
             if (obstacle.body?.getId() == _id) {
                 return obstacle.obstacleType
             }
