@@ -5,6 +5,9 @@ import { Dashboard } from '../ui'
 import { Entity } from '@dcl/ecs'
 import { PlayerCageEntity } from './playerCageEntity'
 
+/**
+ * Stores the current data of a car instance.
+ */
 export class CarData {
     thirdPersonView: boolean = true
 

@@ -1,5 +1,8 @@
 import { Schemas, engine } from "@dcl/sdk/ecs";
 
+/**
+ * Car wheel component.
+ */
 export const CarWheelComponent = engine.defineComponent(
     "carWheelComponent",
     {

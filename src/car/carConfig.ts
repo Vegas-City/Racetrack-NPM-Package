@@ -1,5 +1,8 @@
 import { Vector3 } from "@dcl/sdk/math"
 
+/**
+ * Config that holds all the car's data
+ */
 export type CarConfig = {
     mass: number
     accelerationF: number

@@ -13,6 +13,9 @@ import { CarWheels } from './helpers/carWheels'
 import { CarUpdate } from './helpers/carUpdate'
 import { PlayerCageEntity } from './playerCageEntity'
 
+/**
+ * Car class.
+ */
 export class Car {
     static instances: Car[] = []
 
@@ -132,6 +135,10 @@ export class Car {
         this.data.dashboard = new Dashboard(_config.dashboardPosition, _config.dashboardGLB, this.data.carModelEntity)
     }
 
+    /**
+     * Unloads all car instances and deletes all associated entities.
+     *
+     */
     static unload(): void {
         Car.instances.forEach(car => {
             car.unload()
