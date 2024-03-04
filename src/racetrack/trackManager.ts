@@ -60,6 +60,7 @@ export class TrackManager {
     static onEndEvent: Function = () => { }
     static onCheckpointEvent: Function = () => { }
     static onLapCompleteEvent: Function = () => { }
+    static onQuitEvent: Function = () => { }
 
     static respawnProvided: boolean = false
     static respawnPosition: Vector3 = Vector3.Zero()
@@ -101,6 +102,7 @@ export class TrackManager {
             if (_config.eventCallbacks.onEndEvent) TrackManager.onEndEvent = _config.eventCallbacks.onEndEvent
             if (_config.eventCallbacks.onCheckpointEvent) TrackManager.onCheckpointEvent = _config.eventCallbacks.onCheckpointEvent
             if (_config.eventCallbacks.onLapCompleteEvent) TrackManager.onLapCompleteEvent = _config.eventCallbacks.onLapCompleteEvent
+            if (_config.eventCallbacks.onQuitEvent) TrackManager.onQuitEvent = _config.eventCallbacks.onQuitEvent
         }
 
         TrackManager.InitialiseTracks(_config.trackConfigs)

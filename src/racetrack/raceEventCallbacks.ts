@@ -3,4 +3,5 @@ export type RaceEventCallbacks = {
     onEndEvent?: Function
     onCheckpointEvent?: Function
     onLapCompleteEvent?: Function
+    onQuitEvent?: Function
 }
