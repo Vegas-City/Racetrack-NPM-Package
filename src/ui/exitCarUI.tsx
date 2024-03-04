@@ -1,7 +1,7 @@
 import ReactEcs, { UiEntity } from "@dcl/sdk/react-ecs"
 import { UiCanvasInformation, engine } from "@dcl/sdk/ecs"
 import { Color4 } from "@dcl/sdk/math"
-import { GameManager, InputManager } from "../racetrack"
+import { GameManager, InputManager, TrackManager } from "../racetrack"
 import { Car } from "../car"
 import * as ui from 'dcl-ui-toolkit'
 
@@ -97,6 +97,7 @@ export class ExitCarUI {
                     ExitCarUI.progress = 1
                     if (Car.instances.length > 0 && Car.instances[0].data?.occupied) {
                         GameManager.end(false)
+                        TrackManager.onQuitEvent()
                         ExitCarUI.hide()
                     }
                 }
