@@ -1,4 +1,4 @@
-import { Animator, GltfContainer, Material, MeshRenderer, Transform, engine } from '@dcl/sdk/ecs'
+import { Animator, Material, MeshRenderer, Transform, engine } from '@dcl/sdk/ecs'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
 import { PhysicsManager, Body } from '../physics'
 import { BoxShapeDefinition } from '../physics/shapes'
@@ -17,7 +17,7 @@ import { AudioManagerConfig } from '../audio/audioManagerConfig'
 export class Car {
     static instances: Car[] = []
 
-    static stopSpeed: number = 0.2
+    static stopSpeed: number = 0.5
     static debugMode: boolean = false
     static camFollow: boolean = false
 
