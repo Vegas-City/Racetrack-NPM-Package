@@ -1,17 +1,15 @@
-import { Animator, GltfContainer, Material, MeshRenderer, Transform, engine, pointerEventsSystem } from '@dcl/sdk/ecs'
+import { Animator, GltfContainer, Material, MeshRenderer, Transform, engine } from '@dcl/sdk/ecs'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
-import { CarConfig } from './carConfig'
 import { PhysicsManager, Body } from '../physics'
 import { BoxShapeDefinition } from '../physics/shapes'
 import { Obstacle } from '../racetrack'
-import { CarAttributes } from './carAttributes'
 import { Dashboard } from '../ui'
 import { AudioManager } from '../audio/audioManager'
 import { CarData } from './carData'
 import { CarPerspectives } from './helpers/carPerspectives'
 import { CarWheels } from './helpers/carWheels'
 import { CarUpdate } from './helpers/carUpdate'
-import { PlayerCageEntity } from './playerCageEntity'
+import { AudioManagerConfig } from '../audio/audioManagerConfig'
 
 /**
  * Car class.
@@ -26,107 +24,65 @@ export class Car {
     static audioManager: AudioManager
     static initialised: boolean = false
 
-    data: CarData = new CarData()
+    data: CarData
 
-    constructor(_config: CarConfig, _position: Vector3, _rot: number) {
-        this.data.carAttributes = new CarAttributes(_config)
+    constructor(_position: Vector3, _rot: number, _data: CarData, _audioConfig: AudioManagerConfig) {
+        this.data = _data
 
         if (Car.audioManager != null) {
             AudioManager.clearDown()
         }
 
-        Car.audioManager = new AudioManager(_config)
-        this.data.wheelX_L = _config.wheelX_L
-        this.data.wheelX_R = _config.wheelX_R
-        this.data.wheelZ_F = _config.wheelZ_F
-        this.data.wheelZ_B = _config.wheelZ_B
-        this.data.wheelY = _config.wheelY
-        this.data.carScale = _config.carScale ?? 1
+        Car.audioManager = new AudioManager(_audioConfig)
 
-        this.data.firstPersonCagePosition = _config.firstPersonCagePosition
-        this.data.thirdPersonCagePosition = _config.thirdPersonCagePosition
-
-        this.data.carIcon = _config.carIcon ?? ""
-
-        this.data.startPos = Vector3.clone(_position)
         const scale = Vector3.create(3 * this.data.carScale, 1 * this.data.carScale, 7 * this.data.carScale)
         this.initialiseCannon(_position, Quaternion.fromEulerDegrees(0, _rot, 0), scale)
 
-        this.data.carEntity = engine.addEntity()
-
-        if (Car.debugMode) {
-            MeshRenderer.setBox(this.data.carEntity)
-            Material.setPbrMaterial(this.data.carEntity, {
-                albedoColor: Color4.create(0, 0, 0, 0.5)
-            })
-        }
-        Transform.createOrReplace(this.data.carEntity, {
-            position: _position,
-            rotation: Quaternion.fromEulerDegrees(0, _rot, 0),
-            scale: scale
-        })
-
-        this.data.startRotY = _rot
-
-        this.data.carModelEntity = engine.addEntity()
-        Transform.createOrReplace(this.data.carModelEntity, {
-            parent: this.data.carEntity,
-            position: Vector3.create(0, 0, -0.02),
-            rotation: Quaternion.fromEulerDegrees(0, -90, 0),
-            scale: Vector3.create(1 / scale.z * this.data.carScale, 1 / scale.y * this.data.carScale, 1 / scale.x * this.data.carScale)
-        })
-        GltfContainer.createOrReplace(this.data.carModelEntity, {
-            src: _config.carGLB
-        })
-        Animator.createOrReplace(this.data.carModelEntity, {
-            states: [
-                {
-                    clip: "OpenDoor",
-                    playing: false,
-                    loop: false,
-                    speed: 3
-                },
-                {
-                    clip: "CloseDoor",
-                    playing: true,
-                    loop: false,
-                    speed: 3
-                }
-            ]
-        })
-
-        this.data.carColliderEntity = engine.addEntity()
-        Transform.createOrReplace(this.data.carColliderEntity, {
-            parent: this.data.carModelEntity
-        })
-        GltfContainer.createOrReplace(this.data.carColliderEntity, {
-            src: _config.carColliderGLB
-        })
-
-        this.data.playerCageEntity = new PlayerCageEntity(this.data.carEntity)
-
-        if (_config.brakeLightsGLB) {
-            this.data.brakeLight = engine.addEntity()
-            GltfContainer.createOrReplace(this.data.brakeLight, { src: _config.brakeLightsGLB })
-            Transform.createOrReplace(this.data.brakeLight, {
-                parent: this.data.carModelEntity
-            })
-        }
-
-        if (_config.steeringWheelGLB) {
-            this.data.steeringWheel = engine.addEntity()
-            GltfContainer.createOrReplace(this.data.steeringWheel, { src: _config.steeringWheelGLB })
-            if (this.data.carModelEntity != null) {
-                Transform.createOrReplace(this.data.steeringWheel, {
-                    parent: this.data.carModelEntity,
-                    position: _config.steeringWheelPosition ?? Vector3.Zero()
+        if (this.data.carEntity) {
+            if (Car.debugMode) {
+                MeshRenderer.setBox(this.data.carEntity)
+                Material.setPbrMaterial(this.data.carEntity, {
+                    albedoColor: Color4.create(0, 0, 0, 0.5)
                 })
+            }
+            Transform.createOrReplace(this.data.carEntity, {
+                position: _position,
+                rotation: Quaternion.fromEulerDegrees(0, _rot, 0),
+                scale: scale
+            })
+
+            if (this.data.carModelEntity) {
+                Transform.createOrReplace(this.data.carModelEntity, {
+                    parent: this.data.carEntity,
+                    position: Vector3.create(0, 0, -0.02),
+                    rotation: Quaternion.fromEulerDegrees(0, -90, 0),
+                    scale: Vector3.create(1 / scale.z * this.data.carScale, 1 / scale.y * this.data.carScale, 1 / scale.x * this.data.carScale)
+                })
+                Animator.createOrReplace(this.data.carModelEntity, {
+                    states: [
+                        {
+                            clip: "OpenDoor",
+                            playing: false,
+                            loop: false,
+                            speed: 3
+                        },
+                        {
+                            clip: "CloseDoor",
+                            playing: true,
+                            loop: false,
+                            speed: 3
+                        }
+                    ]
+                })
+
+                this.data.dashboard = new Dashboard(this.data.dashboardPosition, this.data.carModelEntity)
             }
         }
 
         CarPerspectives.attachPointerEvent(this.data)
+        CarWheels.addWheels(this.data)
 
-        CarWheels.addWheels(_config.leftWheelGLB, _config.rightWheelGLB, this.data)
+        this.data.carRot = Quaternion.fromEulerDegrees(0, _rot, 0)
 
         if (!Car.initialised) {
             engine.addSystem(Car.update)
@@ -134,10 +90,6 @@ export class Car {
 
         Car.initialised = true
         Car.instances.push(this)
-
-        this.data.carRot = Quaternion.fromEulerDegrees(0, _rot, 0)
-
-        this.data.dashboard = new Dashboard(_config.dashboardPosition ?? Vector3.Zero(), this.data.carModelEntity)
     }
 
     /**

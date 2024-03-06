@@ -30,7 +30,7 @@ export class CarWheels {
         }
     }
 
-    static addWheels(_leftWheelGLB: string, _rightWheelGLB: string, _data: CarData): void {
+    static addWheels(_data: CarData): void {
         if (_data.carEntity === undefined || _data.carEntity === null) return
 
         const carBodyTransform = Transform.getMutableOrNull(_data.carEntity)
@@ -43,7 +43,7 @@ export class CarWheels {
 
         const wheelL1Child = engine.addEntity()
         GltfContainer.createOrReplace(wheelL1Child, {
-            src: _leftWheelGLB
+            src: _data.leftWheelGLB
         })
         Transform.createOrReplace(wheelL1Child, {
             parent: _data.wheelL1,
@@ -63,7 +63,7 @@ export class CarWheels {
 
         const wheelL2Child = engine.addEntity()
         GltfContainer.createOrReplace(wheelL2Child, {
-            src: _leftWheelGLB
+            src: _data.leftWheelGLB
         })
         Transform.createOrReplace(wheelL2Child, {
             parent: _data.wheelL2,
@@ -82,7 +82,7 @@ export class CarWheels {
 
         const wheelR1Child = engine.addEntity()
         GltfContainer.createOrReplace(wheelR1Child, {
-            src: _rightWheelGLB
+            src: _data.rightWheelGLB
         })
         Transform.createOrReplace(wheelR1Child, {
             parent: _data.wheelR1,
@@ -102,7 +102,7 @@ export class CarWheels {
 
         const wheelR2Child = engine.addEntity()
         GltfContainer.createOrReplace(wheelR2Child, {
-            src: _rightWheelGLB
+            src: _data.rightWheelGLB
         })
         Transform.createOrReplace(wheelR2Child, {
             parent: _data.wheelR2,
