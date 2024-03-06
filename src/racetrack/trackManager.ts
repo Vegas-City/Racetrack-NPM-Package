@@ -97,7 +97,7 @@ export class TrackManager {
         TrackManager.trackCollider = engine.addEntity()
         GltfContainer.createOrReplace(TrackManager.trackCollider, { src: "models/trackCollider.glb" })
         Transform.createOrReplace(TrackManager.trackCollider, {
-            position: _config.position,
+            position: _config.position ?? Vector3.Zero(),
             rotation: _config.rotation ?? Quaternion.Identity(),
             scale: _config.scale ?? Vector3.One()
         })
