@@ -10,13 +10,10 @@ export class Dashboard {
     stateEntity: Entity
     lapEntity: Entity
 
-    constructor(_pos: Vector3, _glb: string, _parent: Entity) {
+    constructor(_pos: Vector3, _parent: Entity) {
         this.dashboardEntity = engine.addEntity()
         Transform.createOrReplace(this.dashboardEntity, {
             parent: _parent
-        })
-        GltfContainer.createOrReplace(this.dashboardEntity, {
-            src: _glb
         })
 
         this.containerEntity = engine.addEntity()

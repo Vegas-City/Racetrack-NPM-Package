@@ -41,12 +41,12 @@ export class Car {
         this.data.wheelZ_F = _config.wheelZ_F
         this.data.wheelZ_B = _config.wheelZ_B
         this.data.wheelY = _config.wheelY
-        this.data.carScale = _config.carScale
+        this.data.carScale = _config.carScale ?? 1
 
         this.data.firstPersonCagePosition = _config.firstPersonCagePosition
         this.data.thirdPersonCagePosition = _config.thirdPersonCagePosition
 
-        this.data.carIcon = _config.carIcon
+        this.data.carIcon = _config.carIcon ?? ""
 
         this.data.startPos = Vector3.clone(_position)
         const scale = Vector3.create(3 * this.data.carScale, 1 * this.data.carScale, 7 * this.data.carScale)
@@ -105,18 +105,23 @@ export class Car {
 
         this.data.playerCageEntity = new PlayerCageEntity(this.data.carEntity)
 
-        this.data.brakeLight = engine.addEntity()
-        GltfContainer.createOrReplace(this.data.brakeLight, { src: _config.brakeLightsGLB })
-        Transform.createOrReplace(this.data.brakeLight, {
-            parent: this.data.carModelEntity
-        })
-        this.data.steeringWheel = engine.addEntity()
-        GltfContainer.createOrReplace(this.data.steeringWheel, { src: _config.steeringWheelGLB })
-        if (this.data.carModelEntity != null) {
-            Transform.createOrReplace(this.data.steeringWheel, {
-                parent: this.data.carModelEntity,
-                position: _config.steeringWheelPosition
+        if (_config.brakeLightsGLB) {
+            this.data.brakeLight = engine.addEntity()
+            GltfContainer.createOrReplace(this.data.brakeLight, { src: _config.brakeLightsGLB })
+            Transform.createOrReplace(this.data.brakeLight, {
+                parent: this.data.carModelEntity
             })
+        }
+
+        if (_config.steeringWheelGLB) {
+            this.data.steeringWheel = engine.addEntity()
+            GltfContainer.createOrReplace(this.data.steeringWheel, { src: _config.steeringWheelGLB })
+            if (this.data.carModelEntity != null) {
+                Transform.createOrReplace(this.data.steeringWheel, {
+                    parent: this.data.carModelEntity,
+                    position: _config.steeringWheelPosition ?? Vector3.Zero()
+                })
+            }
         }
 
         CarPerspectives.attachPointerEvent(this.data)
@@ -132,7 +137,7 @@ export class Car {
 
         this.data.carRot = Quaternion.fromEulerDegrees(0, _rot, 0)
 
-        this.data.dashboard = new Dashboard(_config.dashboardPosition, _config.dashboardGLB, this.data.carModelEntity)
+        this.data.dashboard = new Dashboard(_config.dashboardPosition ?? Vector3.Zero(), this.data.carModelEntity)
     }
 
     /**
