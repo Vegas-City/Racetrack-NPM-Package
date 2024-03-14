@@ -1,5 +1,7 @@
 import { AudioSource, Entity, MeshRenderer, Transform, engine } from "@dcl/ecs"
 import { Vector3 } from "@dcl/ecs-math"
+import { Material, MaterialTransparencyMode } from "@dcl/sdk/ecs"
+import { Color4 } from "@dcl/sdk/math"
 
 export class AudioEntity {
     entities: Entity[] = []
@@ -9,6 +11,11 @@ export class AudioEntity {
         for (let index = 0; index < _numberOfEntities; index++) {
             let entity = engine.addEntity()
             Transform.createOrReplace(entity, { position: Vector3.create(2, 2, 2), scale: Vector3.create(0.001, 0.001, 0.001) })
+            Material.setPbrMaterial(entity, {
+                albedoColor: Color4.create(0, 0, 0, 0),
+                transparencyMode: MaterialTransparencyMode.MTM_ALPHA_TEST,
+                alphaTest: 0
+            })
             AudioSource.createOrReplace(entity, {
                 audioClipUrl: _audioPath,
                 playing: false,
