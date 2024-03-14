@@ -55,10 +55,10 @@ export class Car {
         this.data.carEntity = engine.addEntity()
 
         if (Car.debugMode) {
-            MeshRenderer.setBox(this.data.carEntity)
-            Material.setPbrMaterial(this.data.carEntity, {
-                albedoColor: Color4.create(0, 0, 0, 0.5)
-            })
+            //MeshRenderer.setBox(this.data.carEntity)
+            //Material.setPbrMaterial(this.data.carEntity, {
+            //    albedoColor: Color4.create(0, 0, 0, 0.5)
+            //})
         }
         Transform.createOrReplace(this.data.carEntity, {
             position: _position,
