@@ -127,7 +127,9 @@ export class ExitCarUI {
                 ExitCarUI.progress += _dt * 0.5
                 if (ExitCarUI.progress >= 1) {
                     ExitCarUI.progress = 1
-                    if (Car.instances.length > 0 && Car.instances[0].data?.occupied) {
+
+                    let activeCar = Car.getActiveCar()
+                    if (activeCar && activeCar.data?.occupied) {
                         GameManager.end(false)
                         TrackManager.onQuitEvent()
                         ExitCarUI.hide()

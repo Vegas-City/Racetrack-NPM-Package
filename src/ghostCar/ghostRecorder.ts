@@ -77,18 +77,16 @@ export class GhostRecorder {
     }
 
     record() {
-        if (Car.instances.length < 1) {
-            return
-        }
+        let activeCar = Car.getActiveCar()
+        if (!activeCar) return
 
-        let car: Car = Car.instances[0]
-        if (car.data.carEntity == null) {
+        if (activeCar.data.carEntity == null) {
             return
         }
 
         // Don't save the data to a high dp as we may need to transfer the positions over the network 
         let recordAccuracy: number = 3
-        let carTransform = Transform.getMutableOrNull(car.data.carEntity)
+        let carTransform = Transform.getMutableOrNull(activeCar.data.carEntity)
 
         if (!carTransform) return
 

@@ -16,7 +16,7 @@ export class CarChoiceUI {
                 uiTransform={{
                     height: 128,
                     width: 128,
-                    position: { right: "360",top:-10 }
+                    position: { right: "360", top: -10 }
                 }}
                 uiBackground={{
                     textureMode: "stretch",
@@ -35,12 +35,11 @@ export class CarChoiceUI {
         }
     }
 
-    static GetCarImage() {
-        if (Car.instances.length > 0) {
-            return Car.instances[0].data.carIcon
-        } else {
-            return ""
-        }
+    static GetCarImage(): string {
+        let activeCar = Car.getActiveCar()
+        if (!activeCar) return ""
+
+        return activeCar.data.carIcon
     }
 
     static Show() {

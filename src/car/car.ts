@@ -18,24 +18,19 @@ import { PlayerCageEntity } from './playerCageEntity'
  */
 export class Car {
     static instances: Car[] = []
+    static activeCarIndex: number = 0
 
     static stopSpeed: number = 0.5
     static debugMode: boolean = false
     static camFollow: boolean = false
 
-    static audioManager: AudioManager
     static initialised: boolean = false
 
     data: CarData = new CarData()
 
-    constructor(_config: CarConfig, _position: Vector3, _rot: number) {
+    constructor(_config: CarConfig, _position: Vector3, _rot: number, _hidePos: Vector3) {
         this.data.carAttributes = new CarAttributes(_config)
 
-        if (Car.audioManager != null) {
-            AudioManager.clearDown()
-        }
-
-        Car.audioManager = new AudioManager(_config)
         this.data.wheelX_L = _config.wheelX_L
         this.data.wheelX_R = _config.wheelX_R
         this.data.wheelZ_F = _config.wheelZ_F
@@ -49,16 +44,17 @@ export class Car {
         this.data.carIcon = _config.carIcon ?? ""
 
         this.data.startPos = Vector3.clone(_position)
+        this.data.hidePos = Vector3.clone(_hidePos)
         const scale = Vector3.create(3 * this.data.carScale, 1 * this.data.carScale, 7 * this.data.carScale)
         this.initialiseCannon(_position, Quaternion.fromEulerDegrees(0, _rot, 0), scale)
 
         this.data.carEntity = engine.addEntity()
 
         if (Car.debugMode) {
-            //MeshRenderer.setBox(this.data.carEntity)
-            //Material.setPbrMaterial(this.data.carEntity, {
-            //    albedoColor: Color4.create(0, 0, 0, 0.5)
-            //})
+            MeshRenderer.setBox(this.data.carEntity)
+            Material.setPbrMaterial(this.data.carEntity, {
+                albedoColor: Color4.create(0, 0, 0, 0.5)
+            })
         }
         Transform.createOrReplace(this.data.carEntity, {
             position: _position,
@@ -129,6 +125,7 @@ export class Car {
         CarWheels.addWheels(_config.leftWheelGLB, _config.rightWheelGLB, this.data)
 
         if (!Car.initialised) {
+            new AudioManager(_config)
             engine.addSystem(Car.update)
         }
 
@@ -149,6 +146,46 @@ export class Car {
             car.unload()
         })
         Car.instances.splice(0)
+    }
+
+    static getActiveCar(): Car | null {
+        for (let i = 0; i < Car.instances.length; i++) {
+            if (i == Car.activeCarIndex) {
+                return Car.instances[i]
+            }
+        }
+        return null
+    }
+
+    public show(): void {
+        CarWheels.show(this.data)
+
+        if (this.data.carEntity) {
+            let carEntityTransform = Transform.getMutableOrNull(this.data.carEntity)
+            if (carEntityTransform) {
+                const scale = Vector3.create(3 * this.data.carScale, 1 * this.data.carScale, 7 * this.data.carScale)
+                carEntityTransform.scale = scale
+            }
+        }
+
+        if (this.data.carBody) {
+            this.data.carBody.setPosition(this.data.startPos)
+        }
+    }
+
+    public hide(): void {
+        CarWheels.hide(this.data)
+
+        if (this.data.carEntity) {
+            let carEntityTransform = Transform.getMutableOrNull(this.data.carEntity)
+            if (carEntityTransform) {
+                carEntityTransform.scale = Vector3.Zero()
+            }
+        }
+
+        if (this.data.carBody) {
+            this.data.carBody.setPosition(this.data.hidePos)
+        }
     }
 
     private unload(): void {

@@ -49,6 +49,7 @@ export class CarData {
 
     carAttributes: CarAttributes | null = null
     startPos: Vector3 = Vector3.Zero()
+    hidePos: Vector3 = Vector3.Zero()
 
     firstPersonCagePosition: Vector3 = Vector3.Zero()
     thirdPersonCagePosition: Vector3 = Vector3.Zero()

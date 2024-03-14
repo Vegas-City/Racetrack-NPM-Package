@@ -30,6 +30,9 @@ export class InputManager {
     }
 
     private static update(dt: number): void {
+        let activeCar = Car.getActiveCar()
+        if (!activeCar) return
+
         // Forward
         if (inputSystem.isTriggered(InputManager.KEY_FORWARD, PointerEventType.PET_DOWN)) {
             InputManager.isForwardPressed = true
@@ -67,13 +70,13 @@ export class InputManager {
         }
 
         if (InputManager.isForwardPressed || InputManager.isBackwardPressed) {
-            if(InputManager.inactivityElapsed > 0) {
+            if (InputManager.inactivityElapsed > 0) {
                 InputManager.inactivityElapsed = 0
                 ExitCarUI.hide()
             }
         }
         else {
-            if (Car.instances.length > 0 && Car.instances[0].data?.occupied && TrackManager.GetLap()?.started) {
+            if (activeCar.data?.occupied && TrackManager.GetLap()?.started) {
                 InputManager.inactivityElapsed += dt
                 if (InputManager.inactivityElapsed > InputManager.INACTIVITY_THRESHOLD) {
                     ExitCarUI.show()
@@ -103,20 +106,18 @@ export class InputManager {
             InputManager.leftPressedDuration = 0
         }
 
-        if (Car.instances.length > 0) {
-            if (Car.instances[0].data.speed == 0) {
-                InputManager.rightPressedDuration = 0
-                InputManager.leftPressedDuration = 0
-            }
+        if (activeCar.data.speed == 0) {
+            InputManager.rightPressedDuration = 0
+            InputManager.leftPressedDuration = 0
+        }
 
-            // Switch car view with numbers 1 and 2
-            if (inputSystem.isTriggered(InputManager.KEY_2, PointerEventType.PET_DOWN) && Car.instances[0].data.occupied) {
-                Car.instances[0].data.thirdPersonView = true
-                CarPerspectives.switchToCarPerspective(Car.instances[0].data)
-            } else if (inputSystem.isTriggered(InputManager.KEY_1, PointerEventType.PET_DOWN) && Car.instances[0].data.occupied) {
-                Car.instances[0].data.thirdPersonView = false
-                CarPerspectives.switchToCarPerspective(Car.instances[0].data)
-            }
+        // Switch car view with numbers 1 and 2
+        if (inputSystem.isTriggered(InputManager.KEY_2, PointerEventType.PET_DOWN) && activeCar.data.occupied) {
+            activeCar.data.thirdPersonView = true
+            CarPerspectives.switchToCarPerspective(activeCar.data)
+        } else if (inputSystem.isTriggered(InputManager.KEY_1, PointerEventType.PET_DOWN) && activeCar.data.occupied) {
+            activeCar.data.thirdPersonView = false
+            CarPerspectives.switchToCarPerspective(activeCar.data)
         }
     }
 }
