@@ -14,7 +14,7 @@ export abstract class CarFactory {
      * @param _rot starting rotation of the car.
      * @returns A Car instance.
      */
-    static create(_config: CarConfig, _pos: Vector3, _rot: number) : Car {
-        return new Car(_config, _pos, _rot)
+    static create(_config: CarConfig, _pos: Vector3, _rot: number, _hidePos: Vector3) : Car {
+        return new Car(_config, _pos, _rot, _hidePos)
     }
 }
