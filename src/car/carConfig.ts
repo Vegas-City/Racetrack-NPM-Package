@@ -1,5 +1,4 @@
 import { Vector3 } from "@dcl/sdk/math"
-import { AudioManagerConfig } from "../audio/audioManagerConfig"
 
 /**
  * Config that holds all the car's data
@@ -13,6 +12,16 @@ export type CarConfig = {
     maxSpeed: number
     steerSpeed: number
     grip: number
+
+    engineStartAudio?: string
+    brakeAudio?: string
+    skidAudio?: string
+    crashAudio?: string
+    checkPointAudio?: string
+    countDownAudio?: string
+    startRaceAudio?: string
+    endRaceAudio?: string
+    lapAudio?: string
 
     carGLB: string
     carColliderGLB: string
@@ -35,4 +44,4 @@ export type CarConfig = {
     thirdPersonCagePosition: Vector3
 
     carIcon?: string
-} & AudioManagerConfig
+}

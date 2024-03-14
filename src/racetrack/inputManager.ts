@@ -1,7 +1,7 @@
 import { engine, InputAction, PointerEventType, inputSystem } from "@dcl/sdk/ecs"
 import { Car, CarPerspectives } from "../car"
 import { ExitCarUI } from "../ui"
-import { GameMode, TrackManager } from "."
+import { TrackManager } from "."
 
 export class InputManager {
     private static readonly INACTIVITY_THRESHOLD: number = 3
@@ -67,7 +67,7 @@ export class InputManager {
         }
 
         if (InputManager.isForwardPressed || InputManager.isBackwardPressed) {
-            if (InputManager.inactivityElapsed > 0) {
+            if(InputManager.inactivityElapsed > 0) {
                 InputManager.inactivityElapsed = 0
                 ExitCarUI.hide()
             }
@@ -103,7 +103,7 @@ export class InputManager {
             InputManager.leftPressedDuration = 0
         }
 
-        if (Car.instances.length > 0 && Car.instances[0].data) {
+        if (Car.instances.length > 0) {
             if (Car.instances[0].data.speed == 0) {
                 InputManager.rightPressedDuration = 0
                 InputManager.leftPressedDuration = 0
@@ -116,10 +116,6 @@ export class InputManager {
             } else if (inputSystem.isTriggered(InputManager.KEY_1, PointerEventType.PET_DOWN) && Car.instances[0].data.occupied) {
                 Car.instances[0].data.thirdPersonView = false
                 CarPerspectives.switchToCarPerspective(Car.instances[0].data)
-            }
-
-            if (TrackManager.gameMode == GameMode.DRIVE && InputManager.isExitPressed && Car.instances[0].data.occupied) {
-                CarPerspectives.exitCar(Car.instances[0].data)
             }
         }
     }
