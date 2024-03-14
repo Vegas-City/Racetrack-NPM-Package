@@ -242,9 +242,13 @@ export class Car {
     }
 
     private static update(dt: number): void {
-        for (let car of Car.instances) {
-            car.updateCar(dt)
+        let activeCar = Car.getActiveCar()
+        if(activeCar) {
+            activeCar.updateCar(dt)
         }
+        //for (let car of Car.instances) {
+        //    car.updateCar(dt)
+        //}
     }
 
     private updateCar(_dt: number): void {
