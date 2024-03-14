@@ -11,7 +11,7 @@ export class CarSteering {
 
         if (InputManager.mouseSteering) {
             const carRot = Quaternion.toEulerAngles(Quaternion.normalize(Transform.getMutableOrNull(_data.carEntity)?.rotation ?? Quaternion.Identity())).y
-            const cameraRot = Quaternion.toEulerAngles(Quaternion.normalize(Transform.getMutableOrNull(engine.CameraEntity)?.rotation ?? Quaternion.Identity())).y
+            const cameraRot = Quaternion.toEulerAngles(Quaternion.normalize(Transform.get(engine.CameraEntity).rotation)).y
 
             let angleDif = cameraRot - carRot
             if (angleDif > 180) {

@@ -48,7 +48,7 @@ export class HotspotActionManager {
                 }
             }
 
-            if (car.data && car.data.carBody) {
+            if (car.data.carBody) {
                 const newRot = Quaternion.multiply(car.data.carBody.getRotation(), Quaternion.fromEulerDegrees(0, this.oilSpillSwayElapsed * car.data.speed * 0.2, 0))
                 car.data.carBody.setRotation(newRot)
             }

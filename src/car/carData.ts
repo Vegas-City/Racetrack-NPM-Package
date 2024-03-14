@@ -54,9 +54,5 @@ export class CarData {
     thirdPersonCagePosition: Vector3 = Vector3.Zero()
 
     dashboard: Dashboard | null = null
-    dashboardPosition: Vector3 = Vector3.Zero()
-
     carIcon: string = ""
-    leftWheelGLB: string = ""
-    rightWheelGLB: string = ""
 }
