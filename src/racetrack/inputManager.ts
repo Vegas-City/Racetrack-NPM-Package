@@ -103,7 +103,7 @@ export class InputManager {
             InputManager.leftPressedDuration = 0
         }
 
-        if (Car.instances.length > 0) {
+        if (Car.instances.length > 0 && Car.instances[0].data) {
             if (Car.instances[0].data.speed == 0) {
                 InputManager.rightPressedDuration = 0
                 InputManager.leftPressedDuration = 0
