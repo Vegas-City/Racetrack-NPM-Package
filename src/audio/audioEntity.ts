@@ -14,7 +14,7 @@ export class AudioEntity {
                 playing: false,
                 volume: _volume
             })
-            MeshRenderer.setBox(entity)
+            MeshRenderer.setSphere(entity)
             this.entities.push(entity)
         }
     }

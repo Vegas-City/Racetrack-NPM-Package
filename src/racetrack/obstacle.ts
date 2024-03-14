@@ -36,17 +36,14 @@ export class Obstacle {
             const transformedPoint = applyTransformToPoint(_position, { position: TrackManager.trackTransform.position, rotation: TrackManager.trackTransform.rotation, scale: TrackManager.trackTransform.scale })
 
             if (TrackManager.debugMode) {
-                // mystery cube??
-                /*
-                this.debugEntity = engine.addEntity()
-                MeshRenderer.setBox(this.debugEntity)
+                //this.debugEntity = engine.addEntity()
+                //MeshRenderer.setBox(this.debugEntity)
 
-                Transform.createOrReplace(this.debugEntity, {
-                    position: Vector3.create(transformedPoint.x, (_position.y + TrackManager.trackTransform.position.y) * TrackManager.trackTransform.scale.y, transformedPoint.z),
-                    rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(_rotation.x, _rotation.y, _rotation.z)),
-                    scale: Vector3.Zero()
-                })
-                */
+                //Transform.createOrReplace(this.debugEntity, {
+                //    position: Vector3.create(transformedPoint.x, (_position.y + TrackManager.trackTransform.position.y) * TrackManager.trackTransform.scale.y, transformedPoint.z),
+                //    rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(_rotation.x, _rotation.y, _rotation.z)),
+                //    scale: Vector3.Zero()
+                //})
             }
 
             if (this.obstacleType == ObstacleType.barrel) {
@@ -155,7 +152,7 @@ export class Obstacle {
             }
         }
 
-        if(this.body) {
+        if (this.body) {
             World.getInstance().removeBody(this.body)
         }
     }
