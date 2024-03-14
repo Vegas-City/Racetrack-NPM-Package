@@ -18,7 +18,7 @@ import { PlayerCageEntity } from './playerCageEntity'
  */
 export class Car {
     static instances: Car[] = []
-    static activeCarIndex: number = 0
+    static activeCarIndex: number = -1
 
     static stopSpeed: number = 0.5
     static debugMode: boolean = false
@@ -180,6 +180,7 @@ export class Car {
             let carEntityTransform = Transform.getMutableOrNull(this.data.carEntity)
             if (carEntityTransform) {
                 carEntityTransform.scale = Vector3.Zero()
+                carEntityTransform.position = this.data.hidePos
             }
         }
 
@@ -243,7 +244,7 @@ export class Car {
 
     private static update(dt: number): void {
         let activeCar = Car.getActiveCar()
-        if(activeCar) {
+        if (activeCar) {
             activeCar.updateCar(dt)
         }
         //for (let car of Car.instances) {

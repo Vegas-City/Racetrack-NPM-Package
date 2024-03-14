@@ -12,7 +12,7 @@ export class GameManager {
         let activeCar = Car.getActiveCar()
         if (!activeCar) return
 
-        activeCar.data.carBody?.setPosition(activeCar.data.startPos)
+        activeCar.data.carBody?.setPosition(activeCar.data.hidePos)
         activeCar.data.carBody?.setRotation(Quaternion.fromEulerDegrees(0, activeCar.data.startRotY, 0))
         activeCar.data.speed = 0
 
