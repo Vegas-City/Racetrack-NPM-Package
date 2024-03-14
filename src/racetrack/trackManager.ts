@@ -14,14 +14,15 @@ import { InputManager } from "./inputManager"
  * Config for creating a Track Manager.
  */
 export type TrackManagerConfig = {
-    position: Vector3,
+    gameMode: GameMode,
+    position?: Vector3,
     rotation?: Quaternion,
     scale?: Vector3
     debugMode?: boolean,
     eventCallbacks?: RaceEventCallbacks,
     respawnPosition?: Vector3,
     respawnDirection?: Vector3,
-    trackConfigs: {
+    trackConfigs?: {
         index: number,
         guid: string,
         data: any
@@ -32,6 +33,7 @@ export type TrackManagerConfig = {
  * Manages all track logic and setup.
  */
 export class TrackManager {
+    static gameMode: GameMode = GameMode.DRIVE
     static debugMode: boolean = false
     static experimentalMode: boolean = false
 
@@ -74,6 +76,7 @@ export class TrackManager {
      *
      */
     constructor(_config: TrackManagerConfig) {
+        TrackManager.gameMode = _config.gameMode
         TrackManager.debugMode = _config.debugMode ?? false
         TrackManager.trackTransform = {
             position: _config.position ?? Vector3.Zero(),
@@ -106,11 +109,14 @@ export class TrackManager {
             if (_config.eventCallbacks.onQuitEvent) TrackManager.onQuitEvent = _config.eventCallbacks.onQuitEvent
         }
 
-        TrackManager.InitialiseTracks(_config.trackConfigs)
+        if (_config.trackConfigs && _config.trackConfigs.length > 0) {
+            TrackManager.InitialiseTracks(_config.trackConfigs)
+        }
+
+        new InputManager()
+        new PhysicsManager()
 
         engine.addSystem(TrackManager.update)
-
-        new PhysicsManager()
     }
 
     /**

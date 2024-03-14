@@ -1,7 +1,7 @@
 import { Transform, engine } from "@dcl/sdk/ecs";
 import { AudioEntity } from "./audioEntity";
-import { CarConfig } from "../car";
 import { Vector3 } from "@dcl/ecs-math";
+import { AudioManagerConfig } from "./audioManagerConfig";
 
 export class AudioManager {
 
@@ -15,7 +15,7 @@ export class AudioManager {
   private static endRaceAudio: AudioEntity | undefined = undefined
   private static lapAudio: AudioEntity | undefined = undefined
 
-  constructor(_config: CarConfig) {
+  constructor(_config: AudioManagerConfig) {
 
     // Building
     if (_config.engineStartAudio) AudioManager.engineStartAudio = new AudioEntity(_config.engineStartAudio, 1, 1)

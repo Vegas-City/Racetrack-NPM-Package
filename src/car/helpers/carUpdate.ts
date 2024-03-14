@@ -16,10 +16,11 @@ import { CarWheels } from "./carWheels"
 
 export class CarUpdate {
     static update(_dt: number, _data: CarData): void {
-        if (_data.carEntity === undefined || _data.carEntity === null
+        if (_data === undefined || _data === null
+            || _data.carEntity === undefined || _data.carEntity === null
             || _data.carBody === undefined || _data.carBody === null) return
 
-        if(!TrackManager.experimentalMode) _dt = 1 / 30 // fixed for car updates
+        if (!TrackManager.experimentalMode) _dt = 1 / 30 // fixed for car updates
         _data.collisionCooldown -= _dt
         if (_data.collisionCooldown <= 0) {
             _data.collisionCooldown = 0

@@ -9,7 +9,7 @@ import * as utils from '@dcl-sdk/utils'
 
 export class GameManager {
     static reset(): void {
-        if (Car.instances.length < 1) return
+        if (Car.instances.length < 1 || Car.instances[0].data === null || Car.instances[0].data === undefined) return
 
         Car.instances[0].data.carBody?.setPosition(Car.instances[0].data.startPos)
         Car.instances[0].data.carBody?.setRotation(Quaternion.fromEulerDegrees(0, Car.instances[0].data.startRotY, 0))
@@ -62,7 +62,7 @@ export class GameManager {
             AudioManager.playEndRaceAudio()
 
             utils.timers.setTimeout(() => {
-                if (Car.instances.length > 0) {
+                if (Car.instances.length > 0 && Car.instances[0].data) {
                     CarPerspectives.exitCar(Car.instances[0].data)
                 }
                 if (lap) lap.timeElapsed = 0
@@ -75,7 +75,7 @@ export class GameManager {
             TrackManager.ghostCar.endGhost() // Hide the ghost car if there is one
 
             GameManager.reset()
-            if (Car.instances.length > 0) {
+            if (Car.instances.length > 0 && Car.instances[0].data) {
                 CarPerspectives.exitCar(Car.instances[0].data)
             }
             lap.timeElapsed = 0

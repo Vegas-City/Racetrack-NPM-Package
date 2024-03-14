@@ -1,5 +1,5 @@
 
-import { HotspotType, ObstacleType } from "./enums";
+import { HotspotType, ObstacleType, GameMode } from "./enums";
 import { Hotspot } from "./hotspot";
 import { Obstacle } from "./obstacle";
 import { Track } from "./track";
@@ -11,7 +11,7 @@ import { Lap } from "./lap";
 import { GameManager } from "./gameManager";
 import { RaceEventCallbacks } from "./raceEventCallbacks";
 
-export { HotspotType, ObstacleType }
+export { HotspotType, ObstacleType, GameMode }
 export { Hotspot }
 export { Obstacle }
 export { Track }
