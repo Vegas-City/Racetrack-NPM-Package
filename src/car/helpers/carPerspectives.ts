@@ -156,7 +156,10 @@ export class CarPerspectives {
             }
         }
 
-        Car.unload()
+        let activeCar = Car.getActiveCar()
+        if(activeCar) {
+            activeCar.hide()
+        }
 
         let trackColliderEntity = TrackManager.GetTrackColliderEntity()
         if (trackColliderEntity) {
