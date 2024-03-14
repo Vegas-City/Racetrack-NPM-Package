@@ -9,11 +9,12 @@ import * as utils from '@dcl-sdk/utils'
 
 export class GameManager {
     static reset(): void {
-        if (Car.instances.length < 1) return
+        let activeCar = Car.getActiveCar()
+        if (!activeCar) return
 
-        Car.instances[0].data.carBody?.setPosition(Car.instances[0].data.startPos)
-        Car.instances[0].data.carBody?.setRotation(Quaternion.fromEulerDegrees(0, Car.instances[0].data.startRotY, 0))
-        Car.instances[0].data.speed = 0
+        activeCar.data.carBody?.setPosition(activeCar.data.startPos)
+        activeCar.data.carBody?.setRotation(Quaternion.fromEulerDegrees(0, activeCar.data.startRotY, 0))
+        activeCar.data.speed = 0
 
         let lap = TrackManager.GetLap()
         if (!lap) return
@@ -51,6 +52,9 @@ export class GameManager {
     }
 
     static end(_win: boolean = true): void {
+        let activeCar = Car.getActiveCar()
+        if (!activeCar) return
+
         let lap = TrackManager.GetLap()
         if (!lap) return
 
@@ -62,8 +66,8 @@ export class GameManager {
             AudioManager.playEndRaceAudio()
 
             utils.timers.setTimeout(() => {
-                if (Car.instances.length > 0) {
-                    CarPerspectives.exitCar(Car.instances[0].data)
+                if (activeCar) {
+                    CarPerspectives.exitCar(activeCar.data)
                 }
                 if (lap) lap.timeElapsed = 0
                 GameManager.reset()
@@ -75,9 +79,7 @@ export class GameManager {
             TrackManager.ghostCar.endGhost() // Hide the ghost car if there is one
 
             GameManager.reset()
-            if (Car.instances.length > 0) {
-                CarPerspectives.exitCar(Car.instances[0].data)
-            }
+            CarPerspectives.exitCar(activeCar.data)
             lap.timeElapsed = 0
         }
     }

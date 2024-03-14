@@ -122,4 +122,58 @@ export class CarWheels {
         if (_data.wheelR1) engine.removeEntityWithChildren(_data.wheelR1)
         if (_data.wheelR2) engine.removeEntityWithChildren(_data.wheelR2)
     }
+
+    static show(_data: CarData) {
+        if (_data.wheelL1) {
+            let transformL1 = Transform.getMutableOrNull(_data.wheelL1)
+            if (transformL1) {
+                transformL1.scale = Vector3.One()
+            }
+        }
+        if (_data.wheelL2) {
+            let transformL2 = Transform.getMutableOrNull(_data.wheelL2)
+            if (transformL2) {
+                transformL2.scale = Vector3.One()
+            }
+        }
+        if (_data.wheelR1) {
+            let transformR1 = Transform.getMutableOrNull(_data.wheelR1)
+            if (transformR1) {
+                transformR1.scale = Vector3.One()
+            }
+        }
+        if (_data.wheelR2) {
+            let transformR2 = Transform.getMutableOrNull(_data.wheelR2)
+            if (transformR2) {
+                transformR2.scale = Vector3.One()
+            }
+        }
+    }
+
+    static hide(_data: CarData) {
+        if (_data.wheelL1) {
+            let transformL1 = Transform.getMutableOrNull(_data.wheelL1)
+            if (transformL1) {
+                transformL1.scale = Vector3.Zero()
+            }
+        }
+        if (_data.wheelL2) {
+            let transformL2 = Transform.getMutableOrNull(_data.wheelL2)
+            if (transformL2) {
+                transformL2.scale = Vector3.Zero()
+            }
+        }
+        if (_data.wheelR1) {
+            let transformR1 = Transform.getMutableOrNull(_data.wheelR1)
+            if (transformR1) {
+                transformR1.scale = Vector3.Zero()
+            }
+        }
+        if (_data.wheelR2) {
+            let transformR2 = Transform.getMutableOrNull(_data.wheelR2)
+            if (transformR2) {
+                transformR2.scale = Vector3.Zero()
+            }
+        }
+    }
 }

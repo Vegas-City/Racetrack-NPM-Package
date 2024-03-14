@@ -29,10 +29,11 @@ export class HotspotActionManager {
                 HotspotActionManager.oilSpillTimer = 0
             }
         }
+        
+        let activeCar = Car.getActiveCar()
+        if (!activeCar) return
 
-        if (Car.instances.length > 0 && HotspotActionManager.oilSpillTimer > 0) {
-            const car = Car.instances[0]
-
+        if (HotspotActionManager.oilSpillTimer > 0) {
             if (HotspotActionManager.oilSpillSwayLeft) {
                 HotspotActionManager.oilSpillSwayElapsed -= (_dt * 4)
 
@@ -48,9 +49,9 @@ export class HotspotActionManager {
                 }
             }
 
-            if (car.data.carBody) {
-                const newRot = Quaternion.multiply(car.data.carBody.getRotation(), Quaternion.fromEulerDegrees(0, this.oilSpillSwayElapsed * car.data.speed * 0.2, 0))
-                car.data.carBody.setRotation(newRot)
+            if (activeCar.data.carBody) {
+                const newRot = Quaternion.multiply(activeCar.data.carBody.getRotation(), Quaternion.fromEulerDegrees(0, this.oilSpillSwayElapsed * activeCar.data.speed * 0.2, 0))
+                activeCar.data.carBody.setRotation(newRot)
             }
 
         }

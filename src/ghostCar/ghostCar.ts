@@ -76,10 +76,13 @@ export class GhostCar {
         let transform = Transform.getMutableOrNull(this.entity)
         if (!transform) return
 
+        let activeCar = Car.getActiveCar()
+        if (!activeCar) return
+
         // If we are too close to the ghost car and in first person hide it. So we can see where we are going.
-        if (Car.instances.length > 0 && !Car.instances[0].data.thirdPersonView) {
-            if (Car.instances[0].data.carEntity != null) {
-                let carTransform = Transform.getMutableOrNull(Car.instances[0].data.carEntity)
+        if (activeCar.data.thirdPersonView) {
+            if (activeCar.data.carEntity != null) {
+                let carTransform = Transform.getMutableOrNull(activeCar.data.carEntity)
                 if (!carTransform) return
 
                 if (Vector3.distance(carTransform.position, transform.position) < 15) {
@@ -88,7 +91,7 @@ export class GhostCar {
                     this.show()
                 }
             }
-        } else if (Car.instances.length > 0) {
+        } else {
             this.show()
         }
 
