@@ -21,15 +21,15 @@ export class Car {
     static debugMode: boolean = false
     static camFollow: boolean = false
 
-    static audioManager: AudioManager
+    static audioManager: AudioManager | null = null
     static initialised: boolean = false
 
-    data: CarData
+    data: CarData | null = null
 
     constructor(_position: Vector3, _rot: number, _data: CarData, _audioConfig: AudioManagerConfig) {
         this.data = _data
 
-        if (Car.audioManager != null) {
+        if (Car.audioManager !== undefined && Car.audioManager !== null) {
             AudioManager.clearDown()
         }
 
@@ -104,6 +104,8 @@ export class Car {
     }
 
     private unload(): void {
+        if (this.data === undefined || this.data === null) return
+
         this.data.dashboard?.cleardown()
         CarWheels.clearDown(this.data)
 
@@ -118,6 +120,8 @@ export class Car {
     }
 
     private initialiseCannon(_position: Vector3, _rot: Quaternion, _scale: Vector3): void {
+        if (this.data === undefined || this.data === null) return
+
         const carShape = new BoxShapeDefinition({
             position: Vector3.create(_position.x, _position.y, _position.z),
             rotation: Quaternion.create(_rot.x, _rot.y, _rot.z, _rot.w),
@@ -131,6 +135,7 @@ export class Car {
 
         const self = this
         this.data.carBody.addEventListener("collide", (function (e: any) {
+            if (self.data === undefined || self.data === null) return
             if (self.data.collisionCooldown > 0) return
 
             const contact = e.contact
@@ -163,6 +168,8 @@ export class Car {
     }
 
     private updateCar(_dt: number): void {
+        if (this.data === undefined || this.data === null) return
+
         CarUpdate.update(_dt, this.data)
     }
 }

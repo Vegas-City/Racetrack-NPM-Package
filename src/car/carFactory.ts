@@ -20,7 +20,7 @@ export abstract class CarFactory {
      * @returns A Car instance.
      */
     static create(_pos: Vector3, _rot: number, _config: CarConfig): Car {
-        let data: CarData = new CarData()
+        let data = new CarData()
 
         data.carAttributes = new CarAttributes(_config)
         data.wheelX_L = _config.wheelX_L
