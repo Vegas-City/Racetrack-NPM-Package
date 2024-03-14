@@ -1,7 +1,7 @@
 import { Vector3, Quaternion } from "@dcl/sdk/math";
 import { ObstacleType } from "./enums";
 import { TrackManager } from "./trackManager";
-import { Entity, GltfContainer, MeshRenderer, Transform, TransformType, engine } from "@dcl/sdk/ecs";
+import { Entity, GltfContainer, Transform, engine } from "@dcl/sdk/ecs";
 import { applyTransformToPoint } from "../utils";
 import { BoxShapeDefinition } from "../physics/shapes";
 import { Body, World } from "../physics";
@@ -36,6 +36,8 @@ export class Obstacle {
             const transformedPoint = applyTransformToPoint(_position, { position: TrackManager.trackTransform.position, rotation: TrackManager.trackTransform.rotation, scale: TrackManager.trackTransform.scale })
 
             if (TrackManager.debugMode) {
+                // mystery cube??
+                /*
                 this.debugEntity = engine.addEntity()
                 MeshRenderer.setBox(this.debugEntity)
 
@@ -44,6 +46,7 @@ export class Obstacle {
                     rotation: Quaternion.multiply(TrackManager.trackTransform.rotation, Quaternion.fromEulerDegrees(_rotation.x, _rotation.y, _rotation.z)),
                     scale: Vector3.Zero()
                 })
+                */
             }
 
             if (this.obstacleType == ObstacleType.barrel) {
