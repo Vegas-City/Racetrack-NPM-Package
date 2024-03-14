@@ -58,9 +58,9 @@ export class CarPerspectives {
 
         if (!carEntityTransform) return
 
-        const targetPos = localToWorldPosition(Vector3.create(-2.3, -2, -0.2), carEntityTransform.position, carEntityTransform.rotation)
-        const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carEntityTransform.position, carEntityTransform.rotation)
-        movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
+        //const targetPos = localToWorldPosition(Vector3.create(-2.3, -2, -0.2), carEntityTransform.position, carEntityTransform.rotation)
+        //const targetCameraPos = localToWorldPosition(Vector3.create(10, 2, -4), carEntityTransform.position, carEntityTransform.rotation)
+        //movePlayerTo({ newRelativePosition: targetPos, cameraTarget: targetCameraPos })
 
         utils.timers.setTimeout(() => {
             //triggerSceneEmote({ src: 'animations/GetInEmote.glb', loop: false })
