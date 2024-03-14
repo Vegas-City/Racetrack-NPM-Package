@@ -8,6 +8,7 @@ import { HotspotActionManager } from "./hotspotActionManager"
 import { GhostCar, GhostRecorder } from "./../ghostCar"
 import { RaceEventCallbacks } from "./raceEventCallbacks"
 import { PhysicsManager } from "../physics"
+import { InputManager } from "./inputManager"
 
 /**
  * Config for creating a Track Manager.
@@ -75,7 +76,7 @@ export class TrackManager {
     constructor(_config: TrackManagerConfig) {
         TrackManager.debugMode = _config.debugMode ?? false
         TrackManager.trackTransform = {
-            position: _config.position,
+            position: _config.position ?? Vector3.Zero(),
             rotation: _config.rotation ?? Quaternion.Identity(),
             scale: _config.scale ?? Vector3.One()
         }
@@ -92,7 +93,7 @@ export class TrackManager {
         TrackManager.trackCollider = engine.addEntity()
         GltfContainer.createOrReplace(TrackManager.trackCollider, { src: "models/trackCollider.glb" })
         Transform.createOrReplace(TrackManager.trackCollider, {
-            position: _config.position,
+            position: _config.position ?? Vector3.Zero(),
             rotation: _config.rotation ?? Quaternion.Identity(),
             scale: _config.scale ?? Vector3.One()
         })

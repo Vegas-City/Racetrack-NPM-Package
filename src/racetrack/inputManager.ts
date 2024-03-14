@@ -17,6 +17,8 @@ export class InputManager {
     static rightPressedDuration: number = 0
     static leftPressedDuration: number = 0
 
+    private static readonly KEY_1: InputAction = InputAction.IA_ACTION_3
+    private static readonly KEY_2: InputAction = InputAction.IA_ACTION_4
     private static readonly KEY_FORWARD: InputAction = InputAction.IA_FORWARD
     private static readonly KEY_BACKWARD: InputAction = InputAction.IA_BACKWARD
     private static readonly KEY_LEFT: InputAction = InputAction.IA_LEFT
@@ -108,10 +110,10 @@ export class InputManager {
             }
 
             // Switch car view with numbers 1 and 2
-            if (inputSystem.isTriggered(InputAction.IA_ACTION_3, PointerEventType.PET_DOWN) && Car.instances[0].data.occupied) {
+            if (inputSystem.isTriggered(InputManager.KEY_2, PointerEventType.PET_DOWN) && Car.instances[0].data.occupied) {
                 Car.instances[0].data.thirdPersonView = true
                 CarPerspectives.switchToCarPerspective(Car.instances[0].data)
-            } else if (inputSystem.isTriggered(InputAction.IA_ACTION_4, PointerEventType.PET_DOWN) && Car.instances[0].data.occupied) {
+            } else if (inputSystem.isTriggered(InputManager.KEY_1, PointerEventType.PET_DOWN) && Car.instances[0].data.occupied) {
                 Car.instances[0].data.thirdPersonView = false
                 CarPerspectives.switchToCarPerspective(Car.instances[0].data)
             }

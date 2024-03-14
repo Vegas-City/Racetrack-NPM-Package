@@ -19,7 +19,7 @@ import { PlayerCageEntity } from './playerCageEntity'
 export class Car {
     static instances: Car[] = []
 
-    static stopSpeed: number = 0.2
+    static stopSpeed: number = 0.5
     static debugMode: boolean = false
     static camFollow: boolean = false
 
