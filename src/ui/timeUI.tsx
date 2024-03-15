@@ -7,8 +7,8 @@ export class TimeUI {
 
     static visibility: boolean = false
     static pbOrQualValue: number = 0
-    static pbOrQualLabel: string = "Qualification"
-    static pBQualPos: PositionUnit
+    static pbOrQualLabel: string = "Loading data"
+    static pBQualPos: PositionUnit = "240px"
 
     private static component = () => (
         <UiEntity
