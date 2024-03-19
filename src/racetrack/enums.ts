@@ -1,3 +1,8 @@
+export enum GameMode {
+    DRIVE,
+    RACE
+}
+
 export enum HotspotType {
     none,
     oilSpill

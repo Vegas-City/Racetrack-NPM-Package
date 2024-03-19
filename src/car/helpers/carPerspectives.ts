@@ -6,7 +6,7 @@ import { movePlayerTo } from "../../utils/setup"
 import { CarData } from "../carData"
 import { localToWorldPosition } from "../../utils/utils"
 import { Car } from "../car"
-import { GameManager, TrackManager } from "../../racetrack"
+import { GameManager, GameMode, TrackManager } from "../../racetrack"
 import { AudioManager } from "../../audio"
 import * as utils from '@dcl-sdk/utils'
 
@@ -156,9 +156,11 @@ export class CarPerspectives {
             }
         }
 
-        let activeCar = Car.getActiveCar()
-        if(activeCar) {
-            activeCar.hide()
+        if (TrackManager.gameMode == GameMode.RACE) {
+            let activeCar = Car.getActiveCar()
+            if (activeCar) {
+                activeCar.hide()
+            }
         }
 
         let trackColliderEntity = TrackManager.GetTrackColliderEntity()

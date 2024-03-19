@@ -1,7 +1,7 @@
 import { Transform } from "@dcl/sdk/ecs"
 import { Vector3 } from "@dcl/sdk/math"
 import { CarData } from "../carData"
-import { InputManager, Lap, TrackManager } from "../../racetrack"
+import { GameMode, InputManager, TrackManager } from "../../racetrack"
 import { Car } from "../car"
 
 export class CarSpeed {
@@ -16,10 +16,15 @@ export class CarSpeed {
 
         let braking: boolean = false
 
-        let lap = TrackManager.GetLap()
-        if (!lap) return
+        let locked: boolean = false
+        if(TrackManager.gameMode == GameMode.RACE) {
+            let lap = TrackManager.GetLap()
+            if (!lap) return
+
+            locked = !lap.started
+        }
         
-        if (_data.occupied && InputManager.isForwardPressed && lap.started) {
+        if (_data.occupied && InputManager.isForwardPressed && !locked) {
             if (_data.speed - maxSpeed > 2) {
                 _data.speed -= (deceleration * _dt)
             }
@@ -32,7 +37,7 @@ export class CarSpeed {
                 }
             }
         }
-        else if (_data.occupied && InputManager.isBackwardPressed && lap.started) {
+        else if (_data.occupied && InputManager.isBackwardPressed && !locked) {
             braking = true
 
             if (minSpeed - _data.speed > 2) {
