@@ -1,7 +1,7 @@
 import { engine, InputAction, PointerEventType, inputSystem } from "@dcl/sdk/ecs"
 import { Car, CarPerspectives } from "../car"
 import { ExitCarUI } from "../ui"
-import { TrackManager } from "."
+import { GameMode, TrackManager } from "."
 
 export class InputManager {
     private static readonly INACTIVITY_THRESHOLD: number = 3
@@ -118,6 +118,10 @@ export class InputManager {
         } else if (inputSystem.isTriggered(InputManager.KEY_1, PointerEventType.PET_DOWN) && activeCar.data.occupied) {
             activeCar.data.thirdPersonView = false
             CarPerspectives.switchToCarPerspective(activeCar.data)
+        }
+
+        if (TrackManager.gameMode == GameMode.DRIVE && InputManager.isExitPressed && activeCar.data.occupied) {
+            CarPerspectives.exitCar(activeCar.data)
         }
     }
 }
