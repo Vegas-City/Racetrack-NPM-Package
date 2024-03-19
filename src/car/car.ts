@@ -1,4 +1,4 @@
-import { Animator, GltfContainer, Material, MeshRenderer, Transform, engine, pointerEventsSystem } from '@dcl/sdk/ecs'
+import { Animator, GltfContainer, Material, MeshRenderer, Transform, engine } from '@dcl/sdk/ecs'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
 import { CarConfig } from './carConfig'
 import { PhysicsManager, Body } from '../physics'
